@@ -1,1 +1,1 @@
-# spring-angular-starter
+# Arithmetic Calculator
