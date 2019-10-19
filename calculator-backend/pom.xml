@@ -5,12 +5,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.mycorp</groupId>
-		<artifactId>spring-angular-starter-parent</artifactId>
+		<artifactId>arithmetic-calculator-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<artifactId>backend</artifactId>
-	<name>backend</name>
-	<description>Starter project with Spring boot and Angular</description>
+	<artifactId>calculator-backend</artifactId>
+	<name>calculator-backend</name>
+	<description>calculator server side</description>
 	<packaging>jar</packaging>
 	<properties>
 		<java.version>1.8</java.version>
@@ -90,7 +90,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.mycorp</groupId>
-			<artifactId>frontend</artifactId>
+			<artifactId>calculator-frontend</artifactId>
 			<version>${project.version}</version>
 			<scope>runtime</scope>
 		</dependency>
