@@ -3,6 +3,7 @@ package com.mycorp.arithmeticcalculator.service;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,17 +20,21 @@ public class UserService implements IUserService {
     @Autowired
     private VerificationTokenRepository tokenRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+     
     @Override
     public User registerNewUserAccount(UserDto accountDto) throws EmailExistsException {
-
         if (emailExist(accountDto.getEmail())) {
-            throw new EmailExistsException("There is an account with that email adress: " + accountDto.getEmail());
+            throw new EmailExistsException(
+              "There is an account with that email adress:" + accountDto.getEmail());
         }
-
         User user = new User();
         user.setFirstName(accountDto.getFirstName());
         user.setLastName(accountDto.getLastName());
-        user.setPassword(accountDto.getPassword());
+         
+        user.setPassword(passwordEncoder.encode(accountDto.getPassword()));
+         
         user.setEmail(accountDto.getEmail());
         user.setRole(new Role(Integer.valueOf(1), user));
         return repository.save(user);
