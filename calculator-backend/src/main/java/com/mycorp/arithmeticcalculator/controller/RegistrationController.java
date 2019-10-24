@@ -12,35 +12,37 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.ModelAndView;
 
 import com.mycorp.arithmeticcalculator.domain.OnRegistrationCompleteEvent;
 import com.mycorp.arithmeticcalculator.domain.User;
 import com.mycorp.arithmeticcalculator.domain.VerificationToken;
 import com.mycorp.arithmeticcalculator.dto.GenericResponse;
 import com.mycorp.arithmeticcalculator.dto.UserDto;
+import com.mycorp.arithmeticcalculator.error.EmailExistsException;
 import com.mycorp.arithmeticcalculator.service.IUserService;
 
 public class RegistrationController {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
-	
+
 	@Autowired
 	ApplicationEventPublisher eventPublisher;
 
 	@Autowired
-	private IUserService service;
+	private IUserService userService;
 
-	@RequestMapping(value = "/regitrationConfirm", method = RequestMethod.GET)
+	@GetMapping(value = "/regitrationConfirm")
 	public String confirmRegistration(Locale locale, Model model, @RequestParam("token") String token) {
 		VerificationToken verificationToken = userService.getVerificationToken(token);
 		if (verificationToken == null) {
@@ -64,49 +66,29 @@ public class RegistrationController {
 		return "redirect:/login.html?lang=" + locale.getLanguage();
 	}
 
-	@RequestMapping(value = "/user/registration", method = RequestMethod.GET)
+	@GetMapping(value = "/user/registration")
 	public String showRegistrationForm(WebRequest request, Model model) {
 		UserDto userDto = new UserDto();
 		model.addAttribute("user", userDto);
 		return "registration";
 	}
 
-	@RequestMapping(value = "/user/registration", method = RequestMethod.POST)
+	@PostMapping(value = "/user/registration")
 	@ResponseBody
-	public GenericResponse registerUserAccount(
-	      @Valid UserDto accountDto, HttpServletRequest request) {
-	    LOGGER.debug("Registering user account with information: {}", accountDto);
-	    User registered = createUserAccount(accountDto);
-	    if (registered == null) {
-	        throw new UserAlreadyExistException();
-	    }
-	    String appUrl = "http://" + request.getServerName() + ":" + 
-	      request.getServerPort() + request.getContextPath();
-	    
-	    eventPublisher.publishEvent(
-	      new OnRegistrationCompleteEvent(registered, request.getLocale(), appUrl));
-	 
-	    return new GenericResponse("success");
-	}
-	@RequestMapping(value = "/user/registration", method = RequestMethod.POST)
-	@ResponseBody
-	public GenericResponse registerUserAccount(
-	      @Valid UserDto accountDto, HttpServletRequest request) {
-	    logger.debug("Registering user account with information: {}", accountDto);
-	    User registered = createUserAccount(accountDto);
-	    if (registered == null) {
-	        throw new UserAlreadyExistException();
-	    }
-	    String appUrl = "http://" + request.getServerName() + ":" + 
-	      request.getServerPort() + request.getContextPath();
-	    
-	    eventPublisher.publishEvent(
-	      new OnRegistrationCompleteEvent(registered, request.getLocale(), appUrl));
-	 
-	    return new GenericResponse("success");
+	public GenericResponse registerUserAccount(@Valid UserDto accountDto, HttpServletRequest request) {
+		LOGGER.debug("Registering user account with information: {}", accountDto);
+		User registered = createUserAccount(accountDto);
+		if (registered == null) {
+			throw new UserAlreadyExistException();
+		}
+		String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+
+		eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, request.getLocale(), appUrl));
+
+		return new GenericResponse("success");
 	}
 
-	@RequestMapping(value = "/user/resendRegistrationToken", method = RequestMethod.GET)
+	@GetMapping(value = "/user/resendRegistrationToken")
 	@ResponseBody
 	public GenericResponse resendRegistrationToken(HttpServletRequest request,
 			@RequestParam("token") String existingToken) {
@@ -120,10 +102,64 @@ public class RegistrationController {
 		return new GenericResponse(messages.getMessage("message.resendToken", null, request.getLocale()));
 	}
 
+	@PostMapping(value = "/user/resetPassword")
+	@ResponseBody
+	public GenericResponse resetPassword(HttpServletRequest request, @RequestParam("email") String userEmail) {
+		User user = userService.findUserByEmail(userEmail);
+		if (user == null) {
+			throw new UserNotFoundException();
+		}
+		String token = UUID.randomUUID().toString();
+		userService.createPasswordResetTokenForUser(user, token);
+		mailSender.send(constructResetTokenEmail(getAppUrl(request), request.getLocale(), token, user));
+		return new GenericResponse(messages.getMessage("message.resetPasswordEmail", null, request.getLocale()));
+	}
+
+	@GetMapping(value = "/user/changePassword")
+	public String showChangePasswordPage(Locale locale, Model model, 
+	  @RequestParam("id") long id, @RequestParam("token") String token) {
+	    String result = userSecurityService.validatePasswordResetToken(id, to ken);
+	    if (result != null) {
+	        model.addAttribute("message", 
+	          messages.getMessage("auth.message." + result, null, locale));
+	        return "redirect:/login?lang=" + locale.getLanguage();
+	    }
+	    return "redirect:/updatePassword.html?lang=" + locale.getLanguage();
+	}
+	
+	@PostMapping(value = "/user/savePassword")
+	@ResponseBody
+	public GenericResponse savePassword(Locale locale, 
+	  @Valid PasswordDto passwordDto) {
+	    User user = 
+	      (User) SecurityContextHolder.getContext()
+	                                  .getAuthentication().getPrincipal();
+	     
+	    userService.changeUserPassword(user, passwordDto.getNewPassword());
+	    return new GenericResponse(
+	      messages.getMessage("message.resetPasswordSuc", null, locale));
+	}
+	
+	@PostMapping(value = "/user/updatePassword")
+	@PreAuthorize("hasRole('READ_PRIVILEGE')")
+	@ResponseBody
+	public GenericResponse changeUserPassword(Locale locale, 
+	  @RequestParam("password") String password, 
+	  @RequestParam("oldpassword") String oldPassword) {
+	    User user = userService.findUserByEmail(
+	      SecurityContextHolder.getContext().getAuthentication().getName());
+	     
+	    if (!userService.checkIfValidOldPassword(user, oldPassword)) {
+	        throw new InvalidOldPasswordException();
+	    }
+	    userService.changeUserPassword(user, password);
+	    return new GenericResponse(messages.getMessage("message.updatePasswordSuc", null, locale));
+	}
+	
 	private User createUserAccount(UserDto accountDto, BindingResult result) {
 		User registered = null;
 		try {
-			registered = service.registerNewUserAccount(accountDto);
+			registered = userService.registerNewUserAccount(accountDto);
 		} catch (EmailExistsException e) {
 			return null;
 		}
@@ -139,6 +175,21 @@ public class RegistrationController {
 		email.setText(message + " rn" + confirmationUrl);
 		email.setFrom(env.getProperty("support.email"));
 		email.setTo(user.getEmail());
+		return email;
+	}
+
+	private SimpleMailMessage constructResetTokenEmail(String contextPath, Locale locale, String token, User user) {
+		String url = contextPath + "/user/changePassword?id=" + user.getId() + "&token=" + token;
+		String message = messages.getMessage("message.resetPassword", null, locale);
+		return constructEmail("Reset Password", message + " \r\n" + url, user);
+	}
+
+	private SimpleMailMessage constructEmail(String subject, String body, User user) {
+		SimpleMailMessage email = new SimpleMailMessage();
+		email.setSubject(subject);
+		email.setText(body);
+		email.setTo(user.getEmail());
+		email.setFrom(env.getProperty("support.email"));
 		return email;
 	}
 

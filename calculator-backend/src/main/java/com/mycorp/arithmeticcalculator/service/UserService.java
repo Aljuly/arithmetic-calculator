@@ -1,15 +1,16 @@
 package com.mycorp.arithmeticcalculator.service;
 
-import java.util.Arrays;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import com.mycorp.arithmeticcalculator.domain.PasswordResetToken;
+import com.mycorp.arithmeticcalculator.domain.Role;
 import com.mycorp.arithmeticcalculator.domain.User;
 import com.mycorp.arithmeticcalculator.domain.VerificationToken;
 import com.mycorp.arithmeticcalculator.dto.UserDto;
+import com.mycorp.arithmeticcalculator.error.EmailExistsException;
+import com.mycorp.arithmeticcalculator.repository.UserRepository;
 import com.mycorp.arithmeticcalculator.repository.VerificationTokenRepository;
 
 @Service
@@ -36,7 +37,7 @@ public class UserService implements IUserService {
         user.setPassword(passwordEncoder.encode(accountDto.getPassword()));
          
         user.setEmail(accountDto.getEmail());
-        user.setRole(new Role(Integer.valueOf(1), user));
+        user.setRoles(new Role(Integer.valueOf(1), user));
         return repository.save(user);
     }
 
@@ -69,4 +70,15 @@ public class UserService implements IUserService {
         VerificationToken myToken = new VerificationToken(token, user);
         tokenRepository.save(myToken);
     }
+    
+    public void createPasswordResetTokenForUser(User user, String token) {
+        PasswordResetToken myToken = new PasswordResetToken(token, user);
+        passwordTokenRepository.save(myToken);
+    }
+    
+    public void changeUserPassword(User user, String password) {
+        user.setPassword(passwordEncoder.encode(password));
+        repository.save(user);
+    }
+    
 }

@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 
 import com.mycorp.arithmeticcalculator.validators.PasswordMatches;
 import com.mycorp.arithmeticcalculator.validators.ValidEmail;
+import com.mycorp.arithmeticcalculator.validators.ValidPassword;
 
 import lombok.Data;
 
@@ -21,6 +22,7 @@ public class UserDto {
 
 	@NotNull
 	@NotEmpty
+	@ValidPassword
 	private String password;
 	private String matchingPassword;
 
