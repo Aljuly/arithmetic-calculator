@@ -1,7 +1,9 @@
 package com.mycorp.arithmeticcalculator.controller;
 
-import java.util.Calendar;
 import java.util.Locale;
+
+import java.io.UnsupportedEncodingException;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -11,186 +13,190 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.MessageSource;
+import org.springframework.core.env.Environment;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.WebRequest;
 
 import com.mycorp.arithmeticcalculator.domain.OnRegistrationCompleteEvent;
 import com.mycorp.arithmeticcalculator.domain.User;
 import com.mycorp.arithmeticcalculator.domain.VerificationToken;
 import com.mycorp.arithmeticcalculator.dto.GenericResponse;
+import com.mycorp.arithmeticcalculator.dto.PasswordDto;
 import com.mycorp.arithmeticcalculator.dto.UserDto;
-import com.mycorp.arithmeticcalculator.error.EmailExistsException;
+import com.mycorp.arithmeticcalculator.error.InvalidOldPasswordException;
+import com.mycorp.arithmeticcalculator.error.UserNotFoundException;
+import com.mycorp.arithmeticcalculator.service.ISecurityUserService;
 import com.mycorp.arithmeticcalculator.service.IUserService;
 
+@Controller
 public class RegistrationController {
-
 	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
-
-	@Autowired
-	ApplicationEventPublisher eventPublisher;
 
 	@Autowired
 	private IUserService userService;
 
-	@GetMapping(value = "/regitrationConfirm")
-	public String confirmRegistration(Locale locale, Model model, @RequestParam("token") String token) {
-		VerificationToken verificationToken = userService.getVerificationToken(token);
-		if (verificationToken == null) {
-			String message = messages.getMessage("auth.message.invalidToken", null, locale);
-			model.addAttribute("message", message);
-			return "redirect:/badUser.html?lang=" + locale.getLanguage();
-		}
+	@Autowired
+	private ISecurityUserService securityUserService;
+	/*
+	 * @Autowired private ICaptchaService captchaService;
+	 */
+	@Autowired
+	private MessageSource messages;
 
-		User user = verificationToken.getUser();
-		Calendar cal = Calendar.getInstance();
-		if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
-			model.addAttribute("message", messages.getMessage("auth.message.expired", null, locale));
-			model.addAttribute("expired", true);
-			model.addAttribute("token", token);
-			return "redirect:/badUser.html?lang=" + locale.getLanguage();
-		}
+	@Autowired
+	private JavaMailSender mailSender;
 
-		user.setEnabled(true);
-		userService.saveRegisteredUser(user);
-		model.addAttribute("message", messages.getMessage("message.accountVerified", null, locale));
-		return "redirect:/login.html?lang=" + locale.getLanguage();
+	@Autowired
+	private ApplicationEventPublisher eventPublisher;
+
+	@Autowired
+	private Environment env;
+
+	public RegistrationController() {
+		super();
 	}
 
-	@GetMapping(value = "/user/registration")
-	public String showRegistrationForm(WebRequest request, Model model) {
-		UserDto userDto = new UserDto();
-		model.addAttribute("user", userDto);
-		return "registration";
-	}
+	// Registration
 
-	@PostMapping(value = "/user/registration")
+	@RequestMapping(value = "/user/registration", method = RequestMethod.POST)
 	@ResponseBody
-	public GenericResponse registerUserAccount(@Valid UserDto accountDto, HttpServletRequest request) {
+	public GenericResponse registerUserAccount(@Valid final UserDto accountDto, final HttpServletRequest request) {
 		LOGGER.debug("Registering user account with information: {}", accountDto);
-		User registered = createUserAccount(accountDto);
-		if (registered == null) {
-			throw new UserAlreadyExistException();
-		}
-		String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
 
-		eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, request.getLocale(), appUrl));
-
+		final User registered = userService.registerNewUserAccount(accountDto);
+		eventPublisher
+				.publishEvent(new OnRegistrationCompleteEvent(registered, request.getLocale(), getAppUrl(request)));
 		return new GenericResponse("success");
 	}
 
-	@GetMapping(value = "/user/resendRegistrationToken")
+	@RequestMapping(value = "/registrationConfirm", method = RequestMethod.GET)
+	public String confirmRegistration(final Locale locale, final Model model, @RequestParam("token") final String token)
+			throws UnsupportedEncodingException {
+		final String result = userService.validateVerificationToken(token);
+		if (result.equals("valid")) {
+			final User user = userService.getUser(token);
+			System.out.println(user);
+			if (user.isUsing2FA()) {
+				model.addAttribute("qr", userService.generateQRUrl(user));
+				return "redirect:/qrcode.html?lang=" + locale.getLanguage();
+			}
+			model.addAttribute("message", messages.getMessage("message.accountVerified", null, locale));
+			return "redirect:/login?lang=" + locale.getLanguage();
+		}
+
+		model.addAttribute("message", messages.getMessage("auth.message." + result, null, locale));
+		model.addAttribute("expired", "expired".equals(result));
+		model.addAttribute("token", token);
+		return "redirect:/badUser.html?lang=" + locale.getLanguage();
+	}
+
+	// user activation - verification
+
+	@RequestMapping(value = "/user/resendRegistrationToken", method = RequestMethod.GET)
 	@ResponseBody
-	public GenericResponse resendRegistrationToken(HttpServletRequest request,
-			@RequestParam("token") String existingToken) {
-		VerificationToken newToken = userService.generateNewVerificationToken(existingToken);
-
-		User user = userService.getUser(newToken.getToken());
-		String appUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-		SimpleMailMessage email = constructResendVerificationTokenEmail(appUrl, request.getLocale(), newToken, user);
-		mailSender.send(email);
-
+	public GenericResponse resendRegistrationToken(final HttpServletRequest request,
+			@RequestParam("token") final String existingToken) {
+		final VerificationToken newToken = userService.generateNewVerificationToken(existingToken);
+		final User user = userService.getUser(newToken.getToken());
+		mailSender.send(constructResendVerificationTokenEmail(getAppUrl(request), request.getLocale(), newToken, user));
 		return new GenericResponse(messages.getMessage("message.resendToken", null, request.getLocale()));
 	}
 
-	@PostMapping(value = "/user/resetPassword")
+	// Reset password
+	@RequestMapping(value = "/user/resetPassword", method = RequestMethod.POST)
 	@ResponseBody
-	public GenericResponse resetPassword(HttpServletRequest request, @RequestParam("email") String userEmail) {
-		User user = userService.findUserByEmail(userEmail);
+	public GenericResponse resetPassword(final HttpServletRequest request,
+			@RequestParam("email") final String userEmail) {
+		final User user = userService.findUserByEmail(userEmail);
 		if (user == null) {
 			throw new UserNotFoundException();
 		}
-		String token = UUID.randomUUID().toString();
+		final String token = UUID.randomUUID().toString();
 		userService.createPasswordResetTokenForUser(user, token);
 		mailSender.send(constructResetTokenEmail(getAppUrl(request), request.getLocale(), token, user));
 		return new GenericResponse(messages.getMessage("message.resetPasswordEmail", null, request.getLocale()));
 	}
 
-	@GetMapping(value = "/user/changePassword")
-	public String showChangePasswordPage(Locale locale, Model model, 
-	  @RequestParam("id") long id, @RequestParam("token") String token) {
-	    String result = userSecurityService.validatePasswordResetToken(id, to ken);
-	    if (result != null) {
-	        model.addAttribute("message", 
-	          messages.getMessage("auth.message." + result, null, locale));
-	        return "redirect:/login?lang=" + locale.getLanguage();
-	    }
-	    return "redirect:/updatePassword.html?lang=" + locale.getLanguage();
+	@RequestMapping(value = "/user/changePassword", method = RequestMethod.GET)
+	public String showChangePasswordPage(final Locale locale, final Model model, @RequestParam("id") final long id,
+			@RequestParam("token") final String token) {
+		final String result = securityUserService.validatePasswordResetToken(id, token);
+		if (result != null) {
+			model.addAttribute("message", messages.getMessage("auth.message." + result, null, locale));
+			return "redirect:/login?lang=" + locale.getLanguage();
+		}
+		return "redirect:/updatePassword.html?lang=" + locale.getLanguage();
 	}
-	
-	@PostMapping(value = "/user/savePassword")
-	@ResponseBody
-	public GenericResponse savePassword(Locale locale, 
-	  @Valid PasswordDto passwordDto) {
-	    User user = 
-	      (User) SecurityContextHolder.getContext()
-	                                  .getAuthentication().getPrincipal();
-	     
-	    userService.changeUserPassword(user, passwordDto.getNewPassword());
-	    return new GenericResponse(
-	      messages.getMessage("message.resetPasswordSuc", null, locale));
-	}
-	
-	@PostMapping(value = "/user/updatePassword")
+
+	@RequestMapping(value = "/user/savePassword", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('READ_PRIVILEGE')")
 	@ResponseBody
-	public GenericResponse changeUserPassword(Locale locale, 
-	  @RequestParam("password") String password, 
-	  @RequestParam("oldpassword") String oldPassword) {
-	    User user = userService.findUserByEmail(
-	      SecurityContextHolder.getContext().getAuthentication().getName());
-	     
-	    if (!userService.checkIfValidOldPassword(user, oldPassword)) {
-	        throw new InvalidOldPasswordException();
-	    }
-	    userService.changeUserPassword(user, password);
-	    return new GenericResponse(messages.getMessage("message.updatePasswordSuc", null, locale));
+	public GenericResponse savePassword(final Locale locale, @Valid PasswordDto passwordDto) {
+		final User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		userService.changeUserPassword(user, passwordDto.getNewPassword());
+		return new GenericResponse(messages.getMessage("message.resetPasswordSuc", null, locale));
 	}
-	
-	private User createUserAccount(UserDto accountDto, BindingResult result) {
-		User registered = null;
-		try {
-			registered = userService.registerNewUserAccount(accountDto);
-		} catch (EmailExistsException e) {
-			return null;
+
+	// change user password
+	@RequestMapping(value = "/user/updatePassword", method = RequestMethod.POST)
+	@PreAuthorize("hasRole('READ_PRIVILEGE')")
+	@ResponseBody
+	public GenericResponse changeUserPassword(final Locale locale, @Valid PasswordDto passwordDto) {
+		final User user = userService.findUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+		if (!userService.checkIfValidOldPassword(user, passwordDto.getOldPassword())) {
+			throw new InvalidOldPasswordException();
 		}
-		return registered;
+		userService.changeUserPassword(user, passwordDto.getNewPassword());
+		return new GenericResponse(messages.getMessage("message.updatePasswordSuc", null, locale));
 	}
 
-	private SimpleMailMessage constructResendVerificationTokenEmail(String contextPath, Locale locale,
-			VerificationToken newToken, User user) {
-		String confirmationUrl = contextPath + "/regitrationConfirm.html?token=" + newToken.getToken();
-		String message = messages.getMessage("message.resendToken", null, locale);
-		SimpleMailMessage email = new SimpleMailMessage();
-		email.setSubject("Resend Registration Token");
-		email.setText(message + " rn" + confirmationUrl);
-		email.setFrom(env.getProperty("support.email"));
-		email.setTo(user.getEmail());
-		return email;
+	@RequestMapping(value = "/user/update/2fa", method = RequestMethod.POST)
+	@ResponseBody
+	public GenericResponse modifyUser2FA(@RequestParam("use2FA") final boolean use2FA)
+			throws UnsupportedEncodingException {
+		final User user = userService.updateUser2FA(use2FA);
+		if (use2FA) {
+			return new GenericResponse(userService.generateQRUrl(user));
+		}
+		return null;
 	}
 
-	private SimpleMailMessage constructResetTokenEmail(String contextPath, Locale locale, String token, User user) {
-		String url = contextPath + "/user/changePassword?id=" + user.getId() + "&token=" + token;
-		String message = messages.getMessage("message.resetPassword", null, locale);
+	// ============== NON-API ============
+
+	private SimpleMailMessage constructResendVerificationTokenEmail(final String contextPath, final Locale locale,
+			final VerificationToken newToken, final User user) {
+		final String confirmationUrl = contextPath + "/registrationConfirm.html?token=" + newToken.getToken();
+		final String message = messages.getMessage("message.resendToken", null, locale);
+		return constructEmail("Resend Registration Token", message + " \r\n" + confirmationUrl, user);
+	}
+
+	private SimpleMailMessage constructResetTokenEmail(final String contextPath, final Locale locale,
+			final String token, final User user) {
+		final String url = contextPath + "/user/changePassword?id=" + user.getId() + "&token=" + token;
+		final String message = messages.getMessage("message.resetPassword", null, locale);
 		return constructEmail("Reset Password", message + " \r\n" + url, user);
 	}
 
 	private SimpleMailMessage constructEmail(String subject, String body, User user) {
-		SimpleMailMessage email = new SimpleMailMessage();
+		final SimpleMailMessage email = new SimpleMailMessage();
 		email.setSubject(subject);
 		email.setText(body);
 		email.setTo(user.getEmail());
 		email.setFrom(env.getProperty("support.email"));
 		return email;
+	}
+
+	private String getAppUrl(HttpServletRequest request) {
+		return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
 	}
 
 }

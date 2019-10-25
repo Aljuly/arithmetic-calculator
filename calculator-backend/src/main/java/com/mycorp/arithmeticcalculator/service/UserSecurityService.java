@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import com.mycorp.arithmeticcalculator.domain.PasswordResetToken;
+import com.mycorp.arithmeticcalculator.domain.User;
+import com.mycorp.arithmeticcalculator.repository.PasswordResetTokenRepository;
 
 @Service
 @Transactional
