@@ -1,8 +1,10 @@
-package com.mycorp.arithmeticcalculator.domain;
+package com.mycorp.arithmeticcalculator.service;
 
 import java.util.Locale;
 
 import org.springframework.context.ApplicationEvent;
+
+import com.mycorp.arithmeticcalculator.domain.User;
 
 @SuppressWarnings("serial")
 public class OnRegistrationCompleteEvent extends ApplicationEvent {
