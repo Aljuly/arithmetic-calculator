@@ -19,6 +19,7 @@ import com.mycorp.arithmeticcalculator.domain.Privilege;
 import com.mycorp.arithmeticcalculator.domain.Role;
 import com.mycorp.arithmeticcalculator.domain.User;
 import com.mycorp.arithmeticcalculator.repository.UserRepository;
+import com.mycorp.arithmeticcalculator.security.LoginAttemptService;
 
 @Service("userDetailsService")
 @Transactional
@@ -65,8 +66,8 @@ public class MyUserDetailsService implements UserDetailsService {
     }
 
     private final List<String> getPrivileges(final Collection<Role> roles) {
-        final List<String> privileges = new ArrayList<String>();
-        final List<Privilege> collection = new ArrayList<Privilege>();
+        final List<String> privileges = new ArrayList<>();
+        final List<Privilege> collection = new ArrayList<>();
         for (final Role role : roles) {
             collection.addAll(role.getPrivileges());
         }
@@ -77,7 +78,7 @@ public class MyUserDetailsService implements UserDetailsService {
     }
 
     private final List<GrantedAuthority> getGrantedAuthorities(final List<String> privileges) {
-        final List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+        final List<GrantedAuthority> authorities = new ArrayList<>();
         for (final String privilege : privileges) {
             authorities.add(new SimpleGrantedAuthority(privilege));
         }

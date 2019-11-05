@@ -10,12 +10,14 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.mycorp.arithmeticcalculator.PersistenceJPAConfig;
+
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
 @Primary
-@ComponentScan({ "org.baeldung.persistence.dao" })
+@ComponentScan({ "com.mycorp.arithmeticcalculator.repository" })
 public class TestDbConfig extends PersistenceJPAConfig {
 
     @Bean

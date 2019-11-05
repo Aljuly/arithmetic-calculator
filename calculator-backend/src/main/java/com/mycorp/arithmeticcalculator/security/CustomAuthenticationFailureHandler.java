@@ -1,4 +1,4 @@
-package com.mycorp.arithmeticcalculator.service;
+package com.mycorp.arithmeticcalculator.security;
 
 import java.io.IOException;
 import java.util.Locale;

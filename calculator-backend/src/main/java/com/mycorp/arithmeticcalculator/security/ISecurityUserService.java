@@ -1,4 +1,4 @@
-package com.mycorp.arithmeticcalculator.service;
+package com.mycorp.arithmeticcalculator.security;
 
 public interface ISecurityUserService {
 

@@ -1,4 +1,4 @@
-package com.mycorp.arithmeticcalculator.service;
+package com.mycorp.arithmeticcalculator.security;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
