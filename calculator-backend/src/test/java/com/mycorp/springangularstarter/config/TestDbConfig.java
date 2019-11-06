@@ -25,7 +25,7 @@ public class TestDbConfig extends PersistenceJPAConfig {
         return new BCryptPasswordEncoder(11);
     }
 
-    @Override
+    @Bean
     public DataSource dataSource() {
         EmbeddedDatabase datasource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
         return datasource;

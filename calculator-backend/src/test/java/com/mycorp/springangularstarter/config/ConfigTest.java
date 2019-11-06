@@ -7,7 +7,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-// @ComponentScan("org.baeldung.test")
 public class ConfigTest implements WebMvcConfigurer {
 
     public ConfigTest() {

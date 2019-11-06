@@ -9,7 +9,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-@Service
+@Service("loginAttemptService")
 public class LoginAttemptService {
 
     private final int MAX_ATTEMPT = 10;

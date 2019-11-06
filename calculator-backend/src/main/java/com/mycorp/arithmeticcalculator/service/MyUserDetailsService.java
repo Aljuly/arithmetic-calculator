@@ -7,6 +7,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +30,7 @@ public class MyUserDetailsService implements UserDetailsService {
     private UserRepository userRepository;
 
     @Autowired
+    @Qualifier("loginAttemptService")
     private LoginAttemptService loginAttemptService;
 
     @Autowired
@@ -41,10 +43,10 @@ public class MyUserDetailsService implements UserDetailsService {
     // API
 
     @Override
-    public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(final String email) {
         final String ip = getClientIP();
         if (loginAttemptService.isBlocked(ip)) {
-            throw new RuntimeException("blocked");
+            throw new UsernameNotFoundException("blocked");
         }
 
         try {

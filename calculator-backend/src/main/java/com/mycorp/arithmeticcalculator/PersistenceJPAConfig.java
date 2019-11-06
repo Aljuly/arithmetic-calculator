@@ -20,9 +20,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @EnableTransactionManagement
-@PropertySource({ "classpath:persistence.properties" })
-@ComponentScan({ "com.mycorp.arithmeticcalculator.repository" })
-@EnableJpaRepositories(basePackages = "org.baeldung.persistence.dao")
+@PropertySource({ "classpath:application.properties" })
+@ComponentScan({ "com.mycorp.arithmeticcalculator" })
+@EnableJpaRepositories(basePackages = "com.mycorp.arithmeticcalculator.repository")
 public class PersistenceJPAConfig {
 
 	@Autowired
@@ -38,7 +38,7 @@ public class PersistenceJPAConfig {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		em.setDataSource(dataSource());
-		em.setPackagesToScan(new String[] { "org.baeldung.persistence.model" });
+		em.setPackagesToScan(new String[] { "com.mycorp.arithmeticcalculator.domain" });
 		final HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		em.setJpaVendorAdapter(vendorAdapter);
 		em.setJpaProperties(additionalProperties());
@@ -48,10 +48,10 @@ public class PersistenceJPAConfig {
 	@Bean
 	public DataSource dataSource() {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
-		dataSource.setUrl(env.getProperty("jdbc.url"));
-		dataSource.setUsername(env.getProperty("jdbc.user"));
-		dataSource.setPassword(env.getProperty("jdbc.pass"));
+		dataSource.setDriverClassName(env.getProperty("datasource.driverClassName"));
+		dataSource.setUrl(env.getProperty("datasource.url"));
+		dataSource.setUsername(env.getProperty("datasource.user"));
+		dataSource.setPassword(env.getProperty("datasource.password"));
 		return dataSource;
 	}
 
@@ -69,7 +69,7 @@ public class PersistenceJPAConfig {
 
 	protected Properties additionalProperties() {
 		final Properties hibernateProperties = new Properties();
-		hibernateProperties.setProperty("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
+		hibernateProperties.setProperty("spring.jpa.hibernate.ddl-auto", env.getProperty("spring.jpa.hibernate.ddl-auto"));
 		return hibernateProperties;
 	}
 
