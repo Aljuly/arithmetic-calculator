@@ -56,7 +56,7 @@ public class UserService implements IUserService {
 
     public static final String TOKEN_INVALID = "invalidToken";
     public static final String TOKEN_EXPIRED = "expired";
-    private static final String TOKEN_VALID = "valid";
+    public static final String TOKEN_VALID = "valid";
 
     public static String QR_PREFIX = "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
     public static String APP_NAME = "SpringRegistration";
@@ -181,7 +181,6 @@ public class UserService implements IUserService {
         }
 
         user.setEnabled(true);
-        // tokenRepository.delete(verificationToken);
         repository.save(user);
         return TOKEN_VALID;
     }

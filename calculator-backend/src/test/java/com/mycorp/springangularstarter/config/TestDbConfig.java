@@ -10,12 +10,14 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.mycorp.arithmeticcalculator.PersistenceJPAConfig;
+
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
 @Primary
-@ComponentScan({ "org.baeldung.persistence.dao" })
+@ComponentScan({ "com.mycorp.arithmeticcalculator.repository" })
 public class TestDbConfig extends PersistenceJPAConfig {
 
     @Bean
@@ -23,7 +25,7 @@ public class TestDbConfig extends PersistenceJPAConfig {
         return new BCryptPasswordEncoder(11);
     }
 
-    @Override
+    @Bean
     public DataSource dataSource() {
         EmbeddedDatabase datasource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
         return datasource;
@@ -33,6 +35,7 @@ public class TestDbConfig extends PersistenceJPAConfig {
     protected Properties additionalProperties() {
         Properties properties = super.additionalProperties();
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        properties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
         return properties;
     }
 }

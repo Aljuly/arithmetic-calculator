@@ -34,7 +34,7 @@ import com.mycorp.arithmeticcalculator.dto.PasswordDto;
 import com.mycorp.arithmeticcalculator.dto.UserDto;
 import com.mycorp.arithmeticcalculator.error.InvalidOldPasswordException;
 import com.mycorp.arithmeticcalculator.error.UserNotFoundException;
-import com.mycorp.arithmeticcalculator.service.ISecurityUserService;
+import com.mycorp.arithmeticcalculator.security.ISecurityUserService;
 import com.mycorp.arithmeticcalculator.service.IUserService;
 
 @Controller
