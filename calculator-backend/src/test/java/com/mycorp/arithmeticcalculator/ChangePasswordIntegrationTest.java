@@ -78,7 +78,8 @@ public class ChangePasswordIntegrationTest {
         request.when().get("/console.html").then().assertThat().statusCode(200).and().body(containsString("home"));
     }
 
-    @Test
+    @SuppressWarnings("deprecation")
+	@Test
     public void givenNotAuthenticatedUser_whenBadPasswordLoggingIn_thenCorrect() {
         final RequestSpecification request = RestAssured.given().auth().form("XXXXXXXX@XXXXXXXXX.com", "XXXXXXXX", formConfig).redirects().follow(false);
 

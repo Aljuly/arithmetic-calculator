@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 public class RegistrationPasswordLiveTest {
-    private final String BASE_URI = "http://localhost:8081/";
+    private final String BASE_URI = "http://localhost:8080/";
 
     @Test
     public void givenInvalidPassword_thenBadRequest() {

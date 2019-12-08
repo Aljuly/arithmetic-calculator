@@ -55,8 +55,15 @@ public class DeviceService {
     public void verifyDevice(User user, HttpServletRequest request) throws IOException, GeoIp2Exception {
 
         String ip = extractIp(request);
-        String location = getIpLocation(ip);
-
+        
+        String location;
+        
+        if (ip.equals("127.0.0.1")) {
+        	location = "Local Machine";
+        } else {
+        	location = getIpLocation(ip);
+        }
+        
         String deviceDetails = getDeviceDetails(request.getHeader("user-agent"));
 
         DeviceMetadata existingDevice = findExistingDevice(user.getId(), deviceDetails, location);
@@ -157,7 +164,7 @@ public class DeviceService {
         notification.setText(text);
         notification.setFrom(from);
 
-        mailSender.send(notification);
+        // mailSender.send(notification);
     }
 
 }

@@ -27,9 +27,9 @@ import com.mycorp.arithmeticcalculator.domain.User;
 import com.mycorp.arithmeticcalculator.domain.VerificationToken;
 import com.mycorp.arithmeticcalculator.repository.UserRepository;
 import com.mycorp.arithmeticcalculator.repository.VerificationTokenRepository;
+import com.mycorp.arithmeticcalculator.task.TokensPurgeTask;
 import com.mycorp.springangularstarter.config.TestDbConfig;
 import com.mycorp.springangularstarter.config.TestTaskConfig;
-import com.mycorp.springangularstarter.task.TokensPurgeTask;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { TestDbConfig.class, TestTaskConfig.class })
