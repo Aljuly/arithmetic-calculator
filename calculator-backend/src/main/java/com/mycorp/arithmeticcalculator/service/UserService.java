@@ -207,8 +207,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<String> getUsersFromSessionRegistry() {
-        List<String> users = new ArrayList<String>();
+    public List<User> getUsersFromSessionRegistry() {
+        List<User> users = new ArrayList<>();
 
         List<Object> allUsers = sessionRegistry.getAllPrincipals();
 
@@ -216,7 +216,7 @@ public class UserService implements IUserService {
             List<SessionInformation> activeUserSessions = sessionRegistry.getAllSessions(user, false);
 
             if (!activeUserSessions.isEmpty()) {
-                users.add(user.toString());
+                users.add((User) user);
             }
         }
         return users;
