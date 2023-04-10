@@ -40,11 +40,10 @@ public class RegistrationListener implements
         service.createVerificationTokenForUser(user, token);
 
         final SimpleMailMessage email = constructEmailMessage(event, user, token);
-        mailSender.send(email);
+        //mailSender.send(email);
     }
 
     //
-
     private final SimpleMailMessage constructEmailMessage(final OnRegistrationCompleteEvent event, final User user, final String token) {
         final String recipientAddress = user.getEmail();
         final String subject = "Registration Confirmation";

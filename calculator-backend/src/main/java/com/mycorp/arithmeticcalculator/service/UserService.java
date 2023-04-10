@@ -7,9 +7,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
-import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validator;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,7 +36,6 @@ import org.springframework.security.core.session.SessionRegistry;
 
 
 @Service
-@Transactional
 public class UserService implements IUserService {
 
     @Autowired
@@ -54,6 +56,9 @@ public class UserService implements IUserService {
     @Autowired
     private SessionRegistry sessionRegistry;
 
+    @Autowired
+    private Validator validator;
+    
     public static final String TOKEN_INVALID = "invalidToken";
     public static final String TOKEN_EXPIRED = "expired";
     public static final String TOKEN_VALID = "valid";
@@ -64,11 +69,13 @@ public class UserService implements IUserService {
     // API
 
     @Override
-    public User registerNewUserAccount(final UserDto accountDto) {
+    public User registerNewUserAccount(final UserDto accountDto) throws UserAlreadyExistException, ConstraintViolationException {
         if (emailExist(accountDto.getEmail())) {
             throw new UserAlreadyExistException("There is an account with that email adress: " + accountDto.getEmail());
         }
         final User user = new User();
+        
+        validateInputWithInjetedValidator(accountDto);
 
         user.setFirstName(accountDto.getFirstName());
         user.setLastName(accountDto.getLastName());
@@ -76,6 +83,7 @@ public class UserService implements IUserService {
         user.setEmail(accountDto.getEmail());
         user.setUsing2FA(accountDto.isUsing2FA());
         user.setRoles(Arrays.asList(roleRepository.findByName("ROLE_USER")));
+        
         return repository.save(user);
     }
 
@@ -220,6 +228,13 @@ public class UserService implements IUserService {
             }
         }
         return users;
+    }
+    
+    private void validateInputWithInjetedValidator(UserDto user) {
+    	Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
+    	if (!violations.isEmpty()) {
+    		throw new ConstraintViolationException(violations);
+    	}
     }
     
 }

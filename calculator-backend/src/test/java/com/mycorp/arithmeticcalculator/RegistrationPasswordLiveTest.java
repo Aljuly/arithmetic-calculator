@@ -10,12 +10,22 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-public class RegistrationPasswordLiveTest {
-    private final String BASE_URI = "http://localhost:8080/";
+import com.mycorp.springangularstarter.config.TestDbConfig;
+import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 
+@SpringBootTest(classes = { ArithmeticCalculatorApplication.class, TestDbConfig.class, TestIntegrationConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+public class RegistrationPasswordLiveTest {
+    private final String BASE_URI = "http://localhost";
+
+    @Value("${local.server.port}")
+    int port;
+    
     @Test
     public void givenInvalidPassword_thenBadRequest() {
         // too short
@@ -31,10 +41,10 @@ public class RegistrationPasswordLiveTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("abZRYUpl"));
 
         // alphabet sequence
-        assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("1_abcZRYU"));
+        assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("1_abcdeZRYU"));
 
         // qwerty sequence
-        assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("1_abZRTYU"));
+        assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("1_abZRTYUI"));
 
         // numeric sequence
         assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("123_zqrtU"));
@@ -51,8 +61,9 @@ public class RegistrationPasswordLiveTest {
         param.put("email", randomName + "@x.com");
         param.put("password", pass);
         param.put("matchingPassword", pass);
-
-        final Response response = RestAssured.given().formParams(param).accept(MediaType.APPLICATION_JSON_VALUE).post(BASE_URI + "user/registration");
+        RestAssured.port = port;
+        RestAssured.baseURI = BASE_URI;
+        final Response response = RestAssured.given().formParams(param).accept(MediaType.APPLICATION_JSON_VALUE).post(BASE_URI + "/user/registration");
         return response.getStatusCode();
     }
 }

@@ -14,6 +14,9 @@
 	<packaging>jar</packaging>
 	<properties>
 		<java.version>1.8</java.version>
+		<project.version>0.0.1-SNAPSHOT</project.version>
+		<junit-jupiter.version>5.2.0</junit-jupiter.version>
+		<junit-platform.version>1.2.0</junit-platform.version>
 	</properties>
 
 	<dependencies>
@@ -88,12 +91,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-integration</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.mycorp</groupId>
-			<artifactId>calculator-frontend</artifactId>
-			<version>${project.version}</version>
-			<scope>runtime</scope>
-		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.passay/passay -->
 		<dependency>
@@ -163,6 +160,7 @@
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
+
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-runner</artifactId>
 			<scope>test</scope>
@@ -171,7 +169,13 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${junit-jupiter.version}</version><!--$NO-MVN-MAN-VER$ -->
+			<version>${junit-jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-launcher</artifactId>
+			<version>${junit-platform.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -197,6 +201,18 @@
 			<artifactId>springfox-bean-validators</artifactId>
 			<version>2.9.2</version>
 		</dependency>
+		<dependency>
+			<groupId>javax.interceptor</groupId>
+			<artifactId>javax.interceptor-api</artifactId>
+			<version>1.2.2</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework.plugin/spring-plugin-core -->
+		<dependency>
+			<groupId>org.springframework.plugin</groupId>
+			<artifactId>spring-plugin-core</artifactId>
+			<version>2.0.0.RELEASE</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

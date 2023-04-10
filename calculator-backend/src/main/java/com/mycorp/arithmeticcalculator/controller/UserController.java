@@ -1,29 +1,31 @@
 package com.mycorp.arithmeticcalculator.controller;
 
+import java.util.List;
 import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.mycorp.arithmeticcalculator.domain.User;
 import com.mycorp.arithmeticcalculator.error.ResourceNotFoundException;
 import com.mycorp.arithmeticcalculator.security.ActiveUserStore;
 import com.mycorp.arithmeticcalculator.service.IUserService;
 
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Controller
+@Api(value = "User")
+@RestController
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired
@@ -33,13 +35,17 @@ public class UserController {
     private IUserService userService;
 
 	@Autowired
-	private MessageSource messages;
+	private MessageSource messages; 
     
-    @RequestMapping(value = "/loggedUsers", method = RequestMethod.GET)
-    public String getLoggedUsers(final Locale locale, final Model model) {
-        model.addAttribute("users", activeUserStore.getUsers());
-        return "users";
-    }
+	@ApiOperation(value = "Retrieves all LoggedIn users")
+	@ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Retrieves all LoggedIn users"),
+            @ApiResponse(code = 500, message = "Server Error")
+    })
+    @GetMapping("/loggedUsers")
+	public ResponseEntity<Iterable<String>> getLoggedUsers() {
+		return new ResponseEntity<>(activeUserStore.getUsers(), HttpStatus.OK);
+	}
 
     @ApiOperation(value = "View a list of users")
     @ApiResponses(value = {
@@ -47,7 +53,7 @@ public class UserController {
             @ApiResponse(code = 500, message = "Server Error")
     })
     @GetMapping("/loggedUsersFromSessionRegistry")
-    public ResponseEntity<Iterable<User>> getAllUsers() {
+    public ResponseEntity<List<User>> getAllUsers() {
         return new ResponseEntity<>(userService.getUsersFromSessionRegistry(), HttpStatus.OK);        
     }
     

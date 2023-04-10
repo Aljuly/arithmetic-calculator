@@ -20,12 +20,10 @@ import javax.persistence.PersistenceContext;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -39,10 +37,8 @@ import com.mycorp.arithmeticcalculator.domain.VerificationToken;
 import com.mycorp.springangularstarter.config.TestDbConfig;
 import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 
-import javafx.application.Application;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = { Application.class, TestDbConfig.class, TestIntegrationConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = { TestDbConfig.class, TestIntegrationConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Transactional
 public class RegistrationControllerIntegrationTest {
 

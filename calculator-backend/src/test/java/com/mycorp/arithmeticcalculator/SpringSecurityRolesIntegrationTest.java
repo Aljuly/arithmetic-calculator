@@ -4,13 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mycorp.arithmeticcalculator.domain.Privilege;
@@ -21,7 +19,6 @@ import com.mycorp.arithmeticcalculator.repository.RoleRepository;
 import com.mycorp.arithmeticcalculator.repository.UserRepository;
 import com.mycorp.springangularstarter.config.TestDbConfig;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = TestDbConfig.class)
 @Transactional
 public class SpringSecurityRolesIntegrationTest {

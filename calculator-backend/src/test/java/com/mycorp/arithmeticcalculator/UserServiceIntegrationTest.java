@@ -10,17 +10,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mycorp.arithmeticcalculator.domain.Privilege;
@@ -38,7 +37,6 @@ import com.mycorp.arithmeticcalculator.service.UserService;
 import com.mycorp.springangularstarter.config.TestDbConfig;
 import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { TestDbConfig.class, ServiceConfig.class, TestIntegrationConfig.class, LoginNotificationConfig.class})
 public class UserServiceIntegrationTest {
 
@@ -75,12 +73,12 @@ public class UserServiceIntegrationTest {
     public void givenDetachedUser_whenAccessingEntityAssociations_thenCorrect() throws EmailExistsException {
         final User user = registerUser();
         assertNotNull(user.getRoles());
-        user.getRoles().stream().filter(r -> r != null).forEach(Role::getId);
-        user.getRoles().stream().filter(r -> r != null).forEach(Role::getName);
-        user.getRoles().stream().filter(r -> r != null).forEach(r -> r.getPrivileges());
-        user.getRoles().stream().filter(r -> r != null).forEach(r -> r.getPrivileges().stream().filter(p -> p != null).forEach(Privilege::getId));
-        user.getRoles().stream().filter(r -> r != null).forEach(r -> r.getPrivileges().stream().filter(p -> p != null).forEach(Privilege::getName));
-        user.getRoles().stream().filter(r -> r != null).forEach(r -> r.getPrivileges().stream().map(Privilege::getRoles).forEach(Assertions::assertNotNull));
+        user.getRoles().stream().filter(Objects::nonNull).forEach(Role::getId);
+        user.getRoles().stream().filter(Objects::nonNull).forEach(Role::getName);
+        user.getRoles().stream().filter(Objects::nonNull).forEach(Role::getPrivileges);
+        user.getRoles().stream().filter(Objects::nonNull).forEach(r -> r.getPrivileges().stream().filter(Objects::nonNull).forEach(Privilege::getId));
+        user.getRoles().stream().filter(Objects::nonNull).forEach(r -> r.getPrivileges().stream().filter(Objects::nonNull).forEach(Privilege::getName));
+        user.getRoles().stream().filter(Objects::nonNull).forEach(r -> r.getPrivileges().stream().map(Privilege::getRoles).forEach(Assertions::assertNotNull));
     }
 
     @Test

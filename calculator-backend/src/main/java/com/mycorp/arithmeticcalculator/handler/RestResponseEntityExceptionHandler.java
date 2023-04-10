@@ -4,6 +4,10 @@ import com.mycorp.arithmeticcalculator.dto.GenericResponse;
 import com.mycorp.arithmeticcalculator.error.InvalidOldPasswordException;
 import com.mycorp.arithmeticcalculator.error.UserNotFoundException;
 import com.mycorp.arithmeticcalculator.error.UserAlreadyExistException;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +19,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -47,6 +53,18 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ValidationErrorResponse onConstValidationErrorResponse(ConstraintViolationException e) {
+    	ValidationErrorResponse errorResponse = new ValidationErrorResponse();
+    	for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
+    		errorResponse.getViolations().add(new Violation(violation.getPropertyPath().toString(), violation.getMessage()));
+    	}
+    	return errorResponse;
+    }
+    
+        //400
     @ExceptionHandler({ InvalidOldPasswordException.class })
     public ResponseEntity<Object> handleInvalidOldPassword(final RuntimeException ex, final WebRequest request) {
         logger.error("400 Status Code", ex);

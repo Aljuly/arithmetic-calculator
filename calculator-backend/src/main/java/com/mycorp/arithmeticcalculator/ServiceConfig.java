@@ -15,21 +15,21 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 @ComponentScan({ "com.mycorp.arithmeticcalculator" })
 public class ServiceConfig {
     @Bean
-    public LocaleResolver localeResolver() {
+    LocaleResolver localeResolver() {
         SessionLocaleResolver slr = new SessionLocaleResolver();
         slr.setDefaultLocale(Locale.US);
         return slr;
     }
 
     @Bean
-    public LocaleChangeInterceptor localeChangeInterceptor() {
+    LocaleChangeInterceptor localeChangeInterceptor() {
         LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
         lci.setParamName("lang");
         return lci;
     }
     
     @Bean
-    public MessageSource messageSource() {
+    MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:messages_en");
         messageSource.setDefaultEncoding("UTF-8");

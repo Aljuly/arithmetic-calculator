@@ -11,7 +11,6 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
@@ -19,12 +18,12 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.mycorp.arithmeticcalculator.domain.OnRegistrationCompleteEvent;
 import com.mycorp.arithmeticcalculator.domain.User;
@@ -37,41 +36,56 @@ import com.mycorp.arithmeticcalculator.error.UserNotFoundException;
 import com.mycorp.arithmeticcalculator.security.ISecurityUserService;
 import com.mycorp.arithmeticcalculator.service.IUserService;
 
-@Controller
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+@Api(value = "Registration")
+@RestController
 public class RegistrationController {
 	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
-	@Autowired
-	private IUserService userService;
+	private final IUserService userService;
 
-	@Autowired
-	private ISecurityUserService securityUserService;
+	private final ISecurityUserService securityUserService;
 	/*
 	 * @Autowired private ICaptchaService captchaService;
 	 */
-	@Autowired
-	private MessageSource messages;
+	private final MessageSource messages;
 
-	@Autowired
-	private JavaMailSender mailSender;
+	private final JavaMailSender mailSender;
 
-	@Autowired
-	private ApplicationEventPublisher eventPublisher;
+	private final ApplicationEventPublisher eventPublisher;
 
-	@Autowired
-	private Environment env;
+	private final Environment env;
 
-	public RegistrationController() {
+	public RegistrationController(IUserService userService,
+								  ISecurityUserService securityUserService,
+								  MessageSource messages,
+								  JavaMailSender mailSender,
+								  ApplicationEventPublisher eventPublisher,
+								  Environment env) {
 		super();
+		this.userService = userService;
+		this.securityUserService = securityUserService;
+		this.messages = messages;
+		this.mailSender = mailSender;
+		this.eventPublisher = eventPublisher;
+		this.env = env;
 	}
 
 	// Registration
 
+	@ApiOperation(value = "Performing user registration")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 400, message = "Bad Request")
+	})
 	@PostMapping(value = "/user/registration")
 	@ResponseBody
 	public GenericResponse registerUserAccount(@Valid final UserDto accountDto, final HttpServletRequest request) {
 		LOGGER.debug("Registering user account with information: {}", accountDto);
-
 		final User registered = userService.registerNewUserAccount(accountDto);
 		eventPublisher
 				.publishEvent(new OnRegistrationCompleteEvent(registered, request.getLocale(), getAppUrl(request)));
@@ -84,6 +98,7 @@ public class RegistrationController {
 		final String result = userService.validateVerificationToken(token);
 		if (result.equals("valid")) {
 			final User user = userService.getUser(token);
+			// logger
 			System.out.println(user);
 			if (user.isUsing2FA()) {
 				model.addAttribute("qr", userService.generateQRUrl(user));
@@ -100,7 +115,12 @@ public class RegistrationController {
 	}
 
 	// user activation - verification
-
+	@ApiOperation(value = "user activation - verification. \r\n"
+	+ "Sends Email to user with registration conformation")
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 500, message = "Server Error")
+	})
 	@GetMapping(value = "/user/resendRegistrationToken")
 	@ResponseBody
 	public GenericResponse resendRegistrationToken(final HttpServletRequest request,
@@ -167,7 +187,7 @@ public class RegistrationController {
 		if (use2FA) {
 			return new GenericResponse(userService.generateQRUrl(user));
 		}
-		return null;
+		return new GenericResponse("Success");
 	}
 
 	// ============== NON-API ============

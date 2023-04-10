@@ -14,24 +14,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hamcrest.core.IsNot;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.mycorp.arithmeticcalculator.ArithmeticCalculatorApplication;
 import com.mycorp.arithmeticcalculator.domain.User;
 import com.mycorp.arithmeticcalculator.repository.UserRepository;
 import com.mycorp.springangularstarter.config.TestDbConfig;
 import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { ArithmeticCalculatorApplication.class, TestDbConfig.class, TestIntegrationConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ChangePasswordIntegrationTest {
 
@@ -74,7 +70,6 @@ public class ChangePasswordIntegrationTest {
     @Test
     public void givenNotAuthenticatedUser_whenLoggingIn_thenCorrect() {
         final RequestSpecification request = RestAssured.given().auth().form("test@test.com", "test", formConfig);
-
         request.when().get("/console.html").then().assertThat().statusCode(200).and().body(containsString("home"));
     }
 
@@ -82,7 +77,6 @@ public class ChangePasswordIntegrationTest {
 	@Test
     public void givenNotAuthenticatedUser_whenBadPasswordLoggingIn_thenCorrect() {
         final RequestSpecification request = RestAssured.given().auth().form("XXXXXXXX@XXXXXXXXX.com", "XXXXXXXX", formConfig).redirects().follow(false);
-
         request.when().get("/console.html").then().statusCode(IsNot.not(200)).body(isEmptyOrNullString());
     }
 

@@ -13,12 +13,12 @@ import java.io.IOException;
 public class LoginNotificationConfig {
 
     @Bean
-    public Parser uaParser() throws IOException {
+    Parser uaParser() throws IOException {
         return new Parser();
     }
 
     @Bean
-    public DatabaseReader databaseReader() throws IOException {
+    DatabaseReader databaseReader() throws IOException {
         File database = ResourceUtils
                 .getFile("classpath:maxmind/GeoLite2-City.mmdb");
         return new DatabaseReader.Builder(database)

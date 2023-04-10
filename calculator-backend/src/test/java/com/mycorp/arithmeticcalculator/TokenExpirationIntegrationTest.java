@@ -17,10 +17,8 @@ import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mycorp.arithmeticcalculator.domain.User;
@@ -31,7 +29,6 @@ import com.mycorp.arithmeticcalculator.task.TokensPurgeTask;
 import com.mycorp.springangularstarter.config.TestDbConfig;
 import com.mycorp.springangularstarter.config.TestTaskConfig;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { TestDbConfig.class, TestTaskConfig.class })
 @Transactional
 public class TokenExpirationIntegrationTest {

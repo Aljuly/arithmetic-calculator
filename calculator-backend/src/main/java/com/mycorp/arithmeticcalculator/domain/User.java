@@ -15,6 +15,9 @@ import javax.persistence.Table;
 
 import org.jboss.aerogear.security.otp.api.Base32;
 
+import com.mycorp.arithmeticcalculator.validators.ValidEmail;
+import com.mycorp.arithmeticcalculator.validators.ValidPassword;
+
 @Entity
 @Table(name = "user_account")
 public class User {
@@ -37,8 +40,6 @@ public class User {
 	private boolean isUsing2FA;
 
 	private String secret;
-
-	//
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))

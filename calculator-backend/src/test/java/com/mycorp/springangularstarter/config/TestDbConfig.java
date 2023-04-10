@@ -36,6 +36,7 @@ public class TestDbConfig extends PersistenceJPAConfig {
         Properties properties = super.additionalProperties();
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         properties.setProperty("hibernate.hbm2ddl.auto", "create-drop");
+        properties.setProperty("hibernate.show_sql", "true");
         return properties;
     }
 }

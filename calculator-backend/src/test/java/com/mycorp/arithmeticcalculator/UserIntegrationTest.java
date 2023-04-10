@@ -12,12 +12,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mycorp.arithmeticcalculator.domain.User;
@@ -28,7 +26,6 @@ import com.mycorp.arithmeticcalculator.repository.VerificationTokenRepository;
 import com.mycorp.springangularstarter.config.TestDbConfig;
 import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 
-@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = { TestDbConfig.class, ServiceConfig.class, TestIntegrationConfig.class, LoginNotificationConfig.class})
 @Transactional
 public class UserIntegrationTest {

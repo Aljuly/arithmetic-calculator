@@ -12,13 +12,13 @@ public class TestIntegrationConfig {
 
     @Bean
     @ConditionalOnMissingBean(RequestContextListener.class)
-    public RequestContextListener requestContextListener() {
+    RequestContextListener requestContextListener() {
 
         return new RequestContextListener();
     }
 
     @Bean
-    public SessionRegistry sessionRegistry() {
+    SessionRegistry sessionRegistry() {
         return new SessionRegistryImpl();
     }
 }
