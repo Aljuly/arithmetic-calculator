@@ -1,0 +1,37 @@
+<mat-toolbar color="primary" fxLayoutAlign="end center">
+    <a class="button"
+       *ngIf="userNotFound"
+       fxLayoutAlign="center center"
+       (click)="userNotFound=false">
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+    <div fxFlex>Please Log In</div>
+    <a class="button"
+       fxLayoutAlign="center center"
+       (click)="onEscape()">
+      <mat-icon>close</mat-icon>
+    </a>
+  </mat-toolbar>
+  <form (ngSubmit)="onSubmit()" fxLayout="column" fxLayoutGap="1em">
+    <div class="signin" fxLayoutAlign="center center">
+      <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="1em" *ngIf="!userNotFound" >
+        <app-password-login (signinEvent)="receiveSignin($event)"></app-password-login>
+        <mat-divider vertical></mat-divider>
+        <!--
+            <app-social-signin (socialSigninEvent)="receiveSignin($event)"></app-social-signin>
+        -->
+      </div>
+      <div fxFill *ngIf="userNotFound">
+        <strong>The username/e-mail or password you entered was incorrect.</strong>
+      </div>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="space-between end" fxLayout.xs="column" fxLayoutAlign.xs="center start" fxLayoutGap="1em">
+      <button *ngIf="!userNotFound" [disabled]="!loginObject" mat-flat-button type="submit">
+        Continue
+      </button>
+      <button *ngIf="userNotFound" mat-flat-button (click)="registerNewUser()">
+        Register
+      </button>
+      <a fxFlexAlign="end" href="#">Forgot password?</a> <!--TODO Send email with password-->
+    </div>
+  </form>

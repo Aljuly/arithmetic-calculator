@@ -1,0 +1,91 @@
+<mat-sidenav-container class="sidenav-container app-background">
+  <mat-sidenav #drawer class="sidenav" mode="over" opened="false">
+    <mat-toolbar color="primary">Menu</mat-toolbar>
+    <mat-nav-list>
+      <a mat-list-item *ngFor="let key of sectionKeys" [routerLink]="key">{{ sections[key] }}</a>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <mat-toolbar class="mat-elevation-z6 toolbar" color="primary">
+      <button
+        class="app-navbar-show-small"
+        type="button"
+        aria-label="Toggle sidenav"
+        mat-icon-button
+        (click)="drawer.toggle()"
+      >
+        <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+      </button>
+      <a
+        mat-button
+        class="app-button"
+        routerLink="/"
+        aria-label="Angular Material"
+      >
+        <img
+          class="app-logo-img"
+          src="../../../assets/img/logo_big.png"
+          alt="angular"
+        />
+        <span>Uniportal</span>
+      </a>
+
+      <a
+        mat-button
+        class="app-navbar-hide-small app-button"
+        *ngFor="let key of sectionKeys"
+        [routerLink]="key"
+        >{{ sections[key] }}</a
+      >
+
+      <div class="flex-spacer"></div>
+
+      <!-- ------------------------------- user knob component ------------------------------------------- -->
+      <a
+        mat-button
+        *ngIf="!authService.isLoggedIn()"
+        class="app-button login-button"
+        color="accent"
+        aria-label="Login function button"
+        (click)="onLogin()"
+      >
+        <!--<img class="app-userknob-avatar-image"
+               src="../../../assets/img/unknown-person.png" alt="login">-->
+        Login
+      </a>
+
+      <mat-menu #appMenu="matMenu">
+        <button mat-menu-item (click)="toggleTheme.emit()">
+          <mat-icon>format_color_fill</mat-icon>
+          <span>Toggle theme</span>
+        </button>
+        <button mat-menu-item (click)="authService.logout()">
+          <mat-icon>exit_to_app</mat-icon>
+          <span>Logout</span>
+        </button>
+      </mat-menu>
+
+      <button
+        mat-button
+        [matMenuTriggerFor]="appMenu"
+        *ngIf="authService.isLoggedIn()"
+        class="app-button"
+        aria-label="Your settings and other menu options"
+      >
+        <img
+          class="app-userknob-avatar-img"
+          src="../../../assets/img/unknown-person.png"
+          alt="Your avatar"
+        />
+        {{ authService.currentUser.login }}
+      </button>
+      <!-- ----------------------------------------------------------------------------------------------- -->
+    </mat-toolbar>
+    <app-alert></app-alert>
+    <app-breadcrumb></app-breadcrumb>
+    <!-- ----------------------------------------------------------------------------------------------- -->
+    <div>
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

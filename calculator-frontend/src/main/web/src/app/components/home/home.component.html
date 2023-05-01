@@ -1,0 +1,46 @@
+<div class="app-primary-header">
+    <h1>Home</h1>
+  </div>
+  
+  <div class="app-homepage-promo">
+    <div class="app-homepage-row app-homepage-reverse-row">
+      <div class="app-homepage-promo-img">
+        <app-svg-viewer
+          src="../assets/img/homepage/fastandconsistent.svg"
+          [scaleToContainer]="true"></app-svg-viewer>
+      </div>
+      <div class="app-homepage-promo-desc">
+        <h2>Fast and Consistent</h2>
+        <p>Finely tuned performance, because every millisecond counts. Fully tested across
+          modern browsers.</p>
+      </div>
+    </div>
+    <div class="app-homepage-row">
+      <div class="app-homepage-promo-img">
+        <app-svg-viewer
+          src="../assets/img/homepage/versatile.svg"
+          [scaleToContainer]="true"></app-svg-viewer>
+      </div>
+      <div class="app-homepage-promo-desc">
+        <h2>Versatile</h2>
+        <p>Themable, for when you need to stay on brand or just have a favorite color.
+          Accessible and internationalized so that all users are welcome.</p>
+      </div>
+    </div>
+    <div class="app-homepage-row app-homepage-reverse-row">
+      <div class="app-homepage-promo-img">
+        <app-svg-viewer
+          src="../assets/img/homepage/optimized.svg"
+          [scaleToContainer]="true"></app-svg-viewer>
+      </div>
+      <div class="app-homepage-promo-desc">
+        <h2>Optimized for Angular</h2>
+        <p>Built by the Angular team to integrate seamlessly with Angular.</p>
+      </div>
+    </div>
+    <div class="app-homepage-bottom-start">
+      <a mat-raised-button class="app-button" routerLink="/guide/getting-started">Get started</a>
+    </div>
+  </div>
+  
+  <app-footer></app-footer>
