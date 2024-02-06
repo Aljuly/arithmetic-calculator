@@ -1,0 +1,131 @@
+<mat-toolbar color="primary">
+  <span>User profile</span>
+  <span class="spacer"></span>
+  <button mat-icon-button class="close" mat-button (click)="onEscape()">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-toolbar>
+<form [formGroup]="reactiveForm" (ngSubmit)="onSubmit()" fxLayout="column" fxLayoutGap="1em">
+  <mat-grid-list cols="4" rowHeight="70px">
+    <mat-grid-tile colspan="2" rowspan="3">
+      <div [hidden]="isAvatarExist || isAvatarLoading">
+        <div id="no_avatar" fxLayout fxLayoutAlign="center center" (drop)="dropHandler($event)"
+          (dragover)="dragOverHandler($event)" (click)=clickOnInputFile($event)>
+          <span>Drag and drop an image with avatar to this area or click on it</span>
+        </div>
+      </div>
+      <div [hidden]="!isAvatarExist || isAvatarLoading">
+        <div fxLayout="column" fxLayoutAlign="start center">
+          <img [src]="isNewUser ? '' : currentUser.avatar" id="avatar" alt="User avatar" width="200px"
+            (drop)="dropHandler($event)" (dragover)="dragOverHandler($event)" (click)=clickOnInputFile($event)>
+          <button mat-raised-button (click)=clickOnInputFile($event)>Change avatar</button>
+        </div>
+      </div>
+      <!--
+       NOTE: Material doesn't support input type file
+      https://github.com/angular/material2/issues/3262
+      -->
+      <input type="file" formControlName="avatar" accept="image/*" id="fileInput" (change)="onFileInput($event)"
+        hidden />
+      <mat-error *ngIf="avatar.hasError('invalidFile')" id="invalidFileError">{{ avatar.getError('invalidFile')
+        }}</mat-error>
+      <div [hidden]="!isAvatarLoading">
+        <div fxLayout id="spinner" fxLayoutAlign="center center">
+          <mat-spinner [diameter]="150">
+          </mat-spinner>
+        </div>
+      </div> 
+    </mat-grid-tile>
+    <mat-grid-tile colspan="2" rowspan="1">
+      <mat-form-field>
+        <input matInput id="login" placeholder="Login" formControlName="login" [value]="login.value"
+          (keydown.enter)="toAnotherField($event, 'firstName')">
+        <mat-error *ngIf="login.hasError('required')">Field mustn't be empty</mat-error>
+        <mat-error *ngIf="login.hasError('dontUniqueUsername')">Login already exists</mat-error>
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile colspan="2" rowspan="1">
+      <mat-form-field>
+        <input matInput id="firstName" placeholder="First name" formControlName="firstName" required
+          [value]="firstName.value" (keydown.enter)="toAnotherField($event, 'lastName')">
+        <mat-error *ngIf="firstName.hasError('required')">Field mustn't be empty</mat-error>
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile colspan="2" rowspan="1">
+      <mat-form-field>
+        <input matInput id="lastName" placeholder="Last name" formControlName="lastName" required
+          [value]="lastName.value" (keydown.enter)="toAnotherField($event, 'email')">
+        <mat-error *ngIf="lastName.hasError('required')">Field mustn't be empty</mat-error>
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile colspan="2" rowspan="1">
+      <mat-form-field>
+        <input type="email" matInput id="email" placeholder="User email" formControlName="email" required
+          [value]="email.value" (keydown.enter)="toAnotherField($event, 'password')">
+        <mat-error *ngIf="email.hasError('required')">Field mustn't be empty</mat-error>
+        <mat-error *ngIf="email.hasError('email')">E-mail is invalid</mat-error>
+        <mat-error *ngIf="email.hasError('dontUniqueEmail')">E-mail already exists</mat-error>
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile colspan="2" rowspan="1">
+      <mat-form-field>
+        <input type="password" matInput id="password" placeholder="Enter password" formControlName="password" required
+          [value]="password.value" (keydown.enter)="toAnotherField($event, 'firstName')">
+        <mat-hint align="end"> {{ password.value.length }} / 6</mat-hint>
+        <mat-error align="end">{{ password.value.length }} / 6</mat-error>
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile colspan="2" rowspan="1">
+      <mat-form-field id="roles_style">
+        <mat-select placeholder="Roles" id="roles" multiple formControlName="roles">
+          <mat-option *ngFor="let role of allRoles" [value]="role">
+            {{ role.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-grid-tile>
+    <mat-grid-tile colspan="2" rowspan="1">
+      <mat-slide-toggle color="primary" id="enabled" formControlName="enabled" [checked]="enabled.value"
+        (keydown.enter)="$event.preventDefault()">
+        Enable user
+      </mat-slide-toggle>
+
+      <mat-slide-toggle color="primary" id="verified" formControlName="verified" [checked]="verified.value"
+        (keydown.enter)="$event.preventDefault()">
+        Verify user
+      </mat-slide-toggle>
+
+      <mat-slide-toggle color="primary" id="banned" [checked]="banned.value" formControlName="banned"
+        (keydown.enter)="$event.preventDefault()">
+        Ban user
+      </mat-slide-toggle>
+    </mat-grid-tile>
+    <mat-grid-tile colspan="3" rowspan="1">
+      <mat-form-field id="ban_reason_style">
+        <textarea matInput id="banReason" placeholder="Ban reason" formControlName="banReason"
+          [value]="!banned.value ? '' : banReason.value" [required]="banned.value"
+          (keydown.enter)="toAnotherField($event, 'submit')">
+          </textarea>
+        <mat-error *ngIf="banned.value">You must specify the ban reason</mat-error>
+      </mat-form-field>
+    </mat-grid-tile>
+  </mat-grid-list>
+
+  <mat-dialog-actions fxLayout="row">
+    <span class="spacer"></span>
+    <button mat-raised-button mat-dialog-close color="warn"
+      [matTooltip]="isNewUser ? 'Cancel adding user' : 'Cancel updating user'" matTooltipShowDelay="500"
+      matTooltipHideDelay="300">
+      <mat-icon>cancel</mat-icon>
+      <span></span>
+      <span>Cancel</span>
+    </button>
+    <button type="submit" id="submit" mat-raised-button color="primary"
+      [matTooltip]="isNewUser ? 'Add new user' : 'Update user'" matTooltipShowDelay="500" matTooltipHideDelay="300"
+      [disabled]="!reactiveForm.valid">
+      <mat-icon>check_circle</mat-icon>
+      <span></span>
+      <span>Confirm</span>
+    </button>
+  </mat-dialog-actions>
+</form>

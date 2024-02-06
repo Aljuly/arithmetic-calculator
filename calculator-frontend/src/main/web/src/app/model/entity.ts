@@ -1,5 +1,6 @@
 import { JsonObject, JsonProperty } from 'json2typescript';
 
+@JsonObject('Entity')
 export abstract class Entity {
     @JsonProperty('id', Number)
     private _id: number;

@@ -32,10 +32,10 @@ public class PersistenceJPAConfig {
 		super();
 	}
 
-	//
+    //
 
-	@Bean
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
+    @Bean
+    LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		em.setDataSource(dataSource());
 		em.setPackagesToScan(new String[] { "com.mycorp.arithmeticcalculator.domain" });
@@ -45,8 +45,8 @@ public class PersistenceJPAConfig {
 		return em;
 	}
 
-	@Bean
-	public DataSource dataSource() {
+    @Bean
+    DataSource dataSource() {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(env.getProperty("spring.datasource.driverClassName"));
 		dataSource.setUrl(env.getProperty("spring.datasource.url"));
@@ -55,15 +55,15 @@ public class PersistenceJPAConfig {
 		return dataSource;
 	}
 
-	@Bean
-	public JpaTransactionManager transactionManager() {
+    @Bean
+    JpaTransactionManager transactionManager() {
 		final JpaTransactionManager transactionManager = new JpaTransactionManager();
 		transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
 		return transactionManager;
 	}
 
-	@Bean
-	public PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
+    @Bean
+    PersistenceExceptionTranslationPostProcessor exceptionTranslation() {
 		return new PersistenceExceptionTranslationPostProcessor();
 	}
 

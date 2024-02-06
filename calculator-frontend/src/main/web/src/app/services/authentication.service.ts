@@ -8,6 +8,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 
 import config from '../config/index';
 import { User } from '../model/User';
+import { UserService } from './user.service';
 import { LocalStorageService } from './local-storage.service';
 import { Role } from '../model/Role';
 
@@ -18,6 +19,7 @@ export class AuthenticationService {
     private readonly authorizationHeader;
 
     constructor(private http: HttpClient,
+                private userService: UserService,
                 private localStorageService: LocalStorageService,
                 private logger: NGXLogger) { 
         this.authorizationHeader = `Basic ${btoa(this.oauthClientUsername + ':' + this.oauthClientPassword)}`;
@@ -73,7 +75,7 @@ export class AuthenticationService {
         return tokenNotExpired();*/
 
         const jwtHelper = new JwtHelperService();
-        const user = this.localStorageService.readCurrentUser();
+        const user =  this.localStorageService.readCurrentUser();
         if (!user) {
             this.logger.trace('AuthenticationService: logged-in user not found');
             return false;

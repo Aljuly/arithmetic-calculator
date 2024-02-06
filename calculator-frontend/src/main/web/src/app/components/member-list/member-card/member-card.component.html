@@ -1,0 +1,68 @@
+<mat-card class="member-card"  fxLayout="column" fxLayoutAlign="start center" (click)="onViewUser(user)">
+  
+    <div fxLayout id="mainContent">
+      <div>
+        <img class="avatar" [src]="avatar" alt="User avatar" width="100%">
+      </div>
+      <div id="contacts"> 
+        <div 
+          class="userInformation"
+          fxLayout="column" 
+          fxLayoutAlign="start start" 
+          >
+          <div class="name">{{ user.firstName | uppercase }}</div>
+          <div class="name">{{ user.lastName  | uppercase }}</div>
+          <div class="username">{{ user.login | lowercase }}</div>
+          <div class="field" (click)="stopPropogationEvent($event)">
+            <mat-icon>email</mat-icon>
+            <span>
+              <a [href]="'mailto:' + user.email + '?subject=Uniportal&body=Dear, ' + user.login + '!'">
+              {{ user.email }}
+              </a>
+            </span>
+          </div>
+          <!--
+            <div class="field" *ngIf="user.phones.length > 0" (click)="stopPropogationEvent($event)">
+            <mat-icon>phone</mat-icon>
+            <span>
+                <a [href]="'tel:' + user.phones[0]">{{ user.phones[0] }}</a>
+            </span>
+          </div>
+          -->
+        </div>
+      </div>
+    </div>
+    <div id="otherContent">
+      <h4>Other content</h4>
+      <div>
+        Other information may be here in the future
+      </div>
+    </div>
+    
+    <div id="menuButton" (click)="stopPropogationEvent($event)">
+      <button 
+          mat-fab
+          [matMenuTriggerFor]="menu"
+          disableRipple="false"
+          color="primary"
+          matTooltip="Menu"
+          matTooltipShowDelay="500"
+          matTooltipHideDelay="1000"
+          >
+          <mat-icon>menu</mat-icon>
+      </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)='onEditUser(user)'>
+          <mat-icon>edit</mat-icon>
+          <span>EDIT</span>
+        </button>
+        <button mat-menu-item (click)="onDeleteUser(user)">
+          <mat-icon>delete</mat-icon>
+          <span>DELETE</span>
+        </button>
+      </mat-menu>
+    </div>
+      
+  
+  </mat-card>
+  

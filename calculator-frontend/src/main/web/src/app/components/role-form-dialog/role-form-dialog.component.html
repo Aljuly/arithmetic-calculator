@@ -1,0 +1,64 @@
+<mat-toolbar color="primary">
+  <span>Role</span>
+  <span class="spacer"></span>
+  <button mat-icon-button class="close" mat-button (click)="onEscape()">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-toolbar>
+<form [formGroup]="reactiveForm" (ngSubmit)="onSubmit()" fxLayout="column" fxLayoutGap="1em">
+  <table>
+    <tr>
+      <td>
+        <mat-form-field>
+          <input matInput formControlName="name" placeholder="Name">
+          <mat-error *ngIf="name.hasError('pattern') && !name.hasError('required')">
+            Must start with 'ROLE_' and can contain only capital Latin letters, underscore as delimiter.
+          </mat-error>
+          <mat-error *ngIf="name.hasError('required')">
+            Name is required
+          </mat-error>
+        </mat-form-field>
+      </td>
+      <td>
+        <mat-form-field>
+          <input matInput formControlName="description" placeholder="Description">
+          <mat-error *ngIf="description.hasError('pattern') && !description.hasError('required')">
+            Can contain only Latin letters, space as delimiter.
+          </mat-error>
+          <mat-error *ngIf="description.hasError('required')">
+            Description is required
+          </mat-error>
+        </mat-form-field>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div fxLayout="row wrap" fxLayoutAlign="space-between center center" fxLayoutGap="20px">
+          <mat-slide-toggle formControlName="showOperationName">Show operation name</mat-slide-toggle>
+        </div>
+      </td>
+      <td>
+        <mat-form-field>
+          <input matInput formControlName="operationFilter" placeholder="Filter">
+        </mat-form-field>
+      </td>
+    </tr>
+  </table>
+  <div formArrayName="operations" fxLayout="column">
+    <div *ngFor="let operation of operations.controls; let i=index" [formGroupName]="i">
+      <mat-checkbox formControlName="checked" *ngIf="filterOperations(operationTitle(operation.value))">
+        {{ operationTitle(operation.value) }}
+      </mat-checkbox>
+    </div>
+  </div>
+  <mat-dialog-actions fxLayout="row">
+    <span class="spacer"></span>
+    <button mat-flat-button id="submit" color="primary" fxFlexOffset="1rem" type="submit" [disabled]="!isValid">
+      <mat-icon>
+        check_circle
+      </mat-icon>
+      <span></span>
+      <span>Save</span>
+    </button>
+  </mat-dialog-actions>
+</form>

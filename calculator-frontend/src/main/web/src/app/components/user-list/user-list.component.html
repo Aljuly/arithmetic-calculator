@@ -1,0 +1,125 @@
+<div class="app-primary-header">
+    <h1>Users</h1>
+  </div>
+  <div class="wrapper mat-elevation-z1">
+    <div *ngIf="!users">
+      <mat-spinner></mat-spinner>
+    </div>
+    <div *ngIf="users">
+      <mat-toolbar class="toolbar">
+        <mat-form-field>
+          <input matInput (keyup)="applyFilter(getValue($event))" placeholder="Filter">
+        </mat-form-field>
+      </mat-toolbar>
+      <main>
+        <mat-table #table [dataSource]="dataSource" matSort>
+  
+          <ng-container matColumnDef="position">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
+            <mat-cell *matCellDef="let user"> {{user.id}} </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="avatar">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Avatar </mat-header-cell>
+            <mat-cell *matCellDef="let user"><img class="avatar-image" [src]="user.avatar"></mat-cell>
+          </ng-container>
+            
+          <ng-container matColumnDef="title">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Login </mat-header-cell>
+            <mat-cell *matCellDef="let user"> {{user.login}} </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="firstName">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> First Name </mat-header-cell>
+            <mat-cell *matCellDef="let user"> {{user.firstName}} </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="lastName">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> Last Name </mat-header-cell>
+            <mat-cell *matCellDef="let user"> {{user.lastName}} </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="email">
+            <mat-header-cell *matHeaderCellDef> Email </mat-header-cell>
+            <mat-cell *matCellDef="let user"> {{user.email}}  </mat-cell>
+          </ng-container>	
+
+          <ng-container matColumnDef="lastLogin">
+            <mat-header-cell *matHeaderCellDef mat-sort-header> LastLogin </mat-header-cell>
+            <mat-cell *matCellDef="let user"> {{user.lastlogin | date:'yyyy-MM-dd'}} </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="userRoles">
+            <mat-header-cell *matHeaderCellDef> Roles </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <mat-list>
+                <mat-list-item *ngFor="let role of user.roles">{{role}}</mat-list-item>
+              </mat-list>
+            </mat-cell>
+          </ng-container>
+
+          <!-- enabled  [class.disabled]="true" -->
+          <ng-container matColumnDef="enabled">
+            <mat-header-cell *matHeaderCellDef> Enabled </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <mat-checkbox disabled="true" [checked]="user.enabled"></mat-checkbox>
+            </mat-cell>
+          </ng-container>
+
+          <!-- verified -->
+          <ng-container matColumnDef="verified">
+            <mat-header-cell *matHeaderCellDef> Verified </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <mat-checkbox disabled="true" [checked]="user.verified"></mat-checkbox>
+            </mat-cell>
+          </ng-container>
+
+          <!-- banned -->
+          <ng-container matColumnDef="banned">
+            <mat-header-cell *matHeaderCellDef> Banned </mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <mat-checkbox disabled="true" [checked]="user.banned"></mat-checkbox>
+            </mat-cell>
+          </ng-container>
+
+          <ng-container matColumnDef="menuAction">
+            <mat-header-cell *matHeaderCellDef></mat-header-cell>
+            <mat-cell *matCellDef="let user">
+              <button mat-button [matMenuTriggerFor]="menu">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)='onEditUser(user)'>
+                  <mat-icon>edit</mat-icon>
+                  <span>EDIT</span>
+                </button>
+                <button mat-menu-item (click)="onDeleteUser(user)">
+                  <mat-icon>delete</mat-icon>
+                  <span>DELETE</span>
+                </button>
+              </mat-menu>
+            </mat-cell>
+          </ng-container>
+  
+          <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+          
+        </mat-table>
+  
+        <mat-paginator #paginator id="paginator"
+          [pageSize]="5"
+          [pageSizeOptions]="[1, 5, 10, 20, 50]" 
+          (page)="pageEvent()">
+        </mat-paginator>
+  
+      </main>
+   
+    </div>
+    <div id="add_button">
+      <button mat-fab disableRipple="false" color="primary" matTooltip="Add new user" matTooltipShowDelay="500"
+        matTooltipHideDelay="1000" (click)="onAddUser()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+  

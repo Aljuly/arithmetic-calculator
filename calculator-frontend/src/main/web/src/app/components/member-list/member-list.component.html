@@ -1,0 +1,49 @@
+<div class="app-primary-header">
+    <h1>Users</h1>
+  </div>
+  <div *ngIf="!loaded" id="spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+  <div [hidden]="!loaded">
+    
+    <mat-toolbar class="toolbar">
+      <mat-form-field>
+        <input matInput (keyup)="applyFilter(getValue($event))" placeholder="Filter">
+      </mat-form-field>
+    </mat-toolbar>
+    
+    <div 
+      fxLayout="row wrap"
+      fxLayout.xs="column" 
+      fxLayoutAlign="start start"
+      fxLayoutAlign.xs="start center"
+      >
+      <div *ngFor="let user of users">
+        <app-member-card [user]="user" (updateUsers)="updateUserList()"></app-member-card>
+      </div>
+    </div>
+  
+    <mat-paginator 
+      #paginator
+      id="paginator"
+      [pageSize]="5" 
+      [pageSizeOptions]="[1, 5, 10, 20, 50]"
+      (page)="pageEvent()"
+      >
+    </mat-paginator>
+  </div>
+  
+  <div id="add_button">
+    <button 
+        mat-fab
+        disableRipple="false"
+        color="primary"
+        matTooltip="Add new user"
+        matTooltipShowDelay="500"
+        matTooltipHideDelay="1000"
+        
+        (click)="onAddUser()">
+        <mat-icon >add</mat-icon>
+    </button>
+  </div>
+  

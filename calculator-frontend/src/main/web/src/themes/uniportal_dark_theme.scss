@@ -1,0 +1,12 @@
+@import '~@angular/material/theming';
+
+// Define the dark theme.
+$uniportal-dark-primary: mat-palette($mat-purple);
+$uniportal-dark-accent: mat-palette($mat-green, A200, A100, A400);
+$uniportal-dark-warn: mat-palette($mat-red);
+
+$uniportal-dark-theme: mat-dark-theme(
+    $uniportal-dark-primary,
+    $uniportal-dark-accent,
+    $uniportal-dark-warn);
+
