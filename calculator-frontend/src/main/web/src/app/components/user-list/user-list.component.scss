@@ -1,0 +1,29 @@
+.wrapper {
+    margin: 20px;
+  }
+  
+  .toolbar {
+    height: unset;
+    min-height: 64px;
+    padding-top: 8px;
+  }
+  
+  main {
+    margin: 16px 0;
+    padding: 0 16px;
+  }
+  
+  mat-cell.mat-cell, mat-header-cell.mat-header-cell {
+    overflow: visible;
+  }
+  
+  #add_button {
+    position: absolute; 
+    right: 1.5em; 
+    bottom: 1.5em;
+  }
+
+  .avatar-image {
+    width:30%;
+    height: auto;
+  }

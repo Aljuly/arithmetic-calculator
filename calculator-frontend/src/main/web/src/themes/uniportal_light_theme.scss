@@ -1,0 +1,11 @@
+@import '~@angular/material/theming';
+
+// Define the light theme.
+$uniportal-light-primary: mat-palette($mat-indigo);
+$uniportal-light-accent: mat-palette($mat-pink, A200, A100, A400);
+$uniportal-light-warn: mat-palette($mat-red);
+
+$uniportal-light-theme: mat-light-theme(
+    $uniportal-light-primary,
+    $uniportal-light-accent,
+    $uniportal-light-warn);

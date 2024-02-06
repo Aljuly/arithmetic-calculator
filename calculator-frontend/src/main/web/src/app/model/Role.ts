@@ -20,6 +20,16 @@ export class Role {
         this._operations = operation || [''];
     }
 
+    static fromRoleDto(roleDto: any): Role {
+        const role: Role = new Role(roleDto.id);
+        role.name = roleDto.name;
+        role.description = roleDto.description;
+        role.operations = roleDto.operations
+            .filter(o => o.checked === true)
+            .map(o => o.name);
+        return role;
+    }
+
 	public get operations(): String[] {
 		return this._operations;
 	}
@@ -28,11 +38,11 @@ export class Role {
 		this._operations = value;
 	}
 
-	public get name(): String {
-		return this._name;
+	public get name(): string {
+		return this._name?.toString();
 	}
 
-	public set name(value: String) {
+	public set name(value: string) {
 		this._name = value;
 	}
 

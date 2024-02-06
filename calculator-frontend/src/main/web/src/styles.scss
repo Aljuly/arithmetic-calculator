@@ -1,4 +1,32 @@
 /* You can add global styles to this file, and also import other style files */
+@import '@angular/material/theming';
+@import './app-theme';
+@import './styles/general';
+@import './styles/tables';
+@import './themes/uniportal_dark_theme';
+@import './themes/uniportal_light_theme';
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+// Include material core styles.
+@include mat-core();
+
+// Set default theme
+@include angular-material-theme($uniportal-dark-theme);
+@include material-app-theme($uniportal-dark-theme);
+
+// This is alternative theme styles inside of a block with a CSS class. Any component inside of an element with
+// `uniportal-light-theme` will be affected by this alternate light theme instead of the default theme.
+.uniportal-light-theme{
+  @include angular-material-theme($uniportal-light-theme);
+  @include material-app-theme($uniportal-light-theme);
+}
+
+// TODO find the root of this browser's glitch and get rid of this hack
+app-navbar + * {
+  margin-top: -4px;
+}
+
+// style for mat dialog
+.no-padding-dialog .mat-dialog-container {
+  padding: 0;
+  overflow: hidden;
+}

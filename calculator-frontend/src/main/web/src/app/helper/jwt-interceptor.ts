@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpRequest, HttpHandler, HttpEvent, HttpInterceptor} from '@angular/common/http';
+import {HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HTTP_INTERCEPTORS} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {LocalStorageService} from '../services/local-storage.service';
 import {User} from '../model/User';
@@ -13,7 +13,7 @@ export class JwtInterceptor implements HttpInterceptor {
         private logger: NGXLogger) {
     }
 
-// add authorization header with jwt token if available
+    // add authorization header with jwt token if available
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         this.logger.trace('JwtInterceptor: intercept()');
 
@@ -38,3 +38,10 @@ export class JwtInterceptor implements HttpInterceptor {
         return next.handle(request);
     }
 }
+
+export let jwtInterceptor = {
+    // use fake backend in place of Http service for backend-less development
+    provide: HTTP_INTERCEPTORS,
+    useClass: JwtInterceptor,
+    multi: true
+};

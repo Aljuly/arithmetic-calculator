@@ -1,0 +1,140 @@
+
+
+
+<div fxLayoutAlign="center">
+  <h1 mat-dialog-title>User profile</h1>
+</div>
+<form #f="ngForm" (ngSubmit)="onSubmit(f)" (keyup.esc)="onEscape()">
+  <mat-dialog-content fxLayout="row wrap" fxLayoutAlign="center">
+
+    <h4>User name</h4>
+    <div fxLayout="row wrap" fxLayoutAlign="center stretch">
+      <mat-form-field>
+        <input matInput placeholder="User name" [ngModel]="isNewUser ? '' : currentUser.username" name="username"
+          #usernameInput="ngModel" required>
+        <mat-error *ngIf="usernameInput.hasError('required')">Field mustn't be empty</mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput placeholder="Displayed name" [ngModel]="isNewUser ? f.value.username : currentUser.displayName"
+          name="displayName">
+      </mat-form-field>
+    </div>
+
+    <!-- TODO: maybe add better validation for email -->
+    <h4>E-mail</h4>
+    <div ngModelGroup="emailGroup" #passworGroup="ngModelGroup" (input)="confirmEmail.control.updateValueAndValidity()"
+      fxLayout="row wrap" fxLayoutAlign="center stretch">
+      <mat-form-field>
+        <input type="email" matInput placeholder="User email" [ngModel]="isNewUser ? '' : currentUser.email"
+          name="email" email (input)="confirmEmail.control.markAsTouched()" #email="ngModel" required>
+        <mat-error *ngIf="email.hasError('required')">Field mustn't be empty</mat-error>
+        <mat-error *ngIf="!email.hasError('required')">E-mail is invalid</mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input type="email" matInput placeholder="Confirm user email" [ngModel]="isNewUser ? '' : currentUser.email"
+          name="confirmEmail" confirmEqual="email" email #confirmEmail="ngModel" required>
+        <mat-error *ngIf="confirmEmail.hasError('required')">Field mustn't be empty</mat-error>
+        <mat-error *ngIf="confirmEmail.hasError('notEqual') 
+                          && !confirmEmail.hasError('required')">E-mail
+          not equal</mat-error>
+      </mat-form-field>
+    </div>
+
+
+    <!-- TODO: maybe add stronger validation for password -->
+    <h4>Password</h4>
+    <div ngModelGroup="passwordGroup" #passworGroup="ngModelGroup"
+      (input)="confirmPassword.control.updateValueAndValidity()" fxLayout="row wrap" fxLayoutAlign="center stretch">
+      <mat-form-field>
+        <input type="password" matInput placeholder="Enter password" [ngModel]="isNewUser ? '' : currentUser.password"
+          name="password" minlength="6" #password="ngModel" (input)="confirmPassword.control.markAsTouched()" required>
+        <mat-hint align="end"> {{password.value?.length}} / 6</mat-hint>
+        <mat-error align="end">{{password.value?.length}} / 6</mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input type="password" matInput confirmEqual="password" placeholder="Confirm password"
+          [ngModel]="isNewUser ? '' : currentUser.password" name="confirmPassword" #confirmPassword="ngModel" required>
+        <mat-error align="end" *ngIf="confirmPassword.touched
+                && confirmPassword.hasError('required')">Confirm
+          password</mat-error>
+        <mat-error align="end" *ngIf="confirmPassword.touched 
+                && confirmPassword.hasError('notEqual') 
+                && !confirmPassword.hasError('required')">Password
+          not equal</mat-error>
+      </mat-form-field>
+    </div>
+
+    <h4>Personal information</h4>
+    <div fxLayout="row wrap" fxLayoutAlign="center stretch">
+      <mat-form-field>
+        <input matInput placeholder="First name" [ngModel]="isNewUser ? '' : currentUser.firstName" name="firstName"
+          #firstNameInput="ngModel" required>
+        <mat-error *ngIf="firstNameInput.hasError('required')">Field mustn't be empty</mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput placeholder="Last name" [ngModel]="isNewUser ? '' : currentUser.lastName" name="lastName"
+          #lastNameInput="ngModel" required>
+        <mat-error *ngIf="lastNameInput.hasError('required')">Field mustn't be empty</mat-error>
+      </mat-form-field>
+
+      <mat-form-field>
+        <input matInput placeholder="Middle name" [ngModel]="isNewUser ? '' : currentUser.middleName" name="middleName">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-select placeholder="Sex" [(value)]="selectedSex" name="gender">
+          <mat-option>None</mat-option>
+          <mat-option value="male">Male</mat-option>
+          <mat-option value="female">Female</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+    </div>
+
+    <h4>Administartive information</h4>
+    <mat-form-field id="roles">
+      <mat-select placeholder="Roles" [formControl]="selectedRoles" multiple name="roles">
+        <mat-option *ngFor="let role of allRoles" [value]="role">{{role.name}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div fxLayout="row wrap" fxLayoutAlign="center" style="width: 80%">
+      <mat-slide-toggle [ngModel]="(isNewUser || !currentUser.enabled)  ? false : currentUser.enabled" color="primary"
+        [checked]="(isNewUser || !currentUser.enabled)  ? false : currentUser.enabled" name="enabled">Enable
+        user</mat-slide-toggle>
+
+      <mat-slide-toggle [ngModel]="(isNewUser || !currentUser.verified)  ? false : currentUser.verified" color="primary"
+        [checked]="(isNewUser || !currentUser.verified)  ? false : currentUser.verified" name="verified">Verify
+        user</mat-slide-toggle>
+
+      <mat-slide-toggle [ngModel]="(isNewUser || !currentUser.banned)  ? false : currentUser.banned" color="primary"
+        [checked]="(isNewUser || !currentUser.banned)  ? false : currentUser.banned" name="banned">Ban
+        user</mat-slide-toggle>
+    </div>
+    <mat-form-field id="ban_reason">
+      <textarea matInput placeholder="Ban reason" [ngModel]="isNewUser || !f.value.banned ? '' : currentUser.banReason"
+        name="banReason" [disabled]="!f.value.banned" [required]="f.value.banned"></textarea>
+      <mat-error *ngIf="f.value.banned">You must specify the ban reason</mat-error>
+    </mat-form-field>
+
+  </mat-dialog-content>
+  <mat-dialog-actions fxLayout="row" fxLayoutAlign="center">
+    <button mat-raised-button mat-dialog-close color="warn" disableRipple="false"
+      [matTooltip]="isNewUser ? 'Cancel adding user' : 'Cancel updating user'" matTooltipShowDelay="500"
+      matTooltipHideDelay="300" fxFlexOffset="2em">
+      <mat-icon>cancel</mat-icon>
+      <span>Cancel</span>
+    </button>
+
+    <button type="submit" mat-raised-button disableRipple="false" color="primary"
+      [matTooltip]="isNewUser ? 'Add new user' : 'Update user'" matTooltipShowDelay="500" matTooltipHideDelay="300"
+      [disabled]="!f.valid" fxFlexOffset="2em">
+      <mat-icon>check</mat-icon>
+      <span>Confirm</span>
+    </button>
+  </mat-dialog-actions>
+</form>

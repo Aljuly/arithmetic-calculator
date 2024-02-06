@@ -1,0 +1,86 @@
+// Styles for overview and guide app generated via `marked` from the material2 repo.
+
+.app-markdown {
+  max-width: 100%;
+}
+
+.app-markdown-h1 {
+  display: inline-block;
+  font-size: 34px;
+  font-weight: 400;
+  padding: 5px;
+}
+
+.app-markdown-h2 {
+  font-size: 24px;
+}
+
+.app-markdown-h3 {
+  font-size: 20px;
+}
+
+.app-markdown-h2,
+.app-markdown-h4 {
+  margin-top: 40px;
+}
+
+.app-markdown-h5 {
+  font-size: 18px;
+}
+
+.app-markdown-p,
+.app-markdown-ul,
+.app-markdown-ol {
+  font-size: 16px;
+  line-height: 28px;
+}
+
+.app-markdown-a {
+  text-decoration: none;
+}
+
+.app-markdown-td code {
+  font-size: 14px;
+}
+
+.app-markdown-pre {
+  border-radius: 5px;
+  display: block;
+  margin: 16px auto;
+  overflow-x: auto;
+  padding: 20px;
+
+  .app-markdown-code {
+    padding: 0;
+  }
+}
+
+.app-markdown-code {
+  padding: 3px;
+}
+
+code, pre {
+  font-family: 'Roboto Mono', monospace;
+}
+
+pre {
+  font-size: 14px;
+}
+
+.app-header-link {
+  a {
+    text-decoration: none;
+    // deduct -30px so the anchor icon will be positioned outside the content
+    margin-left: -30px;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .material-icons {
+    visibility: hidden;
+  }
+
+  &:hover .material-icons {
+    visibility: visible;
+  }
+}

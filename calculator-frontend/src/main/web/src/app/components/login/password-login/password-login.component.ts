@@ -4,6 +4,7 @@ import { FormControl, Validators } from '@angular/forms';
 @Component({
   selector: 'app-password-login',
   templateUrl: './password-login.component.html',
+  styleUrls: ['./password-login.component.scss']
 })
 export class PasswordLoginComponent {
   @Output() signinEvent = new EventEmitter<object>();

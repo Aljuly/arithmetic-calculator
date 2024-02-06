@@ -1,0 +1,34 @@
+<div (keyup.esc)="onEscape()">
+  <mat-toolbar color="primary">
+    <a class="button" *ngIf="data.showBackArrow" fxLayoutAlign="center center" (click)="onEscape()">
+      <mat-icon>arrow_back</mat-icon>
+    </a>
+    <a class="button" *ngIf="data.showForwardArrow" fxLayoutAlign="center center" (click)="onSubmit()">
+      <mat-icon>arrow_forward</mat-icon>
+    </a>
+    <span>{{data.confirmHeader}}</span>
+    <span class="spacer"></span>
+    <button mat-icon-button class="close" mat-button (click)="onEscape()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-toolbar>
+  <mat-dialog-content>
+    <div fxLayout="column">
+      <strong *ngFor="let line of data.confirmText">
+        {{ line }}
+      </strong>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions fxLayout="row">
+    <span class="spacer"></span>
+    <button mat-raised-button color="primary" (click)="onEscape()" cdkFocusInitial>
+      <mat-icon>{{data.cancelButtonIcon || 'cancel'}}</mat-icon>
+      <span>{{data.cancelButtonText || 'Cancel'}}</span>
+    </button>
+    <button mat-raised-button [color]="data.buttonColor" fxFlexOffset="1rem" [mat-dialog-close]="true" (click)="onSubmit()">
+      <mat-icon>{{data.buttonIcon}}</mat-icon>
+      <span>{{data.buttonText}}</span>
+    </button>
+    <span></span>
+  </mat-dialog-actions>
+</div>

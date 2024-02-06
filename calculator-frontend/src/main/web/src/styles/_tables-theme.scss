@@ -1,0 +1,27 @@
+@import '../../node_modules/@angular/material/theming';
+
+// Mixin to apply theme colors for both generated API app and markdown app (guides/overviews).
+@mixin app-site-tables-theme($theme) {
+  $primary: map-get($theme, primary);
+  $accent: map-get($theme, accent);
+  $warn: map-get($theme, warn);
+  $background: map-get($theme, background);
+  $foreground: map-get($theme, foreground);
+  $is-dark-theme: map-get($theme, is-dark);
+  $tableBorderOpacity: if($is-dark-theme, 0.08, 0.03);
+
+  .app-api table,
+  .app-markdown-table {
+    color: mat-color($foreground, text);
+  }
+
+  .app-api th,
+  .app-markdown-th {
+    background: mat-color($background, app-bar);
+  }
+
+  .app-api td,
+  .app-markdown-td {
+    border: 1px solid rgba(mat-color($foreground, secondary-text), $tableBorderOpacity);
+  }
+}
