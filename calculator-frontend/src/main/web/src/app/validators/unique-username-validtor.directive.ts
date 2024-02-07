@@ -42,8 +42,6 @@ export function uniqueUsernameValidator(userService: UserService, oldUsername?: 
  * use function uniqueEmailValidator
  *
  */
-
-
 @Directive({
   selector: '[appUniqueUsername]',
   providers: [{

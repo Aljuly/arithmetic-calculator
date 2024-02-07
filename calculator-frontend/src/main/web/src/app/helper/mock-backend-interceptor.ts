@@ -106,11 +106,11 @@ export class MockBackendInterceptor implements HttpInterceptor {
                     }
 
                     // is username unique
-                    if (request.params.has('username')) {
+                    if (request.params.has('login')) {
                         this.logger.info('FakeBackend: fake answer for UserService.isUniqueUsername');
-                        const username = request.params.get('username');
+                        const login = request.params.get('login');
                         let isUniqueUsername = true;
-                        if (ALL_USERS.filter(user => user.login === username).length > 0) {
+                        if (ALL_USERS.filter(user => user.login === login).length > 0) {
                             isUniqueUsername = false;
                         }
                         return of(new HttpResponse({status: 200, body: {isUniqueUsername: isUniqueUsername}}));

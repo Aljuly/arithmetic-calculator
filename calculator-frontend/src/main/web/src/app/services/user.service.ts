@@ -118,7 +118,7 @@ export class UserService {
     isUniqueUsername(username: string): Observable<boolean> {
         this.logger.info('UserService: isUniqueUsername');
         return this.http.get<{isUniqueUsername: boolean}>(this.BASE_URL, {
-            params: new HttpParams().set('username', username)
+            params: new HttpParams().set('login', username)
         }).pipe(
             map(body => {
                 return <boolean> body.isUniqueUsername;
