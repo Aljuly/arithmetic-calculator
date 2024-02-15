@@ -30,8 +30,8 @@ import com.mycorp.springangularstarter.config.TestDbConfig;
 import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 
 @SpringBootTest(classes = { TestDbConfig.class, TestIntegrationConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
-//@ContextConfiguration(initializers = ConfigFileApplicationContextInitializer.class)
-//@AutoConfigureMockMvc
+@ContextConfiguration(initializers = ConfigFileApplicationContextInitializer.class)
+@AutoConfigureMockMvc
 @Transactional
 public class FileEndpointTest {
 	
