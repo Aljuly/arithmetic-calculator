@@ -13,7 +13,6 @@ public class TestIntegrationConfig {
     @Bean
     @ConditionalOnMissingBean(RequestContextListener.class)
     RequestContextListener requestContextListener() {
-
         return new RequestContextListener();
     }
 

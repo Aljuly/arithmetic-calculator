@@ -46,21 +46,21 @@
     </mat-grid-tile>
     <mat-grid-tile colspan="2" rowspan="1">
       <mat-form-field>
-        <input matInput id="firstName" placeholder="First name" formControlName="firstName" required
+        <input matInput id="firstName" placeholder="First name" formControlName="firstName" 
           [value]="firstName.value" (keydown.enter)="toAnotherField($event, 'lastName')">
         <mat-error *ngIf="firstName.hasError('required')">Field mustn't be empty</mat-error>
       </mat-form-field>
     </mat-grid-tile>
     <mat-grid-tile colspan="2" rowspan="1">
       <mat-form-field>
-        <input matInput id="lastName" placeholder="Last name" formControlName="lastName" required
+        <input matInput id="lastName" placeholder="Last name" formControlName="lastName" 
           [value]="lastName.value" (keydown.enter)="toAnotherField($event, 'email')">
         <mat-error *ngIf="lastName.hasError('required')">Field mustn't be empty</mat-error>
       </mat-form-field>
     </mat-grid-tile>
     <mat-grid-tile colspan="2" rowspan="1">
       <mat-form-field>
-        <input type="email" matInput id="email" placeholder="User email" formControlName="email" required
+        <input type="email" matInput id="email" placeholder="User email" formControlName="email" 
           [value]="email.value" (keydown.enter)="toAnotherField($event, 'password')">
         <mat-error *ngIf="email.hasError('required')">Field mustn't be empty</mat-error>
         <mat-error *ngIf="email.hasError('email')">E-mail is invalid</mat-error>
@@ -69,7 +69,7 @@
     </mat-grid-tile>
     <mat-grid-tile colspan="2" rowspan="1">
       <mat-form-field>
-        <input type="password" matInput id="password" placeholder="Enter password" formControlName="password" required
+        <input type="password" matInput id="password" placeholder="Enter password" formControlName="password" 
           [value]="password.value" (keydown.enter)="toAnotherField($event, 'firstName')">
         <mat-hint align="end"> {{ password.value.length }} / 6</mat-hint>
         <mat-error align="end">{{ password.value.length }} / 6</mat-error>
@@ -122,7 +122,7 @@
     </button>
     <button type="submit" id="submit" mat-raised-button color="primary"
       [matTooltip]="isNewUser ? 'Add new user' : 'Update user'" matTooltipShowDelay="500" matTooltipHideDelay="300"
-      [disabled]="!reactiveForm.valid">
+      [disabled]="!isValid">
       <mat-icon>check_circle</mat-icon>
       <span></span>
       <span>Confirm</span>

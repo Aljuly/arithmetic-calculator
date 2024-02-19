@@ -21,12 +21,12 @@ import java.util.Properties;
 public class TestDbConfig extends PersistenceJPAConfig {
 
     @Bean
-    public PasswordEncoder encoder() {
+    PasswordEncoder encoder() {
         return new BCryptPasswordEncoder(11);
     }
 
     @Bean
-    public DataSource dataSource() {
+	protected DataSource dataSource() {
         EmbeddedDatabase datasource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
         return datasource;
     }

@@ -101,6 +101,10 @@ export class User extends Entity {
     return user;
   }
 
+  static fromUserDto(userDto: any): User {
+    return this.fromLocaleStorage(userDto);
+  }
+
   public get email(): string {
     return this._email?.toString();
   }
