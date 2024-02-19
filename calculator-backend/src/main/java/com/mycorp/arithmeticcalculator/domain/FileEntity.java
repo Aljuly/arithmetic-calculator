@@ -2,26 +2,18 @@ package com.mycorp.arithmeticcalculator.domain;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.UUID;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 @Table(name = "file")
 public class FileEntity {
 	
 	@Id
-	@GeneratedValue(generator = "uuid-hibernate-generator")
-	@GenericGenerator(
-			name = "uuid-hibernate-generator", 
-			strategy = "org.hibernate.id.UUIDGenerator")
-	private UUID id;
+	private Long id;
 	
 	@Lob
 	private byte[] data;
@@ -32,11 +24,11 @@ public class FileEntity {
 		super();
 	}
 	
-	public UUID getId() {
+	public Long getId() {
 		return id;
 	}
 	
-	public void setId(UUID id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

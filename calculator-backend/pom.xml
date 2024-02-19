@@ -104,14 +104,16 @@
 			<artifactId>guava</artifactId>
 			<version>28.1-jre</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.jboss.aerogear/aerogear-otp-java -->
+		<!--
+		https://mvnrepository.com/artifact/org.jboss.aerogear/aerogear-otp-java -->
 		<dependency>
 			<groupId>org.jboss.aerogear</groupId>
 			<artifactId>aerogear-otp-java</artifactId>
 			<version>1.0.0</version>
 			<scope>provided</scope>
 		</dependency>
-		<!-- http://repo1.maven.org/maven2/javax/mail/javax.mail-api/1.5.6/javax.mail-api-1.5.6.jar -->
+		<!--
+		http://repo1.maven.org/maven2/javax/mail/javax.mail-api/1.5.6/javax.mail-api-1.5.6.jar -->
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>javax.mail-api</artifactId>
@@ -123,6 +125,24 @@
 			<version>1.4.7</version>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.rest-assured/rest-assured -->
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-all</artifactId>
+			<version>3.0.8</version>
+			<type>pom</type>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy -->
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy</artifactId>
+			<version>3.0.8</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-json -->
+		<dependency>
+			<groupId>org.codehaus.groovy</groupId>
+			<artifactId>groovy-json</artifactId>
+			<version>3.0.8</version>
+		</dependency>
 		<dependency>
 			<groupId>io.rest-assured</groupId>
 			<artifactId>rest-assured</artifactId>
@@ -189,13 +209,15 @@
 			<artifactId>springfox-swagger2</artifactId>
 			<version>2.9.2</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
+		<!--
+		https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-swagger-ui</artifactId>
 			<version>2.9.2</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/io.springfox/springfox-bean-validators -->
+		<!--
+		https://mvnrepository.com/artifact/io.springfox/springfox-bean-validators -->
 		<dependency>
 			<groupId>io.springfox</groupId>
 			<artifactId>springfox-bean-validators</artifactId>
@@ -206,7 +228,8 @@
 			<artifactId>javax.interceptor-api</artifactId>
 			<version>1.2.2</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.springframework.plugin/spring-plugin-core -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.plugin/spring-plugin-core -->
 		<dependency>
 			<groupId>org.springframework.plugin</groupId>
 			<artifactId>spring-plugin-core</artifactId>
@@ -231,10 +254,12 @@
 							<goal>copy-resources</goal>
 						</goals>
 						<configuration>
-							<outputDirectory>${project.build.directory}/classes/resources/</outputDirectory>
+							<outputDirectory>
+								${project.build.directory}/classes/resources/</outputDirectory>
 							<resources>
 								<resource>
-									<directory>${project.parent.basedir}/tutorial-web/src/main/web/dist/np-app/</directory>
+									<directory>
+										${project.parent.basedir}/tutorial-web/src/main/web/dist/np-app/</directory>
 								</resource>
 							</resources>
 						</configuration>

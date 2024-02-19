@@ -45,11 +45,11 @@ public class FileServiceTest {
 				MediaType.IMAGE_PNG_VALUE, 
 				"some-entry".getBytes());
 		FileEntity logoEntity = new FileEntity();
-		UUID logoUUID = UUID.randomUUID();
-		logoEntity.setId(logoUUID);
+		Long logoId = 10000L;
+		logoEntity.setId(logoId);
 		doReturn(logoEntity).when(entityRepository).save(any());
 		String imageId = fileService.persistFile(logo);
-		assertEquals(imageId, logoUUID.toString());
+		assertEquals(imageId, logoId.toString());
 	}
 	
 	@Test

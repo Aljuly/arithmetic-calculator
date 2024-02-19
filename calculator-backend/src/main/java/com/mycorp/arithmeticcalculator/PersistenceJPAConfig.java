@@ -46,7 +46,7 @@ public class PersistenceJPAConfig {
 	}
 
     @Bean
-    DataSource dataSource() {
+	protected DataSource dataSource() {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(env.getProperty("spring.datasource.driverClassName"));
 		dataSource.setUrl(env.getProperty("spring.datasource.url"));

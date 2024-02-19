@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ public class FileService implements IFileService {
 	@PostConstruct
 	public void setDefaultBackground() {
 		try {
+			this.defaultBackgroundResource = new ClassPathResource("img/unknown-person.png");
 			defaultBackgroundBytes = StreamUtils.copyToByteArray(defaultBackgroundResource.getInputStream());
 		} catch (IOException e) {
 			log.debug("Error loading defult picture from {} : {}", DEFAUL_RESOURCE_URI, e);
@@ -62,7 +64,7 @@ public class FileService implements IFileService {
 	
 	@Transactional
 	public Optional<FileEntity> getById(String id) {
-		return fileEntityRepository.findById(id);
+		return fileEntityRepository.findById(Long.parseLong(id));
 	}
 	
 	public Optional<FileEntity> getDefaultBackground() {

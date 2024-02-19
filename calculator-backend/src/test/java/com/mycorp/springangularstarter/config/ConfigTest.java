@@ -15,7 +15,7 @@ public class ConfigTest implements WebMvcConfigurer {
 
     // API
     @Bean
-    public PasswordEncoder encoder() {
+    PasswordEncoder encoder() {
         return new BCryptPasswordEncoder(11);
     }
 
