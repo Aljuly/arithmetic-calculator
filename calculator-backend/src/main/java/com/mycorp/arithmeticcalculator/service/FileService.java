@@ -43,7 +43,7 @@ public class FileService implements IFileService {
 			this.defaultBackgroundResource = new ClassPathResource("img/unknown-person.png");
 			defaultBackgroundBytes = StreamUtils.copyToByteArray(defaultBackgroundResource.getInputStream());
 		} catch (IOException e) {
-			log.debug("Error loading defult picture from {} : {}", DEFAUL_RESOURCE_URI, e);
+			log.error("Error loading defult picture from {} : {}", DEFAUL_RESOURCE_URI, e);
 		}
 	}
 	
@@ -57,7 +57,7 @@ public class FileService implements IFileService {
 			FileEntity savedLogo = fileEntityRepository.save(fileEntity);
 			return savedLogo.getId().toString();
 		} catch (IOException e) {
-			log.debug("Error loading file with name {} : {}", multipartFile.getName(), e);
+			log.error("Error loading file with name {} : {}", multipartFile.getName(), e);
 			return "";
 		}
 	}

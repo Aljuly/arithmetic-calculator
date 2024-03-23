@@ -39,8 +39,7 @@ public class UserController {
     
 	@ApiOperation(value = "Retrieves all LoggedIn users")
 	@ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Retrieves all LoggedIn users"),
-            @ApiResponse(code = 500, message = "Server Error")
+            @ApiResponse(code = 200, message = "Retrieves all LoggedIn users")
     })
     @GetMapping("/loggedUsers")
 	public ResponseEntity<Iterable<String>> getLoggedUsers() {
@@ -49,8 +48,7 @@ public class UserController {
 
     @ApiOperation(value = "View a list of users")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Retrieves all available users"),
-            @ApiResponse(code = 500, message = "Server Error")
+            @ApiResponse(code = 200, message = "Retrieves all available users")
     })
     @GetMapping("/loggedUsersFromSessionRegistry")
     public ResponseEntity<List<User>> getAllUsers() {
@@ -60,8 +58,7 @@ public class UserController {
     @ApiOperation(value = "Retrieves an existing User")
     @ApiResponses(value = { 
             @ApiResponse(code = 200, message = "Body: User data"),
-            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found"),
-            @ApiResponse(code = 500, message = "Server Error")
+            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
     })
     @GetMapping("{userId}")
     public ResponseEntity<?> getUserById(final Locale locale,

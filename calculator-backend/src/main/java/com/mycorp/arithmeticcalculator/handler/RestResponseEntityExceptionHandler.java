@@ -2,6 +2,8 @@ package com.mycorp.arithmeticcalculator.handler;
 
 import com.mycorp.arithmeticcalculator.dto.GenericResponse;
 import com.mycorp.arithmeticcalculator.error.InvalidOldPasswordException;
+import com.mycorp.arithmeticcalculator.error.RoleNotFoundException;
+import com.mycorp.arithmeticcalculator.error.RoleProcessException;
 import com.mycorp.arithmeticcalculator.error.UserNotFoundException;
 import com.mycorp.arithmeticcalculator.error.UserAlreadyExistException;
 
@@ -103,4 +105,13 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return new ResponseEntity<Object>(bodyOfResponse, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    // 404
+    @ExceptionHandler({ RoleNotFoundException.class })
+    public ResponseEntity<Object> handleRoleNotFound(final RuntimeException ex, final WebRequest request) {
+        logger.error("404 Status Code", ex);
+        final GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("message.roleNotFound", null, request.getLocale()), "RoleNotFound");
+        return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+    
+    
 }
