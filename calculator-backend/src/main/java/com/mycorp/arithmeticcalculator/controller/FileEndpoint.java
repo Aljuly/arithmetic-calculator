@@ -46,7 +46,6 @@ public class FileEndpoint {
 			tags = {"imge-file-endpoint"})
     @ApiResponses(value = { 
             @ApiResponse(code = 200, message = "OK", response = Resource.class),
-            @ApiResponse(code = 404, message = "Not Found")
     })
 	@GetMapping(value ="/image/{imgeId}", produces = {"image/_*"})
 	public ResponseEntity<Resource> getImageFile(
@@ -54,7 +53,7 @@ public class FileEndpoint {
 				@PathVariable("imgeId")	String imgeId) {
 		return fileService.getById(imgeId)
 				.map(entityResponseMapping)
-				.orElseGet(() -> ResponseEntity.notFound().build());
+				.orElseGet(() -> getDefaultImageFile());
 	}
 	
 	@ApiOperation(value = "Save Imge File", nickname = "saveImgeFile", response = String.class, 

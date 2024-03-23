@@ -7,7 +7,6 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Test;

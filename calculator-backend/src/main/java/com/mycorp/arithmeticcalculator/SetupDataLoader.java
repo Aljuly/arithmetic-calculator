@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -51,16 +53,16 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 		final Privilege passwordPrivilege = createPrivilegeIfNotFound("CHANGE_PASSWORD_PRIVILEGE");
 
 		// == create initial roles
-		final List<Privilege> adminPrivileges = new ArrayList<Privilege>(
-				Arrays.asList(readPrivilege, writePrivilege, passwordPrivilege));
-		final List<Privilege> userPrivileges = new ArrayList<Privilege>(
-				Arrays.asList(readPrivilege, passwordPrivilege));
+		final List<Privilege> adminPrivileges = 
+				Stream.of(readPrivilege, writePrivilege, passwordPrivilege).collect(Collectors.toCollection(ArrayList::new));
+		final List<Privilege> userPrivileges = 
+				Stream.of(readPrivilege, passwordPrivilege).collect(Collectors.toCollection(ArrayList::new));
 		final Role adminRole = createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
 		createRoleIfNotFound("ROLE_USER", userPrivileges);
 
 		// == create initial user
-		createUserIfNotFound("test@test.com", "Test", "Test", "Passw0rd!", new ArrayList<Role>(Arrays.asList(adminRole)));
-
+		createUserIfNotFound("test@test.com", "Test", "Test", "Passw0rd!", Stream.of(adminRole)
+				.collect(Collectors.toCollection(ArrayList::new)));
 		alreadySetup = true;
 	}
 
@@ -75,7 +77,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 	}
 
 	@Transactional
-	private final Role createRoleIfNotFound(final String name, final Collection<Privilege> privileges) {
+	private final Role createRoleIfNotFound(final String name, final List<Privilege> privileges) {
 		Role role = roleRepository.findByName(name);
 		if (role == null) {
 			role = new Role(name);

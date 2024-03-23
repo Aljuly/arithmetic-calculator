@@ -54,6 +54,7 @@ public class FileEndpointTest {
 		FileEntity fileLogoEntity = new FileEntity();
 		fileLogoEntity.setName("test.png");
 		fileLogoEntity.setData(StreamUtils.copyToByteArray(defaultImage.getInputStream()));
+		fileLogoEntity.setContentType(MediaType.IMAGE_PNG_VALUE);
 		entityManager.persist(fileLogoEntity);
 		entityManager.flush();
         entityManager.clear();
@@ -61,8 +62,8 @@ public class FileEndpointTest {
 		mockMvc.perform(get("/image/{imageId}", imgeId))
 			.andExpect(status().is(200))
 			.andExpect(content().bytes(StreamUtils.copyToByteArray(defaultImage.getInputStream())));
-		mockMvc.perform(get("/image").param("imgeId", ""))
-			.andExpect(status().is(404));
+		mockMvc.perform(get("/image/{imageId}", "123456"))
+			.andExpect(status().is(200));
 	}
 	
 	@Test

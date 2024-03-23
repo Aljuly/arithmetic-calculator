@@ -1,6 +1,8 @@
 package com.mycorp.arithmeticcalculator.domain;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -19,14 +21,19 @@ public class Role {
 	private Long id;
 
 	@ManyToMany(mappedBy = "roles")
-	private Collection<User> users;
+	private List<User> users = new ArrayList<>();
 
+	//ToDo change type of a variable to Set/HashSet
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "roles_privileges", joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
-	private Collection<Privilege> privileges;
+	@JoinTable(name = "roles_privileges", 
+		joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"), 
+		inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
+	private List<Privilege> privileges = new ArrayList<>();
 
 	private String name;
 
+	private String description;
+	
 	public Role() {
 		super();
 	}
@@ -35,8 +42,6 @@ public class Role {
 		super();
 		this.name = name;
 	}
-
-	//
 
 	public Long getId() {
 		return id;
@@ -54,11 +59,19 @@ public class Role {
 		this.name = name;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 	public Collection<User> getUsers() {
 		return users;
 	}
 
-	public void setUsers(final Collection<User> users) {
+	public void setUsers(final List<User> users) {
 		this.users = users;
 	}
 
@@ -66,7 +79,7 @@ public class Role {
 		return privileges;
 	}
 
-	public void setPrivileges(final Collection<Privilege> privileges) {
+	public void setPrivileges(final List<Privilege> privileges) {
 		this.privileges = privileges;
 	}
 

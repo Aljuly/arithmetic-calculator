@@ -1,1 +1,1 @@
-create table file (id varchar(36) not null, data int8, filename varchar(255))
+create table file (id int8 not null, data int8, filename varchar(255), primary key (id))

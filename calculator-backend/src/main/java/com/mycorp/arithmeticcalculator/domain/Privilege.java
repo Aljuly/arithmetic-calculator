@@ -1,6 +1,8 @@
 package com.mycorp.arithmeticcalculator.domain;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,10 +17,19 @@ public class Privilege {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	private String name;
-
+	private String description;
+	
 	@ManyToMany(mappedBy = "privileges")
-	private Collection<Role> roles;
+	private List<Role> roles = new ArrayList<Role>();
 
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}	
+	
 	public Privilege() {
 		super();
 	}
@@ -27,8 +38,6 @@ public class Privilege {
 		super();
 		this.name = name;
 	}
-
-	//
 
 	public Long getId() {
 		return id;
@@ -50,7 +59,7 @@ public class Privilege {
 		return roles;
 	}
 
-	public void setRoles(final Collection<Role> roles) {
+	public void setRoles(final List<Role> roles) {
 		this.roles = roles;
 	}
 
