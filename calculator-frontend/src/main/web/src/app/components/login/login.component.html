@@ -1,0 +1,42 @@
+<mat-toolbar color="primary">
+  <a class="button" *ngIf="userNotFound" fxLayoutAlign="center center" (click)="userNotFound = false">
+    <mat-icon>arrow_back</mat-icon>
+  </a>
+  <span>Please Log In</span>
+  <span class="spacer"></span>
+  <button mat-icon-button class="close" mat-button (click)="onEscape()">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-toolbar>
+<form (ngSubmit)="onSubmit()" fxLayout="column" fxLayoutGap="1em">
+  <div class="signin" fxLayoutAlign="center center">
+    <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="1em" *ngIf="!userNotFound">
+      <app-password-login (signinEvent)="receiveSignin($event)"></app-password-login>
+    </div>
+    <div fxFill *ngIf="userNotFound">
+      <strong>The username/e-mail or password you entered was incorrect.</strong>
+    </div>
+  </div>
+  <table>
+    <tr>
+      <td>
+        <button *ngIf="!userNotFound" [disabled]="!loginObject" mat-flat-button type="submit">
+          Continue
+        </button>
+      </td>
+      <td>
+        <button *ngIf="userNotFound" mat-flat-button (click)="registerNewUser()">
+          Register
+        </button>
+      </td>
+      <td>
+        <a fxFlexAlign="end" href="#" disabled="true">Forgot password?</a>
+      </td>
+    </tr>
+  </table>
+  <!--
+      <div fxLayout="row" fxLayoutAlign="space-between end" fxLayout.xs="column" fxLayoutAlign.xs="center start"
+    fxLayoutGap="1em">
+  </div>
+  -->
+</form>

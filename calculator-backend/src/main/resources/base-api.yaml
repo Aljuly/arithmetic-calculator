@@ -1,0 +1,116 @@
+openapi: 3.0.1
+info:
+  title: Basic user API
+  description: 'This is a generic spring boot auth application'
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: alexalg256@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+tags:
+
+  - name: users
+    description: Operations about user
+  - name: role
+    description: Operations about user roles
+
+paths:
+  /api/users:
+    get:
+      tags:
+        - users
+      summary: request to receive all users
+      description: request to receive all users
+      operationId: getAll
+      requestBody:
+        description: request to receive all users
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        default:
+          description: successfull operation
+          content: {}
+      x-codegen-request-body-name: body
+  /api/users/{id}:
+    get:
+      tags:
+        - user
+      summary: Get user by user name
+      operationId: getUserByName
+      parameters:
+        - name: username
+          in: path
+          description: 'The name that needs to be fetched. Use user1 for testing. '
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/User'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: Invalid username supplied
+          content: {}
+        404:
+          description: User not found
+          content: {}
+    put:
+      tags:
+        - user
+      summary: Updated user
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - name: username
+          in: path
+          description: name that need to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Updated user object
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        400:
+          description: Invalid user supplied
+          content: {}
+        404:
+          description: User not found
+          content: {}
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - name: username
+          in: path
+          description: The name that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        400:
+          description: Invalid username supplied
+          content: {}
+        404:
+          description: User not found
+          content: {}
+

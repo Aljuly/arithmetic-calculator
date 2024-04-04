@@ -1,0 +1,67 @@
+<div class="app-primary-header">
+    <h1>User profile</h1>
+  </div>
+  <div>
+    <div *ngIf="!user">
+      <mat-spinner>
+      </mat-spinner>
+    </div>
+    <div *ngIf="user" style="margin: 0 10px 10px;overflow:auto;">
+      <img [src]="avatar" alt="User avatar">
+      <h4>Main user information</h4>
+      <div>
+        {{ user.firstName + " " + (user.middleName.length > 0 ? (user.middleName + " ") : "") + user.lastName | titlecase }}
+      </div>
+  
+      <div>
+        {{ user.username }}
+      </div>
+  
+      <div>
+        {{ user.displayName }}
+      </div>
+      
+      <div>
+        {{ user.gender }}
+      </div>
+  
+      <div>
+        {{ user.birthdate | date:"MM.dd.yyyy" }}
+      </div>
+  
+      <h4>Contacts</h4>
+  
+      <div>
+        {{ user.email }}
+      </div>
+  
+  
+      <div>
+        {{ user.phones }}
+      </div>
+  
+      <h4>Special information</h4>
+  
+      <div>
+        Last login: {{ user.lastLogin | date:"DD.MM.YYYY" }}
+      </div>
+  
+      <div>
+        Enabled: {{ user.enabled }}
+      </div>
+      
+      <div>
+        Verified: {{ user.verified }}
+      </div>
+  
+      <div>
+        Banned: {{ user.banned }}
+      </div>
+  
+      <div *ngIf="user.banned">
+        {{ user.banReason }}
+      </div>
+  
+    </div>
+  </div>
+  

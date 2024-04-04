@@ -1,0 +1,67 @@
+<button mat-flat-button color="accent"
+        class="widget-button app-background"
+        *ngIf="!isWidgetVisible"
+        (click)="toggleWidget()">
+  <mat-icon>mail</mat-icon>&nbsp;&nbsp;Оставить заявку&nbsp;&nbsp;&nbsp;&nbsp;
+</button>
+<div class="form-container app-background" *ngIf="isWidgetVisible">
+  <button mat-icon-button class="x-button" (click)="toggleWidget()">
+    <mat-icon>close</mat-icon>
+  </button>
+  <div>
+    <h1 mat-dialog-title align="center">Отправьте нам сообщение</h1>
+  </div>
+  <form (ngSubmit)="sendMessage()">
+    <div>
+      <p>Оставьте свое сообщение в этой форме, мы получим его на e-mail и обязательно ответим!</p>
+    </div>
+    <div>
+      <mat-form-field class="full-width">
+        <textarea matInput required rows="3"
+                  [formControl]="message" placeholder="Ваше сообщение"></textarea>
+        <mat-error *ngIf="message.invalid">{{ getErrorMessage(message) }}</mat-error>
+
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field class="full-width">
+        <mat-select required [formControl]="unit" placeholder="Выберите учебный план">
+          <mat-option value="Java Enterprise">Java Enterprise</mat-option>
+          <mat-option value="Android">Android</mat-option>
+          <mat-option value="Front-End">Front-End</mat-option>
+          <mat-option value="Automation QA">Automation QA</mat-option>
+          <mat-option value="UI/UX Design">UI/UX Design</mat-option>
+          <mat-option value="Project Management">Project Management</mat-option>
+        </mat-select>
+        <mat-error *ngIf="unit.invalid">{{ getErrorMessage(unit) }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field class="full-width">
+        <input matInput required [formControl]="username" placeholder="Ваше Имя">
+        <mat-error *ngIf="username.invalid">{{ getErrorMessage(username) }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field class="full-width">
+        <input matInput [formControl]="telephone" placeholder="Ваш Телефон">
+      </mat-form-field>
+    </div>
+    <div>
+      <mat-form-field class="full-width">
+        <input matInput required [formControl]="email" placeholder="Ваш e-mail">
+        <mat-error *ngIf="email.invalid">{{ getErrorMessage(email) }}</mat-error>
+      </mat-form-field>
+    </div>
+    <div fxLayout="row" fxLayoutAlign="end">
+      <button
+        mat-raised-button
+        type="submit"
+        [disabled]="message.invalid || unit.invalid || username.invalid || email.invalid"
+        color="primary">
+        <mat-icon>check</mat-icon>
+        <span>Отправить</span>
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,18 @@
+<div (keyup.esc)="onNoClick()">
+  <div fxLayoutAlign="center">
+    <h1 mat-dialog-title>Confirmation</h1>
+  </div>
+  <mat-dialog-content fxLayoutAlign="center">
+    <div class="text">Are your shure to delete user with username "{{data.username}}"?</div>
+  </mat-dialog-content>
+  <mat-dialog-actions fxLayout="row" fxLayoutAlign="center">
+    <button mat-raised-button color="primary" (click)="onNoClick()" cdkFocusInitial>
+      <mat-icon>cancel</mat-icon>
+      <span>No</span>
+    </button>
+    <button mat-raised-button color="warn" fxFlexOffset="1rem" [mat-dialog-close]="true">
+      <mat-icon>delete_forever</mat-icon>
+      <span>Delete</span>
+    </button>
+  </mat-dialog-actions>
+</div>

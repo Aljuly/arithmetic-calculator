@@ -1,0 +1,111 @@
+app-home {
+    overflow-y: auto;
+  }
+  
+  // The margin between two sections
+  $margin-promotion-sections: 60px;
+  $margin-promotion-sections-small: 15px;
+  
+  .app-header-background {
+    overflow: hidden;
+  }
+  
+  .app-header-section {
+    text-align: center;
+    padding-top: $margin-promotion-sections;
+  }
+  
+  .app-header-headline {
+    h1 {
+      font-size: 56px;
+      font-weight: 300;
+      line-height: 56px;
+      margin: 15px 5px;
+    }
+  
+    h2 {
+      font-size: 18px;
+      font-weight: 300;
+      line-height: 28px;
+      margin: 15px 0 25px 0;
+    }
+  }
+  
+  .app-homepage-promo {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+  
+    h2 {
+      font-size: 25px;
+      font-weight: 400;
+      margin: 0 0 16px 0;
+      padding: 0;
+    }
+  
+    p {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 28px;
+      margin: 0 0 24px 0;
+      padding: 0;
+    }
+  }
+  
+  
+  .app-homepage-row {
+    display: flex;
+    max-width: 920px;
+    margin: $margin-promotion-sections 0;
+  }
+  
+  .app-homepage-row .app-svg-image{
+    max-width: 90%;
+  }
+  
+  .app-homepage-reverse-row {
+    flex-direction: row-reverse;
+  }
+  
+  .app-header-start,
+  .app-homepage-bottom-start {
+    text-align: center;
+    margin: $margin-promotion-sections 0;
+  }
+  
+  .app-homepage-promo-img,
+  .app-homepage-promo-desc {
+    width: 50%;
+  }
+  
+  .app-homepage-promo-img {
+    text-align: center;
+  }
+  
+  .app-homepage-promo-desc {
+    line-height: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  
+  /**
+    * Rules for when the device is detected to be a small screen.
+    */
+  @media (max-width: 720px) {
+    .app-header-section {
+      padding-top: $margin-promotion-sections-small;
+    }
+  
+    .app-header-start,
+    .app-homepage-bottom-start {
+      margin: $margin-promotion-sections-small 0;
+    }
+  
+    .app-homepage-row {
+      margin: $margin-promotion-sections-small 0;
+    }
+  }
+  

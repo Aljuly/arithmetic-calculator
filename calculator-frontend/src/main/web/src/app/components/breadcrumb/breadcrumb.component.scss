@@ -1,0 +1,17 @@
+.breadcrumb li {
+    display: inline;
+}
+
+.breadcrumb li+li:before {
+    content: ">";
+    color: white;
+}
+
+.breadcrumb{
+    padding: 20px;
+    margin: 0;
+
+    a{
+        color: white;
+    }
+}

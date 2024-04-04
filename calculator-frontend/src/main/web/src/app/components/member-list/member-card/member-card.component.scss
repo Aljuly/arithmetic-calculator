@@ -1,0 +1,71 @@
+@mixin longText($width) {
+    width: $width;
+    text-decoration: none; 
+    text-overflow: ellipsis; 
+    display: block; 
+    overflow: hidden; 
+    white-space: nowrap;
+  }
+  
+  .member-card {
+      width: 300px;
+      height: 420px;
+      margin: 5px;
+      padding: 0;
+  }
+  
+  #mainContent {
+    height: 35%;
+    width: 100%;
+  }
+  
+  .avatar {
+    widows: 35%;
+    margin: 5px;
+  }
+  
+  #menuButton {
+    position: absolute;
+    top:30%; 
+    right: 20px;
+  }
+  
+  #contacts {
+    width: 65%;
+    margin: 0 0 0 3px;
+  }
+  
+  .userInformation{
+    padding: 0;
+    margin: 5px;
+  
+    .name {
+      @include longText(190px);
+    }
+  
+    .username {
+      margin:2px 0 2px; 
+      font-size: 15px;
+      @include longText(180px);
+    }
+    
+    
+    .field{
+      margin: 2px 0;
+      display: flex;
+      align-items: center;
+      span {
+        margin-left: 5px;
+        font-size: 14px;
+        a{
+          @include longText(160px);
+        }
+      }
+    }
+  }
+  
+  #otherContent {
+    margin: 0px 5px 10px;
+  }
+  
+  

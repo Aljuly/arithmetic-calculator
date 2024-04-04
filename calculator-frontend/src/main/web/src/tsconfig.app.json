@@ -1,0 +1,18 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app",
+    "types": ["node"],
+    "resolveJsonModule": true,
+    "module": "commonjs",
+    "target": "es6"
+  },
+  "files": [
+    "main.ts",
+    "polyfills.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ]
+}
