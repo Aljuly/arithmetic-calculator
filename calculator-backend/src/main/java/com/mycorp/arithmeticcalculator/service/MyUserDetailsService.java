@@ -40,28 +40,29 @@ public class MyUserDetailsService implements UserDetailsService {
         super();
     }
 
-    // API
-
     @Override
     public UserDetails loadUserByUsername(final String email) {
         final String ip = getClientIP();
         if (loginAttemptService.isBlocked(ip)) {
             throw new UsernameNotFoundException("blocked");
         }
-
         try {
-            final User user = userRepository.findByEmail(email);
-            if (user == null) {
-                throw new UsernameNotFoundException("No user found with username: " + email);
-            }
-
-            return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), user.isEnabled(), true, true, true, getAuthorities(user.getRoles()));
+            	final User user = userRepository.findByEmail(email);
+            	if (user == null) {
+            		throw new UsernameNotFoundException("No user found with username: " + email);
+            	}
+            	return new org.springframework.security.core.userdetails.User(
+            			user.getEmail(), 
+            			user.getPassword(), 
+            			user.isEnabled(), 
+            			true, 
+            			true, 
+            			true, 
+            			getAuthorities(user.getRoles()));
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
-
-    // UTIL
 
     public final Collection<? extends GrantedAuthority> getAuthorities(final Collection<Role> roles) {
         return getGrantedAuthorities(getPrivileges(roles));
