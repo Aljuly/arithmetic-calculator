@@ -28,7 +28,6 @@ public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
             if (!isValidLong(verificationCode) || !totp.verify(verificationCode)) {
                 throw new BadCredentialsException("Invalid verfication code");
             }
-
         }
         final Authentication result = super.authenticate(auth);
         return new UsernamePasswordAuthenticationToken(user, result.getCredentials(), result.getAuthorities());
