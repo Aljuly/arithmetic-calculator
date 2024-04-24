@@ -66,7 +66,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     	return errorResponse;
     }
     
-        //400
+    //400
     @ExceptionHandler({ InvalidOldPasswordException.class })
     public ResponseEntity<Object> handleInvalidOldPassword(final RuntimeException ex, final WebRequest request) {
         logger.error("400 Status Code", ex);
