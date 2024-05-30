@@ -15,9 +15,6 @@ import javax.persistence.Table;
 
 import org.jboss.aerogear.security.otp.api.Base32;
 
-import com.mycorp.arithmeticcalculator.validators.ValidEmail;
-import com.mycorp.arithmeticcalculator.validators.ValidPassword;
-
 @Entity
 @Table(name = "user_account")
 public class User {

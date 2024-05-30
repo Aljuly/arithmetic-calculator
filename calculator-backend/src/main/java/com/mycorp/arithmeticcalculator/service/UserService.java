@@ -95,7 +95,7 @@ public class UserService implements IUserService {
         }
         return null;
     }
-
+    
     @Override
     public VerificationToken getVerificationToken(final String VerificationToken) {
         return tokenRepository.findByToken(VerificationToken);

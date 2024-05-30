@@ -12,9 +12,15 @@ import java.time.temporal.TemporalAmount;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import com.mycorp.arithmeticcalculator.domain.User;
+import com.mycorp.arithmeticcalculator.dto.UserResponse;
+import com.mycorp.arithmeticcalculator.repository.UserRepository;
 
 @SuppressWarnings("deprecation")
 @Service
@@ -26,6 +32,9 @@ public class TokenService {
 	private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SIGNATURE_ALGORITHM);
     private static final TemporalAmount TOKEN_VALIDITY = Duration.ofHours(4L);
 
+    @Autowired
+    private UserRepository userRepository;
+    
     /**
      * Builds a JWT with the given subject and role and returns it as a JWS signed compact String.
      */
@@ -48,14 +57,23 @@ public class TokenService {
         String scope = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(" "));
-        
-        return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .claim(CLAIM_ROLE, scope)
-                .setExpiration(expiryDate)
-                .setIssuedAt(Date.from(now))
-                .signWith(SECRET_KEY)
-                .compact();
+        try {
+        	final User user = userRepository.findByEmail(userDetails.getUsername());
+        	if (user == null) {
+        		throw new UsernameNotFoundException("No user found during tocken generation");
+        	} else {
+        		UserResponse response = new UserResponse(user);
+        		return Jwts.builder()
+	                .setSubject(response.toJson())
+	                .claim(CLAIM_ROLE, scope)
+	                .setExpiration(expiryDate)
+	                .setIssuedAt(Date.from(now))
+	                .signWith(SECRET_KEY)
+	                .compact();
+        	}
+        } catch (final Exception e) {
+        	throw new RuntimeException(e);
+        }
 	}
 	
     /**

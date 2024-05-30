@@ -1,6 +1,5 @@
 package com.mycorp.arithmeticcalculator.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,7 +21,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
-@Slf4j
 @Validated
 @Api(value = "login", description = "the Login API")
 @RestController
@@ -40,6 +38,16 @@ public class LoginController {
 		this.usrDetailsService = usrDetailsService;
 	}	
 	
+	/**
+	 * Response tocken example
+		{
+		  "sub": "{\"id\":\"6\",\"login\":\"\",\"password\":\"\",\"email\":\"test@test.com\",\"firstName\":\"Test\",\"lastName\":\"Test\",\"avatar\":\"\",\"lastlogin\":\"\",\"enabled\":true,\"banned\":false,\"verified\":true,\"banReason\":\"\",\"userRoles\":[{\"id\":4,\"description\":null,\"name\":\"ROLE_ADMIN\",\"operations\":[\"READ_PRIVILEGE\",\"WRITE_PRIVILEGE\",\"CHANGE_PASSWORD_PRIVILEGE\"]}]}",
+		  "role": "CHANGE_PASSWORD_PRIVILEGE READ_PRIVILEGE WRITE_PRIVILEGE",
+		  "exp": 1717111122,
+		  "iat": 1717096722
+		}
+	 */
+	
 	@ApiOperation(value = "Log In User", nickname = "userLogin", response = String.class, 
 			tags = {"login-endpoint"})
     @ApiResponses(value = { 
@@ -55,5 +63,5 @@ public class LoginController {
 		String accessToken = tokenService.createToken(user);
 		return ResponseEntity.ok(new LoginResponse(user.getUsername(), accessToken));
 	}
-	
+
 }
