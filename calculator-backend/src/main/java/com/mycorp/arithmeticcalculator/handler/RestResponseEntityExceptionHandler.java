@@ -11,11 +11,13 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailAuthenticationException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,6 +31,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @Qualifier("messageSource")
     @Autowired
     private MessageSource messages;
 
@@ -66,7 +69,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     	return errorResponse;
     }
     
-        //400
+    //400
     @ExceptionHandler({ InvalidOldPasswordException.class })
     public ResponseEntity<Object> handleInvalidOldPassword(final RuntimeException ex, final WebRequest request) {
         logger.error("400 Status Code", ex);
@@ -90,14 +93,15 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         return handleExceptionInternal(ex, bodyOfResponse, new HttpHeaders(), HttpStatus.CONFLICT, request);
     }
 
-    // 500
-    @ExceptionHandler({ MailAuthenticationException.class })
+    // 503
+    @ExceptionHandler({ BadCredentialsException.class })
     public ResponseEntity<Object> handleMail(final RuntimeException ex, final WebRequest request) {
-        logger.error("500 Status Code", ex);
-        final GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("message.email.config.error", null, request.getLocale()), "MailError");
-        return new ResponseEntity<Object>(bodyOfResponse, new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR);
+        logger.error("503 Status Code", ex);
+        final GenericResponse bodyOfResponse = new GenericResponse(messages.getMessage("message.unauth", null, request.getLocale()), "AuthError");
+        return new ResponseEntity<Object>(bodyOfResponse, new HttpHeaders(), HttpStatus.SERVICE_UNAVAILABLE);
     }
 
+    // 500
     @ExceptionHandler({ Exception.class })
     public ResponseEntity<Object> handleInternal(final RuntimeException ex, final WebRequest request) {
         logger.error("500 Status Code", ex);

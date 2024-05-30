@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -78,7 +79,7 @@ public class RoleService implements IRoleService {
 				.stream()
 				.map(p -> privilegeRepository.findByName(p))
 				.filter(Objects::nonNull)
-				.toList());
+				.collect(Collectors.toList()));
 		roleRepository.saveAndFlush(role);
 		log.debug("Saved Role with Id: {}", role.getId());
 		return new RoleDto(role);

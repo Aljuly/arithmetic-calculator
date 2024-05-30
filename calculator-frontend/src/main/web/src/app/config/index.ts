@@ -1,7 +1,8 @@
 const DEFAULTS = {
     endpoint: {
       auth: {
-        issueNewToken: 'http://authentication-server:8901/auth/oauth/token'
+        //issueNewToken: 'http://authentication-server:8901/auth/oauth/token'
+        issueNewToken: '/api/auth/oauth/token'
       },
       users: {
         getById: '/api/users',
