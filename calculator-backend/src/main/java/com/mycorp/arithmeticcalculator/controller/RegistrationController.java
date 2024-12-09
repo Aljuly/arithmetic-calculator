@@ -34,7 +34,7 @@ import com.mycorp.arithmeticcalculator.dto.UserDto;
 import com.mycorp.arithmeticcalculator.error.InvalidOldPasswordException;
 import com.mycorp.arithmeticcalculator.error.UserNotFoundException;
 import com.mycorp.arithmeticcalculator.security.ISecurityUserService;
-import com.mycorp.arithmeticcalculator.service.IUserService;
+import com.mycorp.arithmeticcalculator.service.IUserAuthService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,7 +46,7 @@ import io.swagger.annotations.ApiResponses;
 public class RegistrationController {
 	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
-	private final IUserService userService;
+	private final IUserAuthService userService;
 
 	private final ISecurityUserService securityUserService;
 	/*
@@ -60,7 +60,7 @@ public class RegistrationController {
 
 	private final Environment env;
 
-	public RegistrationController(IUserService userService,
+	public RegistrationController(IUserAuthService userService,
 								  ISecurityUserService securityUserService,
 								  MessageSource messages,
 								  JavaMailSender mailSender,

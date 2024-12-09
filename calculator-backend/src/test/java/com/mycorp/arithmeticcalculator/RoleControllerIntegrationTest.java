@@ -34,7 +34,6 @@ import com.google.common.net.HttpHeaders;
 import com.mycorp.arithmeticcalculator.domain.Privilege;
 import com.mycorp.arithmeticcalculator.domain.Role;
 import com.mycorp.arithmeticcalculator.error.RoleNotFoundException;
-import com.mycorp.arithmeticcalculator.error.RoleProcessException;
 import com.mycorp.arithmeticcalculator.repository.PrivilegeRepository;
 import com.mycorp.arithmeticcalculator.repository.RoleRepository;
 import com.mycorp.springangularstarter.config.TestDbConfig;

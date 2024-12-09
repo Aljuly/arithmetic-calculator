@@ -55,7 +55,6 @@ public class RoleService implements IRoleService {
 			log.debug("About to delete role: {}", roleId);
 			roleRepository.deleteById(roleId);
 		} catch (Exception e) {
-			log.error("Role with id {} couldn't be found", roleId);
 			throw new RoleNotFoundException("Role to delete not found", e);
 		}
 	}
@@ -84,5 +83,12 @@ public class RoleService implements IRoleService {
 		log.debug("Saved Role with Id: {}", role.getId());
 		return new RoleDto(role);
 	}
+
+	@Override
+	public List<Role> getRolesByNames(List<String> names) {
+		return roleRepository.findByNameIn(names);
+	}
+	
+	
 
 }
