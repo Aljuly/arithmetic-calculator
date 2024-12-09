@@ -36,7 +36,7 @@ import org.springframework.security.core.session.SessionRegistry;
 
 
 @Service
-public class UserService implements IUserService {
+public class UserAuthService implements IUserAuthService {
 
     @Autowired
     private UserRepository repository;

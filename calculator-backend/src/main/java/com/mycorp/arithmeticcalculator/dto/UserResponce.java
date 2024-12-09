@@ -34,10 +34,10 @@ import com.mycorp.arithmeticcalculator.validators.ValidEmail;
 "banReason",
 "userRoles"
 })
-public class UserResponse {
+public class UserResponce {
 	
 	@JsonProperty("id")
-	private String id;
+	private Long id;
 	
 	@JsonProperty("login")
 	private String login;
@@ -87,7 +87,7 @@ public class UserResponse {
 	* No args constructor for use in serialization
 	*
 	*/
-	public UserResponse() {
+	public UserResponce() {
 	}
 
 	/**
@@ -106,8 +106,8 @@ public class UserResponse {
 	* @param banned
 	* @param email
 	*/
-	public UserResponse(
-			String id, 
+	public UserResponce(
+			Long id, 
 			String login, 
 			String password, 
 			String email, 
@@ -136,10 +136,10 @@ public class UserResponse {
 		this.userRoles = userRoles;
 	}
 
-	public UserResponse(User user) {
+	public UserResponce(User user) {
 		this(
-				user.getId().toString(),
-				"", //user.getLogin(), 
+				user.getId(),
+				user.getLogin(), 
 				"", //password 
 				user.getEmail(), 
 				user.getFirstName(), 
@@ -157,11 +157,11 @@ public class UserResponse {
 				);
 	}
 	
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(String id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -275,7 +275,7 @@ public class UserResponse {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		UserResponse other = (UserResponse) obj;
+		UserResponce other = (UserResponce) obj;
 		return Objects.equals(avatar, other.avatar) && Objects.equals(banReason, other.banReason)
 				&& banned == other.banned && Objects.equals(email, other.email) && enabled == other.enabled
 				&& Objects.equals(firstName, other.firstName) && Objects.equals(id, other.id)

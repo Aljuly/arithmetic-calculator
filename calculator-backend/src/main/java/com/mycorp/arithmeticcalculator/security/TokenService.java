@@ -19,7 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.mycorp.arithmeticcalculator.domain.User;
-import com.mycorp.arithmeticcalculator.dto.UserResponse;
+import com.mycorp.arithmeticcalculator.dto.UserResponce;
 import com.mycorp.arithmeticcalculator.repository.UserRepository;
 
 @SuppressWarnings("deprecation")
@@ -62,7 +62,7 @@ public class TokenService {
         	if (user == null) {
         		throw new UsernameNotFoundException("No user found during tocken generation");
         	} else {
-        		UserResponse response = new UserResponse(user);
+        		UserResponce response = new UserResponce(user);
         		return Jwts.builder()
 	                .setSubject(response.toJson())
 	                .claim(CLAIM_ROLE, scope)

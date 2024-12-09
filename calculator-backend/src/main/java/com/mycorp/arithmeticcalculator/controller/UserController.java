@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.mycorp.arithmeticcalculator.domain.User;
 import com.mycorp.arithmeticcalculator.error.ResourceNotFoundException;
 import com.mycorp.arithmeticcalculator.security.ActiveUserStore;
-import com.mycorp.arithmeticcalculator.service.IUserService;
+import com.mycorp.arithmeticcalculator.service.IUserAuthService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,7 +32,7 @@ public class UserController {
     private ActiveUserStore activeUserStore;
 
     @Autowired
-    private IUserService userService;
+    private IUserAuthService userService;
 
 	@Autowired
 	private MessageSource messages; 

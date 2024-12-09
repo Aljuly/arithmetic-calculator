@@ -12,8 +12,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "role")
 public class Role {
 
 	@Id
@@ -25,7 +27,7 @@ public class Role {
 
 	//ToDo change type of a variable to Set/HashSet
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "roles_privileges", 
+	@JoinTable(name = "role_privilege", 
 		joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"), 
 		inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
 	private List<Privilege> privileges = new ArrayList<>();

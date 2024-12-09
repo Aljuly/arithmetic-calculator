@@ -48,7 +48,7 @@ public class LoginControllerIntegrationTest {
     public void shouldReturnToken_WhenUserLogin(String body, int status,
 												String titleOne, String valOne,
 												String titleTwo, String valTwo) throws Exception {
-		mockMvc.perform(post("/login")
+		mockMvc.perform(post("/api/login")
 				.characterEncoding("utf-8")
 				.content(body)
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))

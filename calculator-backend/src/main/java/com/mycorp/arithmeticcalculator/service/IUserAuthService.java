@@ -10,7 +10,7 @@ import com.mycorp.arithmeticcalculator.domain.VerificationToken;
 import com.mycorp.arithmeticcalculator.dto.UserDto;
 import com.mycorp.arithmeticcalculator.error.UserAlreadyExistException;
 
-public interface IUserService {
+public interface IUserAuthService {
 
     User registerNewUserAccount(UserDto accountDto) throws UserAlreadyExistException;
 

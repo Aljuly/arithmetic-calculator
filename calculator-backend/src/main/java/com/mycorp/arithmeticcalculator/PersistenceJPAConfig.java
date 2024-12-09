@@ -4,6 +4,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -50,11 +51,22 @@ public class PersistenceJPAConfig {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
 		dataSource.setDriverClassName(env.getProperty("spring.datasource.driverClassName"));
 		dataSource.setUrl(env.getProperty("spring.datasource.url"));
-		dataSource.setUsername(env.getProperty("spring.datasource.user"));
+		dataSource.setUsername(env.getProperty("spring.datasource.username"));
 		dataSource.setPassword(env.getProperty("spring.datasource.password"));
 		return dataSource;
 	}
 
+    @Bean(initMethod = "migrate")
+    Flyway flyway() {
+        return new Flyway(Flyway.configure()
+                .baselineOnMigrate(false)
+                .dataSource(
+                		env.getRequiredProperty("spring.datasource.url"),
+                		env.getRequiredProperty("spring.datasource.username"),
+                		env.getRequiredProperty("spring.datasource.password"))
+        );
+    }
+    
     @Bean
     JpaTransactionManager transactionManager() {
 		final JpaTransactionManager transactionManager = new JpaTransactionManager();

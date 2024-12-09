@@ -18,7 +18,7 @@ public class RegistrationListener implements
   ApplicationListener<OnRegistrationCompleteEvent> {
   
     @Autowired
-    private IUserService service;
+    private IUserAuthService service;
 
     @Autowired
     private MessageSource messages;
