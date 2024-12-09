@@ -1,8 +1,6 @@
 package com.mycorp.arithmeticcalculator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,13 +59,13 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 		createRoleIfNotFound("ROLE_USER", userPrivileges);
 
 		// == create initial user
-		createUserIfNotFound("test@test.com", "Test", "Test", "Passw0rd!", Stream.of(adminRole)
-				.collect(Collectors.toCollection(ArrayList::new)));
+		createUserIfNotFound("testUser", "test@test.com", "Test", "Test", "Passw0rd!", Stream.of(adminRole)
+				.collect(Collectors.toList()));
 		alreadySetup = true;
 	}
 
 	@Transactional
-	private final Privilege createPrivilegeIfNotFound(final String name) {
+	Privilege createPrivilegeIfNotFound(final String name) {
 		Privilege privilege = privilegeRepository.findByName(name);
 		if (privilege == null) {
 			privilege = new Privilege(name);
@@ -77,7 +75,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 	}
 
 	@Transactional
-	private final Role createRoleIfNotFound(final String name, final List<Privilege> privileges) {
+	Role createRoleIfNotFound(final String name, final List<Privilege> privileges) {
 		Role role = roleRepository.findByName(name);
 		if (role == null) {
 			role = new Role(name);
@@ -88,11 +86,12 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 	}
 
 	@Transactional
-	private final User createUserIfNotFound(final String email, final String firstName, final String lastName,
-			final String password, final Collection<Role> roles) {
+	User createUserIfNotFound(final String login, final String email, final String firstName, final String lastName,
+							  final String password, final List<Role> roles) {
 		User user = userRepository.findByEmail(email);
 		if (user == null) {
 			user = new User();
+			user.setLogin(login);
 			user.setFirstName(firstName);
 			user.setLastName(lastName);
 			user.setPassword(passwordEncoder.encode(password));

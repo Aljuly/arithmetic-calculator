@@ -76,7 +76,7 @@ public class FileEndpointTest {
 	}
 	
 	@Test
-	public void shouldSaveLogoImageAndReturnLoction() throws Exception {
+	public void shouldSaveLogoImageAndReturnLocation() throws Exception {
 		final MockMultipartFile logo = new MockMultipartFile(
 				"file", 
 				"logo.png", 

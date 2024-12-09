@@ -32,8 +32,7 @@ import com.mycorp.arithmeticcalculator.error.UserAlreadyExistException;
 import com.mycorp.arithmeticcalculator.repository.RoleRepository;
 import com.mycorp.arithmeticcalculator.repository.UserRepository;
 import com.mycorp.arithmeticcalculator.repository.VerificationTokenRepository;
-import com.mycorp.arithmeticcalculator.service.IUserService;
-import com.mycorp.arithmeticcalculator.service.UserService;
+import com.mycorp.arithmeticcalculator.service.IUserAuthService;
 import com.mycorp.springangularstarter.config.TestDbConfig;
 import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 
@@ -41,7 +40,7 @@ import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 public class UserServiceIntegrationTest {
 
     @Autowired
-    private IUserService userService;
+    private IUserAuthService userService;
 
     @Autowired
     private UserRepository userRepository;

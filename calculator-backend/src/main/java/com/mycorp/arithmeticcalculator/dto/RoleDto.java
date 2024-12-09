@@ -2,6 +2,7 @@ package com.mycorp.arithmeticcalculator.dto;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.validation.constraints.NotEmpty;
@@ -39,7 +40,7 @@ public class RoleDto {
 		this.id = role.getId();
 		this.role = role.getName();
 		this.description = role.getDescription();
-		this.privileges = role.getPrivileges().stream().map(Privilege::getName).toList();
+		this.privileges = role.getPrivileges().stream().map(Privilege::getName).collect(Collectors.toList());
 	}
 	
 	public Long getId() {

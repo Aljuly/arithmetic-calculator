@@ -1,6 +1,7 @@
 package com.mycorp.arithmeticcalculator.domain;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,17 +16,18 @@ import javax.persistence.Table;
 
 import org.jboss.aerogear.security.otp.api.Base32;
 
-import com.mycorp.arithmeticcalculator.validators.ValidEmail;
-import com.mycorp.arithmeticcalculator.validators.ValidPassword;
+import com.mycorp.arithmeticcalculator.dto.UserResponce;
 
 @Entity
-@Table(name = "user_account")
+@Table(name = "_user")
 public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	private String login;
+	
 	private String firstName;
 
 	private String lastName;
@@ -42,15 +44,61 @@ public class User {
 	private String secret;
 
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-	private Collection<Role> roles;
+	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+	private List<Role> roles = new ArrayList<Role>();
 
 	public User() {
 		super();
 		this.secret = Base32.random();
 		this.enabled = false;
 	}
+	
+	public User(
+			String login,
+			String firstName, 
+			String lastName, 
+			String email, 
+			String password, 
+			boolean enabled,
+			boolean isUsing2FA, 
+			String secret
+			) {
+		super();
+		this.login = login;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.password = password;
+		this.enabled = enabled;
+		this.isUsing2FA = isUsing2FA;
+		this.secret = secret;
+	}
 
+	public User(UserResponce userResponse) {
+		this(
+				userResponse.getLogin(),
+				userResponse.getFirstName(),
+				userResponse.getLastName(),
+				userResponse.getEmail(),
+				userResponse.getPassword(),
+				userResponse.isEnabled(),
+				false,
+				""
+				);
+	}
+	
+	public User updateUser(UserResponce userResponse) {
+		this.login = userResponse.getLogin();
+		this.firstName = userResponse.getFirstName();
+		this.lastName = userResponse.getLastName();
+		this.email = userResponse.getEmail();
+		this.password = userResponse.getPassword();
+		this.enabled = userResponse.isEnabled();
+		this.isUsing2FA = false;
+		this.secret = "";
+		return this;
+	}
+	
 	public Long getId() {
 		return id;
 	}
@@ -59,6 +107,14 @@ public class User {
 		this.id = id;
 	}
 
+	public void setLogin(String login) {
+		this.login = login;
+	}
+	
+	public String getLogin() {
+		return login;
+	}
+	
 	public String getFirstName() {
 		return firstName;
 	}
@@ -91,11 +147,11 @@ public class User {
 		this.password = password;
 	}
 
-	public Collection<Role> getRoles() {
+	public List<Role> getRoles() {
 		return roles;
 	}
 
-	public void setRoles(final Collection<Role> roles) {
+	public void setRoles(final List<Role> roles) {
 		this.roles = roles;
 	}
 
