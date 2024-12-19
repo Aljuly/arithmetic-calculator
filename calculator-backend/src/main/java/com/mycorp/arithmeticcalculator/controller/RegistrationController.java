@@ -93,25 +93,10 @@ public class RegistrationController {
 	}
 
 	@GetMapping(value = "/registrationConfirm")
-	public String confirmRegistration(final Locale locale, final Model model, @RequestParam("token") final String token)
+	public GenericResponse confirmRegistration(@RequestParam() final String token)
 			throws UnsupportedEncodingException {
 		final String result = userService.validateVerificationToken(token);
-		if (result.equals("valid")) {
-			final User user = userService.getUser(token);
-			// logger
-			System.out.println(user);
-			if (user.isUsing2FA()) {
-				model.addAttribute("qr", userService.generateQRUrl(user));
-				return "redirect:/qrcode.html?lang=" + locale.getLanguage();
-			}
-			model.addAttribute("message", messages.getMessage("message.accountVerified", null, locale));
-			return "redirect:/login?lang=" + locale.getLanguage();
-		}
-
-		model.addAttribute("message", messages.getMessage("auth.message." + result, null, locale));
-		model.addAttribute("expired", "expired".equals(result));
-		model.addAttribute("token", token);
-		return "redirect:/badUser.html?lang=" + locale.getLanguage();
+		return new GenericResponse(result);
 	}
 
 	// user activation - verification
@@ -147,8 +132,8 @@ public class RegistrationController {
 	}
 
 	@GetMapping(value = "/user/changePassword")
-	public String showChangePasswordPage(final Locale locale, final Model model, @RequestParam("id") final long id,
-			@RequestParam("token") final String token) {
+	public String showChangePasswordPage(final Locale locale, final Model model, @RequestParam() final long id,
+			@RequestParam() final String token) {
 		final String result = securityUserService.validatePasswordResetToken(id, token);
 		if (result != null) {
 			model.addAttribute("message", messages.getMessage("auth.message." + result, null, locale));
@@ -181,7 +166,7 @@ public class RegistrationController {
 
 	@PostMapping(value = "/user/update/2fa")
 	@ResponseBody
-	public GenericResponse modifyUser2FA(@RequestParam("use2FA") final boolean use2FA)
+	public GenericResponse modifyUser2FA(@RequestParam() final boolean use2FA)
 			throws UnsupportedEncodingException {
 		final User user = userService.updateUser2FA(use2FA);
 		if (use2FA) {

@@ -164,7 +164,7 @@ public class DeviceService {
         notification.setText(text);
         notification.setFrom(from);
 
-        // mailSender.send(notification);
+        mailSender.send(notification);
     }
 
 }

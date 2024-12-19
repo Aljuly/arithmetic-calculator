@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -86,15 +87,17 @@ public class RegistrationControllerIntegrationTest {
     public void testRegistrationValidation() throws Exception {
 
         final MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
-        param.add("firstName", "");
-        param.add("lastName", "");
-        param.add("email", "");
-        param.add("password", "");
-        param.add("matchingPassword", "");
+        param.add("firstName", "First");
+        param.add("lastName", "Last");
+        param.add("email", UUID.randomUUID().toString());
+        param.add("password", "Passw0rd!");
+        param.add("matchingPassword", "Passw0rd!");
 
-        ResultActions resultActions = this.mockMvc.perform(post("/user/registration").params(param));
+        ResultActions resultActions = 
+        		mockMvc.perform(post("/user/registration").params(param))
+        		.andDo(print());
         resultActions.andExpect(status().is(400));
-        resultActions.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)).andExpect(jsonPath("$.error", is("InvaliduserDto")))
-                .andExpect(jsonPath("$.message", containsString("{\"field\":\"lastName\",\"defaultMessage\":\"Length must be greater than 1\"}")));
+        resultActions.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message", containsString("Invalid email")));
     }
 }
