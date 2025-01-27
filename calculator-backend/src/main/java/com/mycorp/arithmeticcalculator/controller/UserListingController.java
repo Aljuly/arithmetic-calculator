@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Validated
 @Api(value = "users", description = "the user API")
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/v1.0/users")
 @Slf4j
 public class UserListingController {
 	

@@ -55,8 +55,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 				Stream.of(readPrivilege, writePrivilege, passwordPrivilege).collect(Collectors.toCollection(ArrayList::new));
 		final List<Privilege> userPrivileges = 
 				Stream.of(readPrivilege, passwordPrivilege).collect(Collectors.toCollection(ArrayList::new));
-		final Role adminRole = createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
-		createRoleIfNotFound("ROLE_USER", userPrivileges);
+		final Role adminRole = createRoleIfNotFound("ADMIN", adminPrivileges);
+		createRoleIfNotFound("USER", userPrivileges);
 
 		// == create initial user
 		createUserIfNotFound("testUser", "test@test.com", "Test", "Test", "Passw0rd!", Stream.of(adminRole)

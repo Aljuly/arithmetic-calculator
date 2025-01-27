@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.Date;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,15 +77,52 @@ public class TokenService {
         }
 	}
 	
+	/**
+	 * Returns user name got from the token 
+	 * @param token
+	 * @return User name
+	 */
+	public String getUserName(String token) {
+		return parseSignedClaims(token, Claims::getSubject);
+	}
+	
+	/**
+	 * check token validity
+	 * @param token
+	 * @param userDetails
+	 * @return true if token valid
+	 */
+	public boolean isTokenValid(String token, UserDetails userDetails) {
+		final String userName = getUserName(token);
+		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(userName);
+	}
+	
+	/**
+	 * check if token is expired
+	 * @param token
+	 * @return true if token is expired
+	 */
+	private boolean isTokenExpired(String token) {
+		Date tokenExpirationDate = parseSignedClaims(token, Claims::getExpiration);
+		return tokenExpirationDate.before(new Date());
+	}
+	
     /**
      * Parses the given JWS signed compact JWT, returning the claims.
      * If this method returns without throwing an exception, the token can be trusted.
      */
-    public Claims parseToken(final String compactToken) {       
+    private Claims parseToken(final String compactToken) {       
         return Jwts.parser()
                 .verifyWith(SECRET_KEY)
                 .build()
                 .parseSignedClaims(compactToken)
                 .getPayload();
     }
+    
+    private <T> T parseSignedClaims(String token, Function<Claims, T> claimsResolvers) {
+    	final Claims claims = parseToken(token);
+    	return claimsResolvers.apply(claims);
+    }
+    
+    
 }

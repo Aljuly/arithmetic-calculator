@@ -1,7 +1,6 @@
 package com.mycorp.arithmeticcalculator;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -94,7 +93,7 @@ public class RegistrationControllerIntegrationTest {
         param.add("matchingPassword", "Passw0rd!");
 
         ResultActions resultActions = 
-        		mockMvc.perform(post("/user/registration").params(param))
+        		mockMvc.perform(post("/v1.0/user/register").params(param))
         		.andDo(print());
         resultActions.andExpect(status().is(400));
         resultActions.andExpect(content().contentType(MediaType.APPLICATION_JSON))

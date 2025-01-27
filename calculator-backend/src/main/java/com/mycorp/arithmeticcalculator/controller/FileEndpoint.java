@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
@@ -28,6 +29,7 @@ import io.swagger.annotations.ApiResponses;
 @Validated
 @Api(value = "images", description = "the logo image API")
 @RestController
+@RequestMapping(value = "/v1.0/images")
 public class FileEndpoint {
 	
 	private final IFileService fileService;
@@ -47,7 +49,7 @@ public class FileEndpoint {
     @ApiResponses(value = { 
             @ApiResponse(code = 200, message = "OK", response = Resource.class),
     })
-	@GetMapping(value ="/image/{imgeId}", produces = {"image/_*"})
+	@GetMapping(value ="/{imgeId}", produces = {"image/_*"})
 	public ResponseEntity<Resource> getImageFile(
 				@ApiParam(value = "", required = true) 
 				@PathVariable("imgeId")	String imgeId) {
@@ -61,7 +63,7 @@ public class FileEndpoint {
     @ApiResponses(value = { 
             @ApiResponse(code = 200, message = "Created", response = String.class)
     })
-	@PostMapping(value ="/image", produces = {"*/*"}, consumes = {"multipart/form-data"})
+	@PostMapping(produces = {"*/*"}, consumes = {"multipart/form-data"})
 	public ResponseEntity<String> saveImgeFile(MultipartFile file) {
 		final String imageId = fileService.persistFile(file);
 		final URI uri = MvcUriComponentsBuilder
@@ -77,7 +79,7 @@ public class FileEndpoint {
             @ApiResponse(code = 200, message = "OK", response = Resource.class),
             @ApiResponse(code = 404, message = "Not Found")
     })
-	@GetMapping(value ="/image/default", produces = {"image/_*"})
+	@GetMapping(value ="/default", produces = {"image/_*"})
 	public ResponseEntity<Resource> getDefaultImageFile() {
 		return fileService.getDefaultBackground()
 				.map(entityResponseMapping)

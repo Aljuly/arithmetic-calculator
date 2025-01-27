@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,10 +46,11 @@ public class LoginControllerIntegrationTest {
 
 	@ParameterizedTest
 	@MethodSource("provideTestData")
+	@WithAnonymousUser
     public void shouldReturnToken_WhenUserLogin(String body, int status,
 												String titleOne, String valOne,
 												String titleTwo, String valTwo) throws Exception {
-		mockMvc.perform(post("/api/login")
+		mockMvc.perform(post("/v1.0/login")
 				.characterEncoding("utf-8")
 				.content(body)
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))

@@ -4,18 +4,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -29,7 +34,7 @@ import com.mycorp.arithmeticcalculator.security.CustomWebAuthenticationDetailsSo
 @Configuration
 @ComponentScan(basePackages = { "com.mycorp.arithmeticcalculator.security" })
 @EnableWebSecurity
-public class SecSecurityConfig extends WebSecurityConfigurerAdapter {
+public class SecSecurityConfig {
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -50,59 +55,38 @@ public class SecSecurityConfig extends WebSecurityConfigurerAdapter {
         super();
     }
     
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
+//    @Bean
+//    public AuthenticationManager authenticationManagerBean() throws Exception {
+//        return super.authenticationManagerBean();
+//    }
     
-    @Override
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authProvider());
     }
 
-    @Override
     public void configure(final WebSecurity web) {
         web.ignoring().antMatchers("/resources/**");
     }
 
-    @Override
-    protected void configure(final HttpSecurity http) throws Exception {
-        // @formatter:off
+	@Bean
+	//@Profile("test")
+    SecurityFilterChain scurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
                 .authorizeRequests(requests -> requests
-                        .antMatchers("/login*", "/logout*", "/signin/**", "/signup/**", "/customLogin",
-                                "/user/registration*", "/registrationConfirm*", "/expiredAccount*", "/registration*",
-                                "/badUser*", "/user/resendRegistrationToken*", "/forgetPassword*", "/user/resetPassword*",
-                                "/user/changePassword*", "/emailError*", "/resources/**", "/old/user/registration*", "/successRegister*", "/qrcode*").permitAll()
-                        .antMatchers("/invalidSession*").anonymous()
-                        .antMatchers("/user/updatePassword*", "/user/savePassword*", "/updatePassword*").hasAuthority("CHANGE_PASSWORD_PRIVILEGE")
-                        .anyRequest().hasAuthority("READ_PRIVILEGE"))
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/homepage.html")
-                        .failureUrl("/login?error=true")
-                        .successHandler(myAuthenticationSuccessHandler)
-                        .failureHandler(authenticationFailureHandler)
-                        .authenticationDetailsSource(authenticationDetailsSource)
-                        .permitAll())
-                .sessionManagement(management -> management
-                        .invalidSessionUrl("/invalidSession.html")
-                        .maximumSessions(1).sessionRegistry(sessionRegistry()).and()
-                        .sessionFixation().none())
-                .logout(logout -> logout
-                        .logoutSuccessHandler(myLogoutSuccessHandler)
-                        .invalidateHttpSession(false)
-                        .logoutSuccessUrl("/logout.html?logSucc=true")
-                        .deleteCookies("JSESSIONID")
-                        .permitAll())
-                .rememberMe(me -> me.rememberMeServices(rememberMeServices()).key("theKey"));
-    // @formatter:on
-    }
-
-    // beans
-
+                        .antMatchers("/v1.0/user/register", "/v1.0/registrationConfirm", "/v1.0/user/resendRegistrationToken", "/v1.0/user/resetPassword", "/v1.0/user/changePassword").permitAll()
+                        .antMatchers("/v1.0/user/savePassword", "/v1.0/user/updatePassword", "/v1.0/user/update/2fa").permitAll()
+                        .antMatchers("/v1.0/login").permitAll()
+                        .antMatchers("/v1.0/users/**").hasRole("ADMIN")
+                        .antMatchers("/v1.0/roles*").hasRole("ADMIN")
+                        .antMatchers("/v1.0/images/**").hasRole("ADMIN")
+                        .antMatchers("/v1.0/users/by-name/{userId}").hasAnyRole("USER", "ADMIN")
+                        .antMatchers("/v1.0/users/**").hasRole("ADMIN")
+                        .antMatchers("/loggedUsers").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .csrf(csrf -> csrf.disable());
+		return http.build();
+	}
+    
     @Bean
     DaoAuthenticationProvider authProvider() {
         final CustomAuthenticationProvider authProvider = new CustomAuthenticationProvider();

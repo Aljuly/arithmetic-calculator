@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mycorp.arithmeticcalculator.dto.RoleDto;
@@ -28,6 +29,7 @@ import io.swagger.annotations.ApiResponses;
 @Validated
 @Api(value = "roles", description = "the role API")
 @RestController
+@RequestMapping(value = "/v1.0/roles")
 public class RoleController {
 	
 	private final IRoleService roleService;
@@ -41,7 +43,7 @@ public class RoleController {
     @ApiResponses(value = {
     		@ApiResponse(code = 200, message = "OK", response = Resource.class)
     })
-    @GetMapping(value = "/api/roles", produces = { "application/json" })
+    @GetMapping(produces = { "application/json" })
 	public ResponseEntity<List<RoleDto>> getAll() {
 		return ResponseEntity.ok(roleService.getAllRoles());
 	}
@@ -52,7 +54,7 @@ public class RoleController {
     		@ApiResponse(code = 200, message = "OK", response = Resource.class),
     		@ApiResponse(code = 404, message = "Not Found")
     })
-    @DeleteMapping(value = "/api/roles/{roleId}", produces = { "application/json" })
+    @DeleteMapping(value = "/{roleId}", produces = { "application/json" })
 	public ResponseEntity<Resource> delete(@PathVariable("roleId") Long roleId) throws RoleNotFoundException {
     	roleService.deleteRole(roleId);
 		return new ResponseEntity<>(HttpStatus.OK);
@@ -63,7 +65,7 @@ public class RoleController {
     @ApiResponses(value = { 
             @ApiResponse(code = 200, message = "Created", response = String.class)
     })
-	@PostMapping(value ="/api/roles", produces = {"application/json"}, consumes = {"application/json"})
+	@PostMapping(produces = {"application/json"}, consumes = {"application/json"})
 	public ResponseEntity<RoleDto> create(@RequestBody RoleDto role) throws RoleProcessException {
 		return ResponseEntity.ok(roleService.createRole(role));
 	}
@@ -75,7 +77,7 @@ public class RoleController {
             @ApiResponse(code = 200, message = "Saved", response = String.class),
             @ApiResponse(code = 400, message = "Invalid status value", response = String.class),
     })
-	@PutMapping(value ="/api/roles", produces = {"application/json"}, consumes = {"application/json"})
+	@PutMapping(value ="/v1.0/roles", produces = {"application/json"}, consumes = {"application/json"})
 	public ResponseEntity<Resource> update(@RequestBody RoleDto role) {
 		return ResponseEntity.notFound().build();
 	}

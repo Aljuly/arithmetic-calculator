@@ -59,17 +59,17 @@ public class FileEndpointTest {
 		entityManager.flush();
         entityManager.clear();
 		String imgeId = fileLogoEntity.getId().toString();
-		mockMvc.perform(get("/image/{imageId}", imgeId))
+		mockMvc.perform(get("/v1.0/images/{imageId}", imgeId))
 			.andExpect(status().is(200))
 			.andExpect(content().bytes(StreamUtils.copyToByteArray(defaultImage.getInputStream())));
-		mockMvc.perform(get("/image/{imageId}", "123456"))
+		mockMvc.perform(get("/v1.0/image/{imageId}", "123456"))
 			.andExpect(status().is(200));
 	}
 	
 	@Test
 	public void shouldReturnDefaultImage() throws Exception {
 		final byte[] logoBytes = StreamUtils.copyToByteArray(defaultImage.getInputStream());
-		mockMvc.perform(get("/image/default"))
+		mockMvc.perform(get("/v1.0/images/default"))
 			.andExpect(status().isOk())
 			.andExpect(content().contentType(MediaType.IMAGE_PNG))
 			.andExpect(content().bytes(logoBytes));
@@ -82,7 +82,7 @@ public class FileEndpointTest {
 				"logo.png", 
 				MediaType.IMAGE_PNG_VALUE, 
 				StreamUtils.copyToByteArray(defaultImage.getInputStream()));
-		final MockHttpServletRequestBuilder request = MockMvcRequestBuilders.multipart("/image").file(logo);
+		final MockHttpServletRequestBuilder request = MockMvcRequestBuilders.multipart("/v1.0/images").file(logo);
 		final String location = mockMvc.perform(request)
 				.andExpect(status().isOk())
 				.andReturn()
