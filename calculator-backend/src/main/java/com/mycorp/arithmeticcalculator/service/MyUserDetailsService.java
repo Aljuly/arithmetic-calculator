@@ -19,15 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mycorp.arithmeticcalculator.domain.Privilege;
 import com.mycorp.arithmeticcalculator.domain.Role;
 import com.mycorp.arithmeticcalculator.domain.User;
-import com.mycorp.arithmeticcalculator.repository.UserRepository;
 import com.mycorp.arithmeticcalculator.security.LoginAttemptService;
 
 @Service("userDetailsService")
 @Transactional
 public class MyUserDetailsService implements UserDetailsService {
-
+ 
     @Autowired
-    private UserRepository userRepository;
+    private IUserAuthService userAuthService;
 
     @Autowired
     @Qualifier("loginAttemptService")
@@ -41,15 +40,15 @@ public class MyUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(final String email) {
+    public UserDetails loadUserByUsername(final String userName) {
         final String ip = getClientIP();
         if (loginAttemptService.isBlocked(ip)) {
             throw new UsernameNotFoundException("blocked");
         }
         try {
-            	final User user = userRepository.findByEmail(email);
+            	final User user = userAuthService.findUserByName(userName);
             	if (user == null) {
-            		throw new UsernameNotFoundException("No user found with username: " + email);
+            		throw new UsernameNotFoundException("No user found with username: " + userName);
             	} else {
             		return new org.springframework.security.core.userdetails.User(
             			user.getEmail(), 

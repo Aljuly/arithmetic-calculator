@@ -32,7 +32,7 @@ public class FileServiceTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		fileService = spy(new FileService(entityRepository));
 	}
 	

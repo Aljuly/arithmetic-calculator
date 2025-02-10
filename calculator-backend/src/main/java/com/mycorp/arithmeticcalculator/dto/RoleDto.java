@@ -29,6 +29,13 @@ public class RoleDto {
 	@NotEmpty
 	private List<String> privileges;
 	
+	/**
+	* No args constructor for use in serialization
+	*
+	*/
+	public RoleDto() {
+	}
+	
 	public RoleDto(Long id, String role, String description, List<String> privileges) {
 		this.id = id;
 		this.role = role;

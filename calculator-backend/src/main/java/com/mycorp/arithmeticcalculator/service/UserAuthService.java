@@ -140,6 +140,11 @@ public class UserAuthService implements IUserAuthService {
     public User findUserByEmail(final String email) {
         return repository.findByEmail(email);
     }
+    
+	@Override
+	public User findUserByName(String loginName) {
+		return repository.findByLogin(loginName);
+	}
 
     @Override
     public PasswordResetToken getPasswordResetToken(final String token) {

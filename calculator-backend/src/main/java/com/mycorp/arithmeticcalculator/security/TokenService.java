@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -27,14 +26,17 @@ import com.mycorp.arithmeticcalculator.repository.UserRepository;
 @Service
 public class TokenService {
 	
-    private static final String CLAIM_ROLE = "role";
+	private static final String CLAIM_ROLE = "role";
 
     private static final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS256;
 	private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SIGNATURE_ALGORITHM);
     private static final TemporalAmount TOKEN_VALIDITY = Duration.ofHours(4L);
 
-    @Autowired
     private UserRepository userRepository;
+    
+    public TokenService(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}    
     
     /**
      * Builds a JWT with the given subject and role and returns it as a JWS signed compact String.
@@ -82,8 +84,13 @@ public class TokenService {
 	 * @param token
 	 * @return User name
 	 */
-	public String getUserName(String token) {
-		return parseSignedClaims(token, Claims::getSubject);
+	public UserResponce getUserName(String token) {
+		String userData = parseSignedClaims(token, Claims::getSubject);
+		try {
+			return UserResponce.fromJson(userData);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 	
 	/**
@@ -93,8 +100,8 @@ public class TokenService {
 	 * @return true if token valid
 	 */
 	public boolean isTokenValid(String token, UserDetails userDetails) {
-		final String userName = getUserName(token);
-		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(userName);
+		final String userName = getUserName(token).getLogin();
+		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
 	}
 	
 	/**
@@ -113,10 +120,10 @@ public class TokenService {
      */
     private Claims parseToken(final String compactToken) {       
         return Jwts.parser()
-                .verifyWith(SECRET_KEY)
+        		.setSigningKey(SECRET_KEY)
                 .build()
-                .parseSignedClaims(compactToken)
-                .getPayload();
+                .parseClaimsJws(compactToken)
+                .getBody();
     }
     
     private <T> T parseSignedClaims(String token, Function<Claims, T> claimsResolvers) {
