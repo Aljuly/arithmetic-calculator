@@ -6,121 +6,103 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authorization.AuthorizationDecision;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.RequestAuthorizationContext;
 import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
+import org.springframework.web.cors.CorsConfiguration;
 
+import com.mycorp.arithmeticcalculator.filter.JwtAuthenticationFilter;
 import com.mycorp.arithmeticcalculator.security.CustomAuthenticationProvider;
 import com.mycorp.arithmeticcalculator.security.CustomRememberMeServices;
-import com.mycorp.arithmeticcalculator.security.CustomWebAuthenticationDetailsSource;
+
+import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
+import java.util.List;
+import java.util.Random;
 
 @Configuration
 @ComponentScan(basePackages = { "com.mycorp.arithmeticcalculator.security" })
-@EnableWebSecurity
-public class SecSecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity
+@EnableWebSecurity(debug = true)
+public class SecSecurityConfig {
 
     @Autowired
     private UserDetailsService userDetailsService;
 
     @Autowired
-    private AuthenticationSuccessHandler myAuthenticationSuccessHandler;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private LogoutSuccessHandler myLogoutSuccessHandler;
-
-    @Autowired
-    private AuthenticationFailureHandler authenticationFailureHandler;
-
-    @Autowired
-    private CustomWebAuthenticationDetailsSource authenticationDetailsSource;
-
+	private JwtAuthenticationFilter jwtAuthenticationFilter;
+    
     public SecSecurityConfig() {
         super();
     }
     
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-    
-    @Override
     protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authProvider());
     }
 
-    @Override
     public void configure(final WebSecurity web) {
         web.ignoring().antMatchers("/resources/**");
     }
 
-    @Override
-    protected void configure(final HttpSecurity http) throws Exception {
-        // @formatter:off
+	@Bean
+    SecurityFilterChain scurityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .authorizeRequests(requests -> requests
-                        .antMatchers("/login*", "/logout*", "/signin/**", "/signup/**", "/customLogin",
-                                "/user/registration*", "/registrationConfirm*", "/expiredAccount*", "/registration*",
-                                "/badUser*", "/user/resendRegistrationToken*", "/forgetPassword*", "/user/resetPassword*",
-                                "/user/changePassword*", "/emailError*", "/resources/**", "/old/user/registration*", "/successRegister*", "/qrcode*").permitAll()
-                        .antMatchers("/invalidSession*").anonymous()
-                        .antMatchers("/user/updatePassword*", "/user/savePassword*", "/updatePassword*").hasAuthority("CHANGE_PASSWORD_PRIVILEGE")
-                        .anyRequest().hasAuthority("READ_PRIVILEGE"))
-                .formLogin(login -> login
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/homepage.html")
-                        .failureUrl("/login?error=true")
-                        .successHandler(myAuthenticationSuccessHandler)
-                        .failureHandler(authenticationFailureHandler)
-                        .authenticationDetailsSource(authenticationDetailsSource)
-                        .permitAll())
-                .sessionManagement(management -> management
-                        .invalidSessionUrl("/invalidSession.html")
-                        .maximumSessions(1).sessionRegistry(sessionRegistry()).and()
-                        .sessionFixation().none())
-                .logout(logout -> logout
-                        .logoutSuccessHandler(myLogoutSuccessHandler)
-                        .invalidateHttpSession(false)
-                        .logoutSuccessUrl("/logout.html?logSucc=true")
-                        .deleteCookies("JSESSIONID")
-                        .permitAll())
-                .rememberMe(me -> me.rememberMeServices(rememberMeServices()).key("theKey"));
-    // @formatter:on
-    }
-
-    // beans
-
+		        .cors(cors -> cors.configurationSource(request -> {
+		        	CorsConfiguration corsConfiguration = new CorsConfiguration();
+		            corsConfiguration.setAllowedOriginPatterns(List.of("*"));
+		            corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		            corsConfiguration.setAllowedHeaders(List.of("*"));
+		            corsConfiguration.setAllowCredentials(true);
+		            return corsConfiguration;
+		        }))
+                .authorizeHttpRequests(requests -> requests
+                        .antMatchers("/v1.0/user/register", "/v1.0/registrationConfirm", "/v1.0/user/resendRegistrationToken", "/v1.0/user/resetPassword", "/v1.0/user/changePassword").permitAll()
+                        .antMatchers("/v1.0/user/savePassword", "/v1.0/user/updatePassword", "/v1.0/user/update/2fa").permitAll()
+                        .antMatchers("/v1.0/login").permitAll()
+                        .antMatchers("/v1.0/users/**").hasRole("ADMIN")
+                        .antMatchers("/v1.0/roles/**").hasRole("ADMIN")
+                        .antMatchers("/v1.0/images/**").hasRole("ADMIN")
+                        .antMatchers("/v1.0/users/by-name/{userId}").hasAnyRole("USER", "ADMIN")
+                        .antMatchers("/v1.0/users/**").hasRole("ADMIN")
+                        .antMatchers("/loggedUsers").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
+                .authenticationProvider(authProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf(AbstractHttpConfigurer::disable);
+		return http.build();
+	}
+    
     @Bean
     DaoAuthenticationProvider authProvider() {
         final CustomAuthenticationProvider authProvider = new CustomAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(encoder());
+        authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
     }
 
     @Bean
-    PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder(11);
+    AuthenticationManager authenticationManager(AuthenticationConfiguration config)
+            throws Exception {
+        return config.getAuthenticationManager();
     }
-
-    @Bean
-    SessionRegistry sessionRegistry() {
-        return new SessionRegistryImpl();
-    }
-
+    
     @Bean
     RememberMeServices rememberMeServices() {
         return new CustomRememberMeServices("theKey", userDetailsService, new InMemoryTokenRepositoryImpl());

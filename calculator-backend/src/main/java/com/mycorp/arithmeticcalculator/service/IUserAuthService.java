@@ -22,6 +22,14 @@ public interface IUserAuthService {
     User registerNewUserAccount(UserDto accountDto) throws UserAlreadyExistException;
 
     User getUser(String verificationToken);
+    
+    User getUserByPasswordResetToken(String token);
+    
+    User findUserByEmail(String email);
+    
+    User findUserByName(String name);
+    
+    Optional<User> getUserByID(long id);
 
     void saveRegisteredUser(User user);
 
@@ -35,13 +43,7 @@ public interface IUserAuthService {
 
     void createPasswordResetTokenForUser(User user, String token);
 
-    User findUserByEmail(String email);
-
     PasswordResetToken getPasswordResetToken(String token);
-
-    User getUserByPasswordResetToken(String token);
-
-    Optional<User> getUserByID(long id);
 
     void changeUserPassword(User user, String password);
 

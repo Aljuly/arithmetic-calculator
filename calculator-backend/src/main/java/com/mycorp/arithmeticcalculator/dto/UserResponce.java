@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycorp.arithmeticcalculator.domain.User;
 import com.mycorp.arithmeticcalculator.validators.ValidEmail;
@@ -296,6 +297,11 @@ public class UserResponce {
 	public String toJson() throws JsonProcessingException {
 		return (new ObjectMapper()).writeValueAsString(this);
 	}
+	
+	public static UserResponce fromJson(String json) throws JsonMappingException, JsonProcessingException {
+		return (new ObjectMapper()).readValue(json, UserResponce.class);
+	}
+	
 }
 
 

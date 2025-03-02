@@ -75,7 +75,7 @@ public class UserAuthService implements IUserAuthService {
         user.setPassword(passwordEncoder.encode(accountDto.getPassword()));
         user.setEmail(accountDto.getEmail());
         user.setUsing2FA(accountDto.isUsing2FA());
-        user.setRoles(Arrays.asList(roleRepository.findByName("ROLE_USER")));
+        user.setRoles(Arrays.asList(roleRepository.findByName("USER")));
         
         return repository.save(user);
     }
@@ -140,6 +140,11 @@ public class UserAuthService implements IUserAuthService {
     public User findUserByEmail(final String email) {
         return repository.findByEmail(email);
     }
+    
+	@Override
+	public User findUserByName(String loginName) {
+		return repository.findByLogin(loginName);
+	}
 
     @Override
     public PasswordResetToken getPasswordResetToken(final String token) {

@@ -53,7 +53,7 @@ public class LoginController {
     @ApiResponses(value = { 
             @ApiResponse(code = 200, message = "Token", response = String.class)
     })
-	@PostMapping(value = "/api/login", produces = {"application/json"}, consumes = {"application/json"})
+	@PostMapping(value = "/v1.0/login", produces = {"application/json"}, consumes = {"application/json"})
 	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest)
 			throws BadCredentialsException, UsernameNotFoundException {
 		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(

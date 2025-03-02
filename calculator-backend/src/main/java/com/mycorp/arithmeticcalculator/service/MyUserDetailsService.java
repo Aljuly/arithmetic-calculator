@@ -3,6 +3,7 @@ package com.mycorp.arithmeticcalculator.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,15 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mycorp.arithmeticcalculator.domain.Privilege;
 import com.mycorp.arithmeticcalculator.domain.Role;
 import com.mycorp.arithmeticcalculator.domain.User;
-import com.mycorp.arithmeticcalculator.repository.UserRepository;
 import com.mycorp.arithmeticcalculator.security.LoginAttemptService;
 
 @Service("userDetailsService")
 @Transactional
 public class MyUserDetailsService implements UserDetailsService {
-
+ 
     @Autowired
-    private UserRepository userRepository;
+    private IUserAuthService userAuthService;
 
     @Autowired
     @Qualifier("loginAttemptService")
@@ -41,15 +41,15 @@ public class MyUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(final String email) {
+    public UserDetails loadUserByUsername(final String userName) {
         final String ip = getClientIP();
         if (loginAttemptService.isBlocked(ip)) {
             throw new UsernameNotFoundException("blocked");
         }
         try {
-            	final User user = userRepository.findByEmail(email);
+            	final User user = userAuthService.findUserByName(userName);
             	if (user == null) {
-            		throw new UsernameNotFoundException("No user found with username: " + email);
+            		throw new UsernameNotFoundException("No user found with username: " + userName);
             	} else {
             		return new org.springframework.security.core.userdetails.User(
             			user.getEmail(), 
@@ -58,7 +58,8 @@ public class MyUserDetailsService implements UserDetailsService {
             			true, 
             			true, 
             			true, 
-            			getAuthorities(user.getRoles()));
+            			getAuthorities(user.getRoles())
+            			);
             	}
         } catch (final Exception e) {
             throw new RuntimeException(e);
@@ -66,7 +67,8 @@ public class MyUserDetailsService implements UserDetailsService {
     }
 
     public final Collection<? extends GrantedAuthority> getAuthorities(final Collection<Role> roles) {
-        return getGrantedAuthorities(getPrivileges(roles));
+    	return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+        //return getGrantedAuthorities(getPrivileges(roles));
     }
 
     private final List<String> getPrivileges(final Collection<Role> roles) {
