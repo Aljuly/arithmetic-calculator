@@ -3,6 +3,7 @@ package com.mycorp.arithmeticcalculator.service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -57,7 +58,8 @@ public class MyUserDetailsService implements UserDetailsService {
             			true, 
             			true, 
             			true, 
-            			getAuthorities(user.getRoles()));
+            			getAuthorities(user.getRoles())
+            			);
             	}
         } catch (final Exception e) {
             throw new RuntimeException(e);
@@ -65,7 +67,8 @@ public class MyUserDetailsService implements UserDetailsService {
     }
 
     public final Collection<? extends GrantedAuthority> getAuthorities(final Collection<Role> roles) {
-        return getGrantedAuthorities(getPrivileges(roles));
+    	return roles.stream().map(role -> new SimpleGrantedAuthority(role.getName())).collect(Collectors.toList());
+        //return getGrantedAuthorities(getPrivileges(roles));
     }
 
     private final List<String> getPrivileges(final Collection<Role> roles) {

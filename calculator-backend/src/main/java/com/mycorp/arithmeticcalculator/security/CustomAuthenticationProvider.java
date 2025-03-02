@@ -11,16 +11,17 @@ import org.springframework.security.core.Authentication;
 
 import com.mycorp.arithmeticcalculator.domain.User;
 import com.mycorp.arithmeticcalculator.repository.UserRepository;
+import com.mycorp.arithmeticcalculator.service.IUserAuthService;
 
 @Slf4j
 public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
-
+    
     @Autowired
-    private UserRepository userRepository;
+    private IUserAuthService userAuthService;
 
     @Override
     public Authentication authenticate(Authentication auth) {
-        final User user = userRepository.findByEmail(auth.getName());
+        final User user = userAuthService.findUserByName(auth.getName());
         if ((user == null)) {
             throw new UserNotFoundException("Invalid username or password");
         }

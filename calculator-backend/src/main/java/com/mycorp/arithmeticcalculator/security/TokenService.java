@@ -100,7 +100,7 @@ public class TokenService {
 	 * @return true if token valid
 	 */
 	public boolean isTokenValid(String token, UserDetails userDetails) {
-		final String userName = getUserName(token).getLogin();
+		final String userName = getUserName(token).getEmail();
 		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
 	}
 	
