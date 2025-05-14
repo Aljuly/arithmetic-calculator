@@ -2,29 +2,33 @@ const DEFAULTS = {
     endpoint: {
       auth: {
         //issueNewToken: 'http://authentication-server:8901/auth/oauth/token'
-        issueNewToken: '/api/auth/oauth/token'
+        issueNewToken: '/v1.0/login'
       },
       users: {
-        getById: '/api/users',
-        getAll: '/api/users',
-        create: '/api/users',
-        update: '/api/users',
-        delete: '/api/users',
+        getById: '/v1.0/users',
+        getAll: '/v1.0/users',
+        create: '/v1.0/users',
+        update: '/v1.0/users',
+        delete: '/v1.0/users',
+        email:  '/v1.0/users',
+        name:  '/v1.0/users',
       },
       roles: {
-        getAll: '/api/roles',
-        create: '/api/roles',
-        update: '/api/roles',
-        delete: '/api/roles'
+        getAll: '/v1.0/roles',
+        create: '/v1.0/roles',
+        update: '/v1.0/roles',
+        delete: '/v1.0/roles'
       },
       images: {
-        uploadImage: 'http://localhost:3000/images',
-        getImage: 'http://localhost:3000/images'
+        uploadImage: '/v1.0/images/',
+        getImage: '/v1.0/images/'
       }
     },
     api: {
-      host: 'NO_CONFIG',
-      rpcHost: 'NO_CONFIG',         
+      protocol: 'http',
+      host: 'localhost',
+      port: '8080',
+      //port: '4242',
       tradeReport: 'NO_CONFIG',
       microServiceHost: 'baseProtocol://baseDomain'
     },

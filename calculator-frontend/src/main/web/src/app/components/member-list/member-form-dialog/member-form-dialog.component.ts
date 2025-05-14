@@ -9,9 +9,8 @@ import { User } from '../../../model/User';
 import { RoleService } from '../../../services/role.service';
 import { UserService } from '../../../services/user.service';
 import { uniqueEmailValidator } from '../../../validators/unique-email-validator.directive';
-import { uniqueUsernameValidator } from 'src/app/validators/unique-username-validtor.directive';
-import { Role } from 'src/app/model/Role';
-import { JsonConvert } from 'json2typescript';
+import { uniqueUsernameValidator } from '../../../validators/unique-username-validtor.directive';
+import { Role } from '../../../model/Role';
 
 @Component({
     selector: 'app-member-form-dialog',
@@ -29,8 +28,6 @@ export class MemberFormDialogComponent implements OnInit {
     fileAvatar: File | undefined;
     isAvatarLoading = false;
 
-    private jsonConvert: JsonConvert = new JsonConvert();
-
     constructor(private dialogRef: MatDialogRef<MemberFormDialogComponent>,
         @Inject(MAT_DIALOG_DATA) private data: any,
         private logger: NGXLogger,
@@ -44,9 +41,7 @@ export class MemberFormDialogComponent implements OnInit {
         this.logger.trace('MemberFormDialogComponent: ngOnInit()');
         if (!this.data.isNewUser) {
             this.isNewUser = this.data.isNewUser;
-            // copy data field from data
-            const ret = this.jsonConvert.deserialize({ ...this.data.user }, User);
-            this.currentUser = Array.isArray(ret) ? ret[0] : ret;
+            this.currentUser = this.data.user;
             this.isAvatarExist = this.currentUser!.avatar.length > 0;
         }
         this.createForm();
@@ -69,8 +64,6 @@ export class MemberFormDialogComponent implements OnInit {
                 this.reactiveForm?.setControl('roles', new FormControl([roleUser]));
             }
         });
-        // Check the detailed reference in the chapter "JsonConvert class properties and methods"
-        this.jsonConvert.ignorePrimitiveChecks = false; // don't allow assigning number to string etc.
     }
     onEscape() {
         this.logger.trace('MemberFormDialogComponent: onEscape()');
@@ -137,7 +130,7 @@ export class MemberFormDialogComponent implements OnInit {
 
     onSubmit() {
         this.logger.trace('MemberFormDialogComponent: onSubmit()');
-        const user: User = User.fromUserDto(this.reactiveForm?.value);
+        const user: User = User.fromJson(this.reactiveForm?.value);
         user.userRoles = this.roles?.value.slice();
         if (this.isNewUser) {
             this.logger.trace('Add new user', this.login?.value, this.email?.value);
@@ -206,7 +199,8 @@ export class MemberFormDialogComponent implements OnInit {
             const formErrors = groupErrors ? {groupErrors} : {};
             Object.keys(form.controls).forEach(key => {
                 // Recursive call of the FormGroup fields
-                const error = this.getFormErrors(form.get(key));
+                const control = form.get(key);
+                const error = control ? this.getFormErrors(control) : null;
                 if (error !== null) {
                     // Only add error if not null
                     formErrors[key] = error;
@@ -292,7 +286,7 @@ export class MemberFormDialogComponent implements OnInit {
     }
 
     get isValid(): boolean {
-        return this.getFormErrors(this.reactiveForm) === null;
+        return this.reactiveForm ? this.getFormErrors(this.reactiveForm) === null : false;
     }
 
 }

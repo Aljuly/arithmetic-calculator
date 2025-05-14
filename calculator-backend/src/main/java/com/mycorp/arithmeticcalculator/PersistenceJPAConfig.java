@@ -58,6 +58,7 @@ public class PersistenceJPAConfig {
     Flyway flyway() {
         return new Flyway(Flyway.configure()
                 .baselineOnMigrate(false)
+                .baselineVersion("0")
                 .dataSource(
                 		env.getRequiredProperty("spring.datasource.url"),
                 		env.getRequiredProperty("spring.datasource.username"),

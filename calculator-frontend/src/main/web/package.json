@@ -4,8 +4,8 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port 4242 --host uniportal --ssl true --ssl-cert ssl/server.crt --ssl-key ssl/server.key",
-    "localhost": "ng serve --port 4242 --host localhost --ssl true --ssl-cert ssl/server.crt --ssl-key ssl/server.key",
+    "start": "ng serve --port 443 --host uniportal --ssl true --ssl-cert ssl/server.crt --ssl-key ssl/server.key",
+    "localhost": "ng serve --port 443 --host localhost --ssl true --ssl-cert ssl/server.crt --ssl-key ssl/server.key",
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
@@ -32,7 +32,6 @@
     "angular4-material-table": "^0.8.0",
     "core-js": "^3.6.5",
     "deasync": "^0.1.20",
-    "json2typescript": "^1.5.1",
     "lodash.clonedeep": "^4.5.0",
     "ngx-logger": "^4.1.9",
     "rxjs": "^6.5.5",

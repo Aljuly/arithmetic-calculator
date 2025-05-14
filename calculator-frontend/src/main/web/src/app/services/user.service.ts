@@ -4,68 +4,96 @@ import { HttpResponse } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Page } from '../model/page'; 
 
 import { User } from '../model/User';
 import { NGXLogger } from 'ngx-logger';
-import { LocalStorageService } from './local-storage.service';
-import { JsonConvert } from 'json2typescript';
+import config from '../config/index';
 
 @Injectable({
     providedIn: 'root'
 })
 export class UserService {
 
-    private BASE_URL = '/api/users';
-    private jsonConvert: JsonConvert;
+    private readonly BASE_URL : any;
+    private readonly BASE_IMAGE_URL : any;
+    private readonly user_endpoints: any;
+    private readonly image_endpoints: any;
 
-    constructor(private http: HttpClient,
-        private localStorageService: LocalStorageService,
-        private logger: NGXLogger, ) {
+    constructor(
+        private http: HttpClient,
+        private logger: NGXLogger) {
             // Check the detailed reference in the chapter "JsonConvert class properties and methods"
-            this.jsonConvert = new JsonConvert();
-            this.jsonConvert.ignorePrimitiveChecks = false; // don't allow assigning number to string etc.
+            this.BASE_URL = config.api.protocol + '://' + config.api.host + ':' + config.api.port;
+            this.BASE_IMAGE_URL = config.api.protocol + '://' + config.api.host + ':' + config.api.port;
+            this.user_endpoints = config.endpoint.users;
+            this.image_endpoints = config.endpoint.images;
     }
 
     /**
-     *Get all users
+     * Get all users
      *
      * @returns {Observable<User[]>} an array with all users
      */
-    getAll(): Observable<User[]> {
+    getAll(): Observable<Page<User>> {
         this.logger.info('UserService: getAll()');
-        return this.http.get<any>(this.BASE_URL)
-            .pipe(map(res => {
-                    // json converter returns an Array?
-                    //const jsonstr = JSON.stringify(res)
-                    const ret = this.jsonConvert.deserialize(JSON.parse(res), User);
-                    return Array.isArray(ret) ? ret : new Array(ret);
+        return this.http.get<any>(this.BASE_URL + this.user_endpoints.getAll).pipe(
+            map(users => {
+                    return new Page<User>(users);
                 }
             ));
     }
+    /**
+     * Get users with pagination
+     *
+     * @param {number} page is the page number
+     * @param {number} size is the number of users per page
+     * @returns {Observable<Page<User>>} a paginated list of users
+     */
+    getPaginated(page: number, size: number, login?: string, sortBy?: string, sortOrder?: string): Observable<Page<User>> {
+        this.logger.info('UserService: getPaginated()');
+        let params = new HttpParams()
+            .set('page', page.toString())
+            .set('size', size.toString());
+        if (login) {
+            params = params.set('login', login);
+        }
+        if (sortBy) {
+            params = params.set('sortBy', sortBy);
+        }
+        if (sortOrder) {
+            params = params.set('sortOrder', sortOrder);
+        }
+
+        return this.http.get<any>(this.BASE_URL + this.user_endpoints.getAll, { params }).pipe(
+            map(response => {
+                return new Page<User>(response);
+            })
+        );
+    }
 
     /**
-     * Delete user by its id
+     * Delete user by his id
      *
      * @param {Number} id is id of specific user
      * @returns {Observable<HttpResponse<Object>>} full http response
      */
     delete(id: Number): Observable<HttpResponse<Object>> {
         this.logger.info('UserService: delete()');
-        return this.http.delete(`${this.BASE_URL}/${id}`, { observe: 'response' });
+        return this.http.delete(`${this.BASE_URL + this.user_endpoints.delete}/${id}`, { observe: 'response' });
     }
 
     /**
-     * get user by its username
+     * get user by his username
      *
      * @param {string} username is username of specific user
      * @returns {Observable<User>} user
      */
     getByUsername(username: string): Observable<User> {
         this.logger.info('UserService: getByUsername()');
-        return this.http.get<String>(`${this.BASE_URL}/${username}`).pipe(
+        return this.http.get<String>(`${this.BASE_URL + this.user_endpoints.getById}/by-name/${username}`).pipe(
             map(res => {
-                const _user = this.jsonConvert.deserialize(res, User);
-                return Array.isArray(_user) ? _user[0] : _user
+                return User.fromJson(res.toString());
             })
         );
     }
@@ -78,7 +106,7 @@ export class UserService {
      */
     create(user: User): Observable<HttpResponse<User>> {
         this.logger.info('UserService: create()');
-        return this.http.post<User>(this.BASE_URL, user, { observe: 'response' });
+        return this.http.post<User>(this.BASE_URL + this.user_endpoints.create, user, { observe: 'response' });
     }
 
     /**
@@ -89,7 +117,7 @@ export class UserService {
      */
     update(user: User): Observable<HttpResponse<User>> {
         this.logger.info('UserService: update()');
-        return this.http.put<User>(`${this.BASE_URL}/${user.id}`, user, { observe: 'response' });
+        return this.http.put<User>(`${this.BASE_URL + this.user_endpoints.update}`, user, { observe: 'response' });
     }
 
     /**
@@ -100,7 +128,7 @@ export class UserService {
      */
     isUniqueEmail(email: string): Observable<boolean> {
         this.logger.info('UserService: isUniqueEmail()');
-        return this.http.get<{ isUniqueEmail: boolean }>(this.BASE_URL,
+        return this.http.get<{ isUniqueEmail: boolean }>(this.BASE_URL + this.user_endpoints.email,
             { params: new HttpParams().set('email', email) })
             .pipe(
                 map(body => {
@@ -117,7 +145,7 @@ export class UserService {
      */
     isUniqueUsername(username: string): Observable<boolean> {
         this.logger.info('UserService: isUniqueUsername');
-        return this.http.get<{isUniqueUsername: boolean}>(this.BASE_URL, {
+        return this.http.get<{isUniqueUsername: boolean}>(this.BASE_URL + this.user_endpoints.name, {
             params: new HttpParams().set('login', username)
         }).pipe(
             map(body => {
@@ -139,7 +167,7 @@ export class UserService {
         formData.append('userId', userId.toString());
         formData.append('description', description);
         formData.append('file', file, file.name);
-        return this.http.post<any>(`${this.BASE_URL}/${userId}/storage`, formData, { observe: 'response' });
+        return this.http.post<any>(`${this.BASE_IMAGE_URL + this.image_endpoints.uploadImage}/${userId}`, formData, { observe: 'response' });
     }
 
     /**
@@ -149,8 +177,7 @@ export class UserService {
      * @returns {User} class
      */
     mapSingleUser(asJson: String): User {
-        const _user = this.jsonConvert.deserialize(asJson, User);
-        return Array.isArray(_user) ? _user[0] : _user
+        return User.fromJson(asJson.toString());
     }
 
 }

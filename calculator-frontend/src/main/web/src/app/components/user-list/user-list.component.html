@@ -105,16 +105,24 @@
           <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
           
         </mat-table>
-  
-        <mat-paginator #paginator id="paginator"
-          [pageSize]="5"
-          [pageSizeOptions]="[1, 5, 10, 20, 50]" 
-          (page)="pageEvent()">
-        </mat-paginator>
-  
+
+      <mat-paginator
+        [pageSizeOptions]="pageSizeOptions"
+        [showFirstLastButtons]="true"
+        (page)="onPageChange($event)">
+      </mat-paginator>
+
+        <div class="mat-elevation-z8" *ngIf="dataSource.data.length === 0">
+          <mat-card class="no-data-card">
+            <mat-card-content>
+              <p>No data available</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
       </main>
    
     </div>
+
     <div id="add_button">
       <button mat-fab disableRipple="false" color="primary" matTooltip="Add new user" matTooltipShowDelay="500"
         matTooltipHideDelay="1000" (click)="onAddUser()">

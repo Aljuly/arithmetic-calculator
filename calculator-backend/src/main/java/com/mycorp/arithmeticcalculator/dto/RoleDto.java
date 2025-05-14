@@ -22,6 +22,7 @@ public class RoleDto {
 	@ValidRoleName
 	private String role;
 	
+	@JsonProperty("description")
 	private String description;
 	
 	@JsonProperty("operations")

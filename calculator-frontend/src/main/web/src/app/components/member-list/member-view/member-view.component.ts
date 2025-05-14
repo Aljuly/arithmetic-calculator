@@ -1,10 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-
 import { NGXLogger } from 'ngx-logger';
-
 import { User } from '../../../model/User';
-import { UserService } from 'src/app/services/user.service';
+import { UserService } from '../../../services/user.service';
 
 @Component({
     selector: 'app-member-view',

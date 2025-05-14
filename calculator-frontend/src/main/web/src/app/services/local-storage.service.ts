@@ -16,15 +16,14 @@ export class LocalStorageService {
 
   readCurrentUser(): User | any {
     const stringed = localStorage.getItem('currentUser');
-    //this.logger.debug('Read User from Storage: ', stringed === null ? 'empty' : stringed);
-    //console.log('Read User from Storage: ' + new String(stringed));
     return stringed === null
       ? null
-      : User.fromJsonString(stringed);
+      : User.fromJson(stringed);
   }
 
   saveCurrentUser(user: User) {
-    localStorage.setItem('currentUser', user.toJsonString());
+    localStorage.setItem('currentUser', user.toJson());
+    this.logger.debug('Saved User to Storage: ', user.toJson());
   }
 
   removeCurrentUser() {

@@ -5,9 +5,9 @@
     <mat-icon>close</mat-icon>
   </button>
 </mat-toolbar>
-<form [formGroup]="reactiveForm" (ngSubmit)="onSubmit()" fxLayout="column" fxLayoutGap="1em">
-  <mat-grid-list cols="4" rowHeight="70px">
-    <mat-grid-tile colspan="2" rowspan="3">
+<form [formGroup]="reactiveForm" (ngSubmit)="onSubmit()" fxLayout="column" fxLayoutGap="0.1em">
+  <mat-grid-list cols="4" rowHeight="80px">
+    <mat-grid-tile colspan="2" rowspan="5">
       <div [hidden]="isAvatarExist || isAvatarLoading">
         <div id="no_avatar" fxLayout fxLayoutAlign="center center" (drop)="dropHandler($event)"
           (dragover)="dragOverHandler($event)" (click)=clickOnInputFile($event)>
@@ -84,33 +84,32 @@
         </mat-select>
       </mat-form-field>
     </mat-grid-tile>
-    <mat-grid-tile colspan="2" rowspan="1">
-      <mat-slide-toggle color="primary" id="enabled" formControlName="enabled" [checked]="enabled.value"
-        (keydown.enter)="$event.preventDefault()">
-        Enable user
-      </mat-slide-toggle>
-
-      <mat-slide-toggle color="primary" id="verified" formControlName="verified" [checked]="verified.value"
-        (keydown.enter)="$event.preventDefault()">
-        Verify user
-      </mat-slide-toggle>
-
-      <mat-slide-toggle color="primary" id="banned" [checked]="banned.value" formControlName="banned"
-        (keydown.enter)="$event.preventDefault()">
-        Ban user
-      </mat-slide-toggle>
-    </mat-grid-tile>
-    <mat-grid-tile colspan="3" rowspan="1">
-      <mat-form-field id="ban_reason_style">
-        <textarea matInput id="banReason" placeholder="Ban reason" formControlName="banReason"
-          [value]="!banned.value ? '' : banReason.value" [required]="banned.value"
-          (keydown.enter)="toAnotherField($event, 'submit')">
-          </textarea>
-        <mat-error *ngIf="banned.value">You must specify the ban reason</mat-error>
-      </mat-form-field>
-    </mat-grid-tile>
   </mat-grid-list>
-
+  <mat-grid-list cols="4" rowHeight="70px">
+      <mat-grid-tile colspan="2" rowspan="1">
+        <mat-slide-toggle color="primary" id="enabled" formControlName="enabled" [checked]="enabled.value"
+          (keydown.enter)="$event.preventDefault()">
+          Enable user
+        </mat-slide-toggle>
+        <mat-slide-toggle color="primary" id="verified" formControlName="verified" [checked]="verified.value"
+          (keydown.enter)="$event.preventDefault()">
+          Verify user
+        </mat-slide-toggle>
+        <mat-slide-toggle color="primary" id="banned" [checked]="banned.value" formControlName="banned"
+          (keydown.enter)="$event.preventDefault()">
+          Ban user
+        </mat-slide-toggle>
+      </mat-grid-tile>
+      <mat-grid-tile colspan="2" rowspan="1">
+        <mat-form-field id="ban_reason_style">
+          <textarea matInput id="banReason" placeholder="Ban reason" formControlName="banReason"
+            [value]="!banned.value ? '' : banReason.value" [required]="banned.value"
+            (keydown.enter)="toAnotherField($event, 'submit')">
+            </textarea>
+          <mat-error *ngIf="banned.value">You must specify the ban reason</mat-error>
+        </mat-form-field>
+      </mat-grid-tile>
+  </mat-grid-list>
   <mat-dialog-actions fxLayout="row">
     <span class="spacer"></span>
     <button mat-raised-button mat-dialog-close color="warn"

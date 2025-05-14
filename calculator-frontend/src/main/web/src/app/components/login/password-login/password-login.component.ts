@@ -12,12 +12,11 @@ export class PasswordLoginComponent {
   username = new FormControl('', [
     Validators.required,
     Validators.minLength(4),
-    Validators.pattern('^[a-z]+$'),
+    Validators.pattern('^(?=.*[A-Za-z0-9]$)[A-Za-z][A-Za-z\d.-]{0,19}$'),
   ]);
   password = new FormControl('', [
     Validators.required,
-    Validators.minLength(4),
-    Validators.pattern('^[\\w&.\\-]+$'),
+    Validators.minLength(4)
   ]);
   loginData: any;
 
@@ -27,7 +26,7 @@ export class PasswordLoginComponent {
     if (this.username.valid && this.password.valid) {
       this.loginData = {
         loginType: 'password',
-        username: this.username.value,
+        email: this.username.value,
         password: this.password.value,
       };
     } else {

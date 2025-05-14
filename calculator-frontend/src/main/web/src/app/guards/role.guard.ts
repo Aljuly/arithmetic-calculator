@@ -4,7 +4,6 @@ import {
   CanActivate,
   Router,
   RouterStateSnapshot,
-  RouteReuseStrategy,
 } from '@angular/router';
 
 import { NGXLogger } from 'ngx-logger';
@@ -33,7 +32,7 @@ export class RoleGuard implements CanActivate {
     // on the data property
 
     const expectedRoles = route.data['expectedRoles'];
-
+    this.logger.info('RoleGuard: expected roles: ', expectedRoles);
     const permission = this.authService.hasRole(expectedRoles);
     if (permission) {
       return true;

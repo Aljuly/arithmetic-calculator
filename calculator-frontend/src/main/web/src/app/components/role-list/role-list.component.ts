@@ -8,7 +8,6 @@ import { Role } from '../../model/Role';
 import { RoleService } from '../../services/role.service';
 import { NGXLogger } from 'ngx-logger';
 import { ConfirmDialogComponent } from '../confirm-dilog/confirm-dialog.component';
-import { JsonConvert } from 'json2typescript';
 
 @Component({
     selector: 'app-roles',
@@ -21,7 +20,6 @@ export class RoleListComponent implements OnInit {
     roles: Role[];
     dataSource: MatTableDataSource<Role> = new MatTableDataSource<Role>();
     displayedColumns: string[] = ['name', 'description', 'controls'];
-    private jsonConvert: JsonConvert = new JsonConvert();
     @ViewChild(MatSort) sort: MatSort;
 
     constructor(private service: RoleService,
@@ -31,7 +29,7 @@ export class RoleListComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.logger.trace('RoleListComponent: ngOnInit()');
+        this.logger.info('RoleListComponent: ngOnInit()');
         this.updateRoles();
         this.dataSource.sort = this.sort;
     }
@@ -42,21 +40,22 @@ export class RoleListComponent implements OnInit {
             role = new Role();
             isNewRecord = true;
         }
-        let roleData: string = this.jsonConvert.serialize(role, Role);
+        this.logger.info('RoleListComponent: onEditRole(). Role to edit', role);
+        //let roleData: string = role.toJson().toString();
         const dialogRef = this.dialog.open(RoleFormDialogComponent, {
             disableClose: true,
             minWidth: '25%',
             panelClass: ['no-padding-dialog'], // delete padding in this dialog https://material.angular.io/guide/customizing-component-styles
             data: {
-                role: roleData,
+                role: role,
                 isNewRole: isNewRecord
             }
         });
         dialogRef.afterClosed().subscribe(updatedRole => {
             if (updatedRole) {
-                this.logger.trace('RoleFormDialogComponent: onEditRole(). Role was updated', updatedRole);
+                this.logger.info('RoleFormDialogComponent: onEditRole(). Role was updated', updatedRole);
                 this.updateRoles();
-                this.snackBar.open(`The role "${updatedRole.name}" was updated`, null, {
+                this.snackBar.open(`The role "${updatedRole.name}" was updated`, undefined, {
                     duration: 5000
                 });
             }
@@ -79,11 +78,11 @@ export class RoleListComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result === true) {
-                this.service.delete(role.name).subscribe((response: { status: number; }) => {
+                this.service.delete(role.id).subscribe((response: { status: number; }) => {
                     if (response.status === 204) { // TODO : eliminate violation of Separation principle
-                        this.logger.trace('RoleListComponent: onDeleteRole(). Role was deleted', role);
+                        this.logger.debug('RoleListComponent: onDeleteRole(). Role was deleted', role);
                         this.updateRoles();
-                        this.snackBar.open(`Role '${role.description}' was deleted!`, null, {
+                        this.snackBar.open(`Role '${role.description}' was deleted!`, undefined, {
                             duration: 5000,
                         });
                     }
@@ -98,7 +97,6 @@ export class RoleListComponent implements OnInit {
             .subscribe(
                 (list: Role[]) => {
                     this.logger.trace('RoleListComponent: received roles ', list);
-                    // Use MatTableDataSource for paginatin and filtering
                     this.dataSource.data = list.slice();
                     this.roles = this.dataSource._pageData(this.dataSource.filteredData);
                     this.loaded = true;

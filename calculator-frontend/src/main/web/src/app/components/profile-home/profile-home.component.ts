@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NGXLogger } from 'ngx-logger';
-import { User } from 'src/app/model/User';
-import { LocalStorageService } from 'src/app/services/local-storage.service';
+import { User } from '../../model/User';
+import { LocalStorageService } from '../../services/local-storage.service';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-profile-home',

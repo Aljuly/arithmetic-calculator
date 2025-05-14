@@ -1,40 +1,59 @@
-import { JsonObject, JsonProperty } from 'json2typescript';
+import { Entity } from './Entity'; 
 
 /**
  * Class that strores info about user role
  * @author Alexander Zhulinsky
  * @version 1.0 26 Apr 2023
  */
-@JsonObject('Role')
-export class Role {
-    @JsonProperty('role', String)
-    private _name: String;
-    @JsonProperty('description', String)
-    private _description: String;
-    @JsonProperty('privileges', [String])
-    private _operations: String[];
+export class Role extends Entity {
 
-    constructor(rolename?:String, description?: String, operation?:String[]) {
-        this._name = rolename || '';
+    private _name: string;
+    private _description: string;
+    private _operations: string[];
+
+    constructor(id?: number, name?: string, description?: string, operations?: string[]) {
+        super(id);
+        this._name = name || '';
         this._description = description || '';
-        this._operations = operation || [''];
+        this._operations = operations || [''];
     }
 
     static fromRoleDto(roleDto: any): Role {
         const role: Role = new Role(roleDto.id);
-        role.name = roleDto.name;
-        role.description = roleDto.description;
-        role.operations = roleDto.operations
-            .filter(o => o.checked === true)
-            .map(o => o.name);
+        role._name = roleDto.name;
+        role._description = roleDto.description;
+        if (roleDto.operations) {
+            roleDto.operations.forEach((o: any) => {
+                if (!o.name) {
+                    role._operations.push(o);
+                } else if (o.checked) {
+                    role._operations.push(o.name);
+                }
+            });
+        }
+        role._operations = role._operations.filter((o: string) => o !== '');
         return role;
     }
 
-	public get operations(): String[] {
+    static fromJson(json: string): Role {
+        const role = JSON.parse(json);
+        return new Role(role.id, role.name, role.description, role.operations);
+    }
+
+    public toJson(): object {
+        return {
+            id: this.id,
+            name: this._name,
+            description: this._description,
+            operations: this._operations
+        };
+    }
+    
+	public get operations(): string[] {
 		return this._operations;
 	}
 
-	public set operations(value: String[]) {
+	public set operations(value: string[]) {
 		this._operations = value;
 	}
 
@@ -46,13 +65,16 @@ export class Role {
 		this._name = value;
 	}
 
-	public get description(): String {
+	public get description(): string {
 		return this._description;
 	}
 
-	public set description(value: String) {
+	public set description(value: string) {
 		this._description = value;
 	}
 
+    public isEmpty(): boolean {
+        throw new Error('Method not implemented.');
+    } 
 
 }

@@ -6,9 +6,9 @@ import { NgForm, FormControl } from '@angular/forms';
 import { NGXLogger } from 'ngx-logger';
 
 import { User } from '../../../model/User';
+import { Role } from '../../../model/Role';
 import { UserService } from '../../../services/user.service';
 import { RoleService } from '../../../services/role.service';
-// import { mentorRole, adminRole } from '../../../helpers/fake-data/fake_roles';
 
 @Component({
   selector: 'app-user-form-dialog',
@@ -18,7 +18,7 @@ import { RoleService } from '../../../services/role.service';
 export class UserFormDialogComponent implements OnInit {
   isNewUser = true;
   currentUser: User;
-  allRoles = [];
+  allRoles: Role[] = [];
   selectedRoles = new FormControl();
   selectedSex: string;
 
@@ -32,7 +32,7 @@ export class UserFormDialogComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.logger.trace('UserFormDialogComponent: ngOnInit()');
+    this.logger.info('UserFormDialogComponent: ngOnInit()');
     this.roleService.getAll().subscribe((roles) => {
       this.allRoles = roles;
       if (!this.data.isNewUser) {
@@ -66,7 +66,7 @@ export class UserFormDialogComponent implements OnInit {
 
   onSubmit(form: NgForm) {
     // create new user and fill his fields
-    const user = User.fromLocaleStorage(form.value);
+    const user = User.fromJson(form.value);
     // fill password field which was saved in passwordGroup
     user.password = form.value.passwordGroup.password;
     // fill email field which was saved in emailGroup

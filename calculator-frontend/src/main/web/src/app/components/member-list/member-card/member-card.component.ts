@@ -6,9 +6,10 @@ import { Router } from '@angular/router';
 import { NGXLogger } from 'ngx-logger';
 
 import { User } from '../../../model/User';
-import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { _ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { MemberFormDialogComponent } from '../member-form-dialog/member-form-dialog.component';
-import { UserService } from 'src/app/services/user.service';
+import { UserService } from '../../../services/user.service';
+
 
 @Component({
     selector: 'app-member-card',
@@ -72,7 +73,7 @@ export class MemberCardComponent implements OnInit {
 
     onDeleteUser(user: User) {
         this.logger.trace('MemberCardComponent: onDeleteUser()');
-        const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+        const dialogRef = this.dialog.open(_ConfirmationDialogComponent, {
             width: '22rem',
             panelClass: ['no-padding-dialog'], // delete padding in this dialog https://material.angular.io/guide/customizing-component-styles
             data: { username: user.login }

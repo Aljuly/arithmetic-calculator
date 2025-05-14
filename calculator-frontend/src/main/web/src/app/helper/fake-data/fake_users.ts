@@ -1,8 +1,5 @@
-import { JsonConvert } from 'json2typescript';
 import { User } from '../../model/User';
 import { adminRole, userRole, mentorRole } from './fake_roles';
-
-const jsonConvert: JsonConvert = new JsonConvert();
 
 const admin: User = new User();
 admin.id = 101;
@@ -42,4 +39,3 @@ export const ALL_USERS: User[] = [
     user
 ];
 
-export const USERS = jsonConvert.serialize(ALL_USERS, User);

@@ -1,12 +1,10 @@
-import { JsonObject, JsonProperty } from 'json2typescript';
-
-@JsonObject('Entity')
 export abstract class Entity {
-    @JsonProperty('id', Number)
+
     private _id: number;
+
     // the constructor
-    constructor() {
-        this._id = 0;
+    constructor(_id?: number) {
+        this._id = _id ?? 0;
     }
     // getter and setter
     public get id(): number {
@@ -17,4 +15,5 @@ export abstract class Entity {
     }
     // defines whereas object is empty
     public abstract isEmpty(): boolean;
+    
 }

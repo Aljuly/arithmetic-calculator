@@ -42,7 +42,7 @@ form {
 // } 
 
 mat-form-field {
-	margin: 0 0 0 10px;
+	margin: 0 0 0 1em;
 }
 mat-error {
     text-align:justify;
@@ -114,6 +114,9 @@ mat-slide-toggle {
 	margin-left: 1em;
 }
 
+ mat-grid-tile {
+        width: 100%; /* Increase the row width of mat-grid-tile */
+    }
 // button {
 //     width: 110px;
 //     margin: 0 2px 10px;
@@ -140,5 +143,7 @@ mat-slide-toggle {
     h4 {
         margin: 10px 0 0 10px;
         width: 90%;
-    } 
-  }
+    }
+
+   
+}

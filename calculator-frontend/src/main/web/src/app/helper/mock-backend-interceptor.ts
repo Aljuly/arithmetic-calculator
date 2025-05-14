@@ -5,7 +5,7 @@ import { delay, mergeMap, materialize, dematerialize } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 
 import config from '../config/index';
-import { USERS, ALL_USERS } from './fake-data/fake_users';
+import { ALL_USERS } from './fake-data/fake_users';
 import { Role } from '../model/Role';
 import { ALL_ROLES } from './fake-data/fake_roles';
 import { User } from '../model/User';
@@ -19,7 +19,8 @@ export class MockBackendInterceptor implements HttpInterceptor {
         this.userIdCnt = 0;
      }
 
-    adminAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEwMSIsImxvZ2luIjoiYWRtaW4iLCJwYXNzd29yZCI6IjEyMzQ1NiIsImVtYWlsIjoiYWRtaW5AYWRtaW4iLCJmaXJzdE5hbWUiOiJhZG1pbl9maXJzdCIsImxhc3ROYW1lIjoiYWRtaW5fbGFzdCIsImF2YXRhciI6Ii9hcGkvc3RvcmFnZS9hZG1pbklkLTEucG5nIiwibGFzdGxvZ2luIjoiRnJpIEphbiAwNyAxOTgzIiwiZW5hYmxlZCI6dHJ1ZSwiYmFubmVkIjpmYWxzZSwidmVyaWZpZWQiOnRydWUsImJhblJlYXNvbiI6IiIsInVzZXJSb2xlcyI6W3siaWQiOiJST0xFX0FETUlOIiwibmFtZSI6ImFkbWluIn0seyJpZCI6IlJPTEVfVVNFUiIsIm5hbWUiOiJ1c2VyIn1dfQ.1xty0D99cBdvZCFUX_ZapmqMLqQbz-fJK2Hm3-McO3A';
+    //adminAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEwMSIsImxvZ2luIjoiYWRtaW4iLCJwYXNzd29yZCI6IjEyMzQ1NiIsImVtYWlsIjoiYWRtaW5AYWRtaW4iLCJmaXJzdE5hbWUiOiJhZG1pbl9maXJzdCIsImxhc3ROYW1lIjoiYWRtaW5fbGFzdCIsImF2YXRhciI6Ii9hcGkvc3RvcmFnZS9hZG1pbklkLTEucG5nIiwibGFzdGxvZ2luIjoiRnJpIEphbiAwNyAxOTgzIiwiZW5hYmxlZCI6dHJ1ZSwiYmFubmVkIjpmYWxzZSwidmVyaWZpZWQiOnRydWUsImJhblJlYXNvbiI6IiIsInVzZXJSb2xlcyI6W3siaWQiOiJST0xFX0FETUlOIiwibmFtZSI6ImFkbWluIn0seyJpZCI6IlJPTEVfVVNFUiIsIm5hbWUiOiJ1c2VyIn1dfQ.1xty0D99cBdvZCFUX_ZapmqMLqQbz-fJK2Hm3-McO3A';
+    adminAccessToken = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ7XCJpZFwiOjEwMDAwNSxcImxvZ2luXCI6XCJ0ZXN0VXNlclwiLFwicGFzc3dvcmRcIjpcIlwiLFwiZW1haWxcIjpcInRlc3RAdGVzdC5jb21cIixcImZpcnN0TmFtZVwiOlwiVGVzdFwiLFwibGFzdE5hbWVcIjpcIlRlc3RcIixcImF2YXRhclwiOlwiXCIsXCJsYXN0bG9naW5cIjpcIlwiLFwiZW5hYmxlZFwiOnRydWUsXCJiYW5uZWRcIjpmYWxzZSxcInZlcmlmaWVkXCI6dHJ1ZSxcImJhblJlYXNvblwiOlwiXCIsXCJ1c2VyUm9sZXNcIjpbe1wiaWRcIjoxMDAwMDMsXCJuYW1lXCI6XCJST0xFX0FETUlOXCIsXCJkZXNjcmlwdGlvblwiOlwiU3lzdGVtIEFkbWluaXN0cmF0b3JcIixcIm9wZXJhdGlvbnNcIjpbXCJSRUFEX1BSSVZJTEVHRVwiLFwiV1JJVEVfUFJJVklMRUdFXCIsXCJXUklURV9QUklWSUxFR0VcIixcIkNIQU5HRV9QQVNTV09SRF9QUklWSUxFR0VcIl19XX0iLCJyb2xlIjoiUk9MRV9BRE1JTiIsImV4cCI6MTc0NTg0NTMxMiwiaWF0IjoxNzQ1ODMwOTEyfQ.XGMtnuwbXOHW6nKD3Az3dX85aTJmZoquGvk9QTME0kk';
     userAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXJJZCIsInVzZXJuYW1lIjoidXNlciIsInBhc3N3b3JkIjoidXNlciIsInNhbHQiOiJzYWx0IiwiZW1haWwiOiJ1c2VyQHVzZXIiLCJmaXJzdE5hbWUiOiJ1c2VyX2ZpcnN0IiwibGFzdE5hbWUiOiJ1c2VybGFzdCIsIm1pZGRsZU5hbWUiOiJ1c2VyX21pZGRsZSIsImRpc3BsYXlOYW1lIjoidXNlcl9kaXNwbGF5IiwiZ2VuZGVyIjoibWFsZSIsImJpcnRoZGF0ZSI6IkZyaSBKYW4gMDcgMTk4MyIsInBob25lcyI6WyIxMjM0NTYiXSwiYXZhdGFyIjoiL2FwaS9zdG9yYWdlL3VzZXJJZC0xLnBuZyIsImxhc3RMb2dpbiI6IjEyMzIxMzIzIiwiZW5hYmxlZCI6dHJ1ZSwiYmFubmVkIjpmYWxzZSwidmVyaWZpZWQiOnRydWUsImJhblJlYXNvbiI6bnVsbCwicm9sZXMiOlt7ImlkIjoiUk9MRV9VU0VSIiwibmFtZSI6InVzZXIifV0sImV4cCI6NzAwMDAwMDAwMH0.Ru231tKypE9GIzUuQaTHZW8E5UwTBliefOey0K1PuLg';
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -41,10 +42,10 @@ export class MockBackendInterceptor implements HttpInterceptor {
 // ---------------------------------AuthenticationService------------------------------------------
 
             // authenticate
-            if (url === config.endpoint.auth.issueNewToken) {
+            if (url.endsWith(config.endpoint.auth.issueNewToken)) {
                 // request.body.forEach((value, key) => { console.log(key + ' ' + value); });
                 this.logger.info('FakeBackend: fake answer for AuthentificationService.login()');
-                const loginType = request.body.get('loginType');
+                const loginType = request.body['loginType'];
                 const authentication = {
                     'access_token': null,
                     'token_type': 'bearer',
@@ -56,9 +57,10 @@ export class MockBackendInterceptor implements HttpInterceptor {
                 };
                 if (loginType === 'password') {
                     this.logger.info('FakeBackend: password login');
-                    const username = request.body.get('username');
-                    const password = request.body.get('password');
-                    if (username === 'admin' && password === '123456') {
+                    const username = request.body['email'];
+                    const password = request.body['password'];
+                    this.logger.info('UserName and Password: ', username, password);
+                    if (username === 'testUser' && password === 'Passw0rd!') {
                         authentication['access_token'] = this.adminAccessToken;
                     }
                     if (username === 'user' && password === '123456') {
@@ -66,8 +68,8 @@ export class MockBackendInterceptor implements HttpInterceptor {
                     }
 
                 } else if (loginType === 'oAuth2') {
-                    const fakeAdminEmail = 'microlms360.test.adm@gmail.com';
-                    const provider = request.body.get('provider');
+                    const fakeAdminEmail = 'test.adm@gmail.com';
+                    const provider = request.body['provider'];
                     const code = request.body.get('code');
                     const httpOptions = {
                         headers: new HttpHeaders({
@@ -87,13 +89,10 @@ export class MockBackendInterceptor implements HttpInterceptor {
             }
 
 // ---------------------------------UserService------------------------------------------
-
-
             // get users, is email unique, is username unique
-            if (url === config.endpoint.users.getAll && request.method === 'GET') {
+            if (url.endsWith(config.endpoint.users.getAll) && request.method === 'GET') {
                 // check for fake auth token in header and return users if valid
                 if (request.headers.get('Authorization') === `Bearer ${this.adminAccessToken}`) {
-
                     // is email unique
                     if (request.params.has('email')) {
                         this.logger.info('FakeBackend: fake answer for UserService.isUniqueEmail');
@@ -104,7 +103,6 @@ export class MockBackendInterceptor implements HttpInterceptor {
                         }
                         return of(new HttpResponse({status: 200, body: {isUniqueEmail: isUniqueEmail}}));
                     }
-
                     // is username unique
                     if (request.params.has('login')) {
                         this.logger.info('FakeBackend: fake answer for UserService.isUniqueUsername');
@@ -115,10 +113,9 @@ export class MockBackendInterceptor implements HttpInterceptor {
                         }
                         return of(new HttpResponse({status: 200, body: {isUniqueUsername: isUniqueUsername}}));
                     }
-
                     // get users
                     this.logger.info('FakeBackend: fake answer for UserService.getAll()');
-                    return of(new HttpResponse({ status: 200, body: JSON.stringify(USERS) }));
+                    return of(new HttpResponse({ status: 200, body: ALL_USERS }));
                 } else {
                     // return 401 not authorised if token is null or invalid
                     return observableThrowError('Unauthorised');
@@ -126,7 +123,7 @@ export class MockBackendInterceptor implements HttpInterceptor {
             }
 
             // delete user :id
-            if (url.startsWith(config.endpoint.users.delete) && request.method === 'DELETE') {
+            if (url.indexOf(config.endpoint.users.delete) > 0 && request.method === 'DELETE') {
                 this.logger.info('FakeBackend: fake answer for UserService.delete()');
                 // check for fake auth token in header and return users if valid
                 if (request.headers.get('Authorization') === `Bearer ${this.adminAccessToken}`) {
@@ -162,11 +159,9 @@ export class MockBackendInterceptor implements HttpInterceptor {
             // create user
             if (request.url.endsWith(config.endpoint.users.create) && request.method === 'POST') {
                 this.logger.info('FakeBackend: fake answer for UserService.create()');
-
                 if (request.headers.get('Authorization') === `Bearer ${this.adminAccessToken}`) {
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     // get new user object from post body
-                    const newUser = User.fromLocaleStorage(request.body);
+                    const newUser = User.fromJson(request.body);
                     let isExistsUsername = false;
                     let isExistsEmail = false;
                     // check if username and email are unique
@@ -178,7 +173,6 @@ export class MockBackendInterceptor implements HttpInterceptor {
                             isExistsEmail = true;
                         }
                     });
-
                     if (isExistsUsername) {
                         // NOTE: validation exists in component
                         return observableThrowError(`User with username "${newUser.login}" already exists`);
@@ -197,15 +191,12 @@ export class MockBackendInterceptor implements HttpInterceptor {
             }
 
             // update user
-            if (request.url.startsWith(config.endpoint.users.update) && request.method === 'PUT') {
+            if (request.url.indexOf(config.endpoint.users.update) > 0 && request.method === 'PUT') {
                 this.logger.info('FakeBackend: fake answer for UserService.update()');
-
                 if (request.headers.get('Authorization') === `Bearer ${this.adminAccessToken}`) {
-
                     const updatedUser = request.body;
                     let isExistsUsername = false;
                     let isExistsEmail = false;
-
                     for (let i = 0; i < ALL_USERS.length; i++) {
                         // find user in database
                         if (ALL_USERS[i].id === updatedUser.id) {
@@ -239,9 +230,8 @@ export class MockBackendInterceptor implements HttpInterceptor {
             }
 
             // load file
-            if (request.url.startsWith(config.endpoint.users.update) && request.url.endsWith('storage') && request.method === 'POST') {
+            if (request.url.endsWith(config.endpoint.users.update) && request.url.endsWith('storage') && request.method === 'POST') {
                 this.logger.info('FakeBackend: fake answer for UserService.loadFile()');
-
                 if (request.headers.get('Authorization') === `Bearer ${this.adminAccessToken}`) {
                     const formData: FormData = request.body;
                     const file = <File> formData.get('file');
@@ -264,10 +254,8 @@ export class MockBackendInterceptor implements HttpInterceptor {
             }
 
 // ---------------------------------RoleService------------------------------------------
-
             // get all roles
-            if (url.startsWith(config.endpoint.roles.getAll) &&
-                                            request.method === 'GET') {
+            if (url.endsWith(config.endpoint.roles.getAll) && request.method === 'GET') {
                 this.logger.info('FakeBackend: fake answer for RoleService.getAll()');
                 // check for fake auth token in header and return users if valid
                 if (request.headers.get('Authorization') === `Bearer ${this.adminAccessToken}`) {
@@ -281,7 +269,7 @@ export class MockBackendInterceptor implements HttpInterceptor {
             }
 
             // delete role :id
-            if (url.startsWith(config.endpoint.roles.delete) && request.method === 'DELETE') {
+            if (url.indexOf(config.endpoint.roles.delete) > 0 && request.method === 'DELETE') {
                 this.logger.info('FakeBackend: fake answer for RoleService.delete()');
                 // check for fake auth token in header and return users if valid
                 if (request.headers.get('Authorization') === `Bearer ${this.adminAccessToken}`) {
@@ -297,76 +285,26 @@ export class MockBackendInterceptor implements HttpInterceptor {
                 }
             }
 
-              // create role
+              // create  or update role
               if (request.url.endsWith(config.endpoint.roles.create) && request.method === 'POST') {
                   this.logger.info('FakeBackend: fake answer for RoleService.create()');
 
                   if (request.headers.get('Authorization') === `Bearer ${this.adminAccessToken}`) {
 
                       // get new role object from post body
-                      // const newRole = Role.fromRoleDto(request.body);
                       const newRole = request.body;
-                      let isExistsName = false;
-                      let isExistsDescription = false;
-                      // check if name and description are unique
-                      ALL_ROLES.forEach(role => {
-                          if (role.name === newRole.name) {
-                              isExistsName = true;
-                          }
-                          if (role.description === newRole.description) {
-                              isExistsDescription = true;
-                          }
-                      });
-
-                      if (isExistsName) {
-                          // NOTE: validation exists in component
-                          return observableThrowError(`Role with name "${newRole.name}" already exists`);
+                      const existingRoleIndex = ALL_ROLES.findIndex(role => role.name === newRole.name);
+                      if (existingRoleIndex !== -1) {
+                          ALL_ROLES[existingRoleIndex] = newRole; // Replace existing role
+                      } else {
+                          ALL_ROLES.push(newRole); // Add as new role
                       }
-                      if (isExistsDescription) {
-                          // NOTE: validation exists in component
-                          return observableThrowError(`Role with description "${newRole.description}" already exists`);
-                      }
-                      ALL_ROLES.push(newRole);
                       return of(new HttpResponse({ status: 201, body: newRole }));
                   } else {
                       // return 401 not authorised if token is null or invalid
                       return observableThrowError('Unauthorised');
                   }
               }
-
-              // update role
-              if (request.url.startsWith(config.endpoint.roles.update) && request.method === 'PUT') {
-                  this.logger.info('FakeBackend: fake answer for RoleService.update()');
-
-                  if (request.headers.get('Authorization') === `Bearer ${this.adminAccessToken}`) {
-
-                      const updatedRole = request.body;
-                      let isExistsName = false;
-
-                      for (let i = 0; i < ALL_ROLES.length; i++) {
-                          // find role in database
-                          if (ALL_ROLES[i].name === updatedRole.name) {
-                              // check if name are unique
-                              ALL_ROLES.forEach(role => {
-                                  // check if name unique and thisn't current role
-                                  if (role.description === updatedRole.name  && role.name !== updatedRole.name) {
-                                      isExistsName = true;
-                                  }
-                              });
-                              if (isExistsName) {
-                                  // NOTE: validation exists in component
-                                  return observableThrowError(`Role with name "${updatedRole.name}" already exists`);
-                              }
-                              ALL_ROLES[i] = updatedRole;
-                              return of(new HttpResponse({ status: 200, body: updatedRole }));
-                          }
-                      }
-                  } else {
-                      // return 401 not authorised if token is null or invalid
-                      return observableThrowError('Unauthorised');
-                  }
-              }
-
 
             // pass through any requests not handled above
             return next.handle(request);
