@@ -77,6 +77,7 @@ export class MemberListComponent implements OnInit, AfterViewInit {
         const dialogRef = this.dialog.open(MemberFormDialogComponent, {
             width: '95%',
             height: '80%',
+          // tslint:disable-next-line:max-line-length
             panelClass: ['no-padding-dialog'], // delete padding in this dialog https://material.angular.io/guide/customizing-component-styles
             disableClose: true,
             data: {isNewUser: true}

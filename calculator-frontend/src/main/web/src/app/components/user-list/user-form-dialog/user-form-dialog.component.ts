@@ -160,36 +160,18 @@ export class UserFormDialogComponent implements OnInit {
     if (fromUser.lastName && fromUser.lastName !== toUser.lastName) {
       toUser.lastName = fromUser.lastName;
     }
-    // if (fromUser.middleName && fromUser.middleName !== toUser.middleName) {
-    //     toUser.middleName = fromUser.middleName;
-    // }
-    // if (fromUser.displayName && fromUser.displayName !== toUser.displayName) {
-    //     toUser.displayName = fromUser.displayName;
-    // }
-    // if (fromUser.gender && fromUser.gender !== toUser.gender) {
-    //     toUser.gender = fromUser.gender;
-    // }
-    // if (fromUser.birthdate && fromUser.birthdate !== toUser.birthdate) {
-    //     toUser.birthdate = fromUser.birthdate;
-    // }
-    // if (fromUser.phones && fromUser.phones !== toUser.phones) {
-    //     toUser.phones = fromUser.phones;
-    // }
-    // if (fromUser.lastLogin && fromUser.lastLogin !== toUser.lastLogin) {
-    //     toUser.lastLogin = fromUser.lastLogin;
-    // }
-    // if (fromUser.enabled !== undefined && fromUser.enabled !== toUser.enabled) {
-    //     toUser.enabled = fromUser.enabled;
-    // }
-    // if (fromUser.banned !== undefined && fromUser.banned !== toUser.banned) {
-    //     toUser.banned = fromUser.banned;
-    // }
-    // if (fromUser.verified !== undefined && fromUser.verified !== toUser.verified) {
-    //     toUser.verified = fromUser.verified;
-    // }
-    // if (fromUser.banReason && fromUser.banReason !== toUser.banReason) {
-    //     toUser.banReason = fromUser.banReason;
-    // }
+    if (fromUser.enabled !== undefined && fromUser.enabled !== toUser.enabled) {
+        toUser.enabled = fromUser.enabled;
+    }
+    if (fromUser.banned !== undefined && fromUser.banned !== toUser.banned) {
+        toUser.banned = fromUser.banned;
+    }
+    if (fromUser.verified !== undefined && fromUser.verified !== toUser.verified) {
+        toUser.verified = fromUser.verified;
+    }
+    if (fromUser.banReason && fromUser.banReason !== toUser.banReason) {
+        toUser.banReason = fromUser.banReason;
+    }
     if (fromUser.userRoles) {
       toUser.userRoles = fromUser.userRoles.slice();
     }

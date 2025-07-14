@@ -19,12 +19,12 @@ import { BreadcrumbComponent } from './components/breadcrumb/breadcrumb.componen
 import { RoleListComponent } from './components/role-list/role-list.component';
 import { RoleFormDialogComponent } from './components/role-form-dialog/role-form-dialog.component';
 import { ConfirmDialogComponent } from './components/confirm-dilog/confirm-dialog.component';
-import { UserListComponent } from './components/user-list/user-list.component';
+import { UserListComponent } from './components/user-list';
 import { UserListItemComponent } from './components/user-list/user-list-item/user-list-item.component';
 import { UserFormDialogComponent } from './components/user-list/user-form-dialog/user-form-dialog.component';
 import { ConfirmationDialogComponent } from './components/user-list/confirmation-dialog/confirmation-dialog.component';
 import { _ConfirmationDialogComponent } from './components/member-list/confirmation-dialog/confirmation-dialog.component';
-import { MemberListComponent } from './components/member-list/member-list.component';
+import { MemberListComponent } from './components/member-list';
 import { MemberFormDialogComponent } from './components/member-list/member-form-dialog/member-form-dialog.component';
 import { MemberViewComponent } from './components/member-list/member-view/member-view.component';
 import { MemberCardComponent } from './components/member-list/member-card/member-card.component';
@@ -34,7 +34,7 @@ import { UniqueUsernameValidatorDirective } from './validators/unique-username-v
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NGXLogger } from 'ngx-logger';
 import { AuthGuard, RoleGuard } from './guards';
-import { jwtInterceptor } from './helper/jwt-interceptor';
+import { jwtInterceptor } from './helper';
 import { AlertService, AuthenticationService } from './services';
 import { LocalStorageService } from './services/local-storage.service';
 import { RoleService } from './services/role.service';
@@ -43,6 +43,7 @@ import { MockBackendInterceptor } from './helper/mock-backend-interceptor';
 import { NoAccessComponent } from './components/no-access/no-access.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { ProfileHomeComponent } from './components/profile-home/profile-home.component';
+import { SecureImagePipe } from './services/SecureImagePipe';
 
 @NgModule({
   declarations: [
@@ -71,7 +72,8 @@ import { ProfileHomeComponent } from './components/profile-home/profile-home.com
     ConfirmEqualValidatorDirective,
     NotFoundComponent,
     NoAccessComponent,
-    AppContactMeComponent
+    AppContactMeComponent,
+    SecureImagePipe
   ],
   imports: [
     ROUTING,
@@ -89,7 +91,6 @@ import { ProfileHomeComponent } from './components/profile-home/profile-home.com
   // logging & global error handler
     NGXLogger,
   /* {provide: ErrorHandler, useClass: GlobalErrorHandler},*/
-            
     // auth stuff
     AuthGuard,
     RoleGuard,

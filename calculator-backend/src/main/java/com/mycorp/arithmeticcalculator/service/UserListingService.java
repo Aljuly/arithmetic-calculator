@@ -72,9 +72,7 @@ public class UserListingService implements IUserListingService {
 				.filter(Objects::nonNull)
 				.map(RoleDto::getRole)
 				.toList()));
-		if (user.getPassword() != null 
-				&& !user.getPassword().isBlank() 
-				&& !user.getPassword().isEmpty()) {
+		if (user.getPassword() != null && !user.getPassword().isBlank()) {
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
 		}
 		userRepository.saveAndFlush(user);
@@ -108,7 +106,7 @@ public class UserListingService implements IUserListingService {
 				userRepository.saveAndFlush(user);
 				log.debug("Updated user record with Id: {}", userId);
 			} catch (NoSuchElementException e) {
-				throw new UserNotFoundException(String.format("User with Id: {} not found in DB", userId));
+				throw new UserNotFoundException(String.format("User with Id: %d not found in DB", userId));
 			}
 		}
 	}

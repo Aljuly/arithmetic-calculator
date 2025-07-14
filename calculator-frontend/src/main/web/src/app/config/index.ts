@@ -48,17 +48,13 @@ const DEFAULTS = {
     claims: ['NO_CONFIG'],
     defaultCurrencyPriorities: ['NO_CONFIG']
   };
-  
   const config = DEFAULTS;
   const ENV = process.env["NODE_ENV"] || 'development';
-  
   if (ENV === 'development') {
     const API_BASE_PROTOCOL = 'http';
     const API_BASE_DOMAIN = 'localhost';
-  
     config.api.microServiceHost = config.api.microServiceHost
       .replace('baseDomain', API_BASE_DOMAIN)
       .replace('baseProtocol', API_BASE_PROTOCOL);
   }
-  
   export default config;

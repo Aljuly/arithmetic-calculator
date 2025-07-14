@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -17,7 +17,7 @@ import { MemberFormDialogComponent } from '../member-list/member-form-dialog/mem
     templateUrl: 'user-list.component.html',
     styleUrls: ['user-list.component.scss']
 })
-export class UserListComponent implements OnInit, AfterViewInit {
+export class UserListComponent implements OnInit, OnDestroy, AfterViewInit {
     users: User[];
     displayedColumns = ['position', 'avatar', 'title', 'firstName', 'lastName', 'email', 'userRoles', 'enabled', 'verified', 'banned', 'lastLogin', 'menuAction'];
     pageSizeOptions: number[] = [10, 20, 50];
@@ -42,72 +42,12 @@ export class UserListComponent implements OnInit, AfterViewInit {
         this.dataSource.sort = this.sort;
     }
 
-    // ngOnDestroy(): void {
-    //     this.logger.trace('UserListComponent: ngOnDestroy()');
-    //     if (this._subscriptions$) {
-    //         this._subscriptions$.unsubscribe();
-    //     }
-    // }
+    ngOnDestroy(): void {
+    }
 
     getValue(event: Event): string {
         return (event.target as HTMLInputElement).value;
     }
-
-    public makeAllReady() {
-        if (!this.paginator) {
-          throw new Error('paginator is null, please set in ngAfterViewInit');
-        }
-    
-        if (!this.sort) {
-          throw new Error('sort is null, please set in ngAfterViewInit');
-        }
-    
-        if (!this.service) {
-          throw new Error(
-            'periodic service is null, please set in constructor'
-          );
-        }
-      }
-
-    // public watch(): void {
-    //     this.makeAllReady();
-    //     this._subscriptions$ =
-    //     this.paginator.page.pipe(
-    //         startWith({}),
-    //         delay(0)
-    //       )
-    //     .pipe(
-    //       //this._textControl.valueChanges.pipe(startWith(''))
-    //     ).pipe(
-    //         switchMap(() => {
-    //         //   this._isError = false;
-    //         //   this._isLoadingResults = true;
-    
-    //           return this.service.getPaginated(
-    //             //this._textControl.value,
-    //             this.paginator?.pageIndex || 0,
-    //             this.paginator?.pageSize || 10,
-    //             //this.sort.active,
-    //             //this.sort.direction
-    //           ).pipe(
-    //             map((page: Page<User>) => ({
-    //               items: page.content,
-    //               totalCount: page.totalElements
-    //             })),
-    //             catchError(() => {
-    //               //this._isError = true;
-    //               return of({ items: [], totalCount: this.totalRecords });
-    //             })
-    //           );
-    //         }),
-    //         map(({ items, totalCount }: { items: User[]; totalCount: number }) => {
-    //           //this._isLoadingResults = false;
-    //           this.totalRecords = totalCount;
-    //           return items;
-    //         })
-    //       )
-    //       .subscribe((items: User[]) => (this.dataSource.data = items));
-    //   }
 
     onPageChange(event: any) {
         this.logger.info('UserListComponent: onPageChange()', event);
@@ -125,9 +65,7 @@ export class UserListComponent implements OnInit, AfterViewInit {
                     this.logger.info('UserListComponent: received paginated users', response);
                     this.users = response.content.slice();
                     this.dataSource.data = response.content.slice();
-                    //this.totalRecords$ = of(response.totalElements);
                     setTimeout(() => {
-                        // https://stackoverflow.com/questions/59601416/how-to-set-the-length-prop-for-the-angular-material-paginator
                         if (this.dataSource.paginator) {
                             this.dataSource.paginator.length = response.totalElements;
                             this.dataSource.paginator.pageIndex = pageIndex;
@@ -144,21 +82,18 @@ export class UserListComponent implements OnInit, AfterViewInit {
                 }
             );
     }
-    
     applyFilter(filterValue: string) {
         filterValue = filterValue.trim(); // Remove whitespace
         filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
         this.dataSource.filter = filterValue;
     }
-
     onEditUser(user: User) {
         this.logger.debug('UserListComponent: onEditUser()');
-        //let userData: string = user ? user.toJson().toString() : "";
         const dialogRef = this.dialog.open(MemberFormDialogComponent, {
             width: '50%',
             height: '57%',
             disableClose: true,
-            panelClass: ['no-padding-dialog'], // delete padding in this dialog https://material.angular.io/guide/customizing-component-styles
+            panelClass: ['no-padding-dialog'],
             data: {
                 isNewUser: false,
                 user: user
@@ -174,13 +109,12 @@ export class UserListComponent implements OnInit, AfterViewInit {
             }
         });
     }
-
     onAddUser() {
         this.logger.trace('UserListComponent: onAddUser()');
         const dialogRef = this.dialog.open(MemberFormDialogComponent, {
             width: '50%',
             height: '57%',
-            panelClass: ['no-padding-dialog'], // delete padding in this dialog https://material.angular.io/guide/customizing-component-styles
+            panelClass: ['no-padding-dialog'],
             disableClose: true,
             data: {isNewUser: true}
         });
@@ -217,6 +151,9 @@ export class UserListComponent implements OnInit, AfterViewInit {
             }
         });
     }
-
+    getUserAvatar(user: User): string {
+      const avatarId = user?.avatar?.toString() || 'default';
+      // Return the direct URL - let the browser handle loading
+      return this.service.getImageUrl(avatarId);
+    }
 }
-

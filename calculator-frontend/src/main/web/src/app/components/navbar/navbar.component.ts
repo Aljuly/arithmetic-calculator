@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { LoginComponent } from '../login/login.component';
+import {UserService} from '../../services/user.service';
 
 /**
  * keys are url parts, values are displayed texts
@@ -33,6 +34,7 @@ export class NavbarComponent implements OnInit {
 
   constructor(
     public authService: AuthenticationService,
+    private service: UserService,
     public router: Router,
     private dialog: MatDialog
   ) {}

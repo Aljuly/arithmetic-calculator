@@ -16,15 +16,14 @@
       </div>
       <div [hidden]="!isAvatarExist || isAvatarLoading">
         <div fxLayout="column" fxLayoutAlign="start center">
-          <img [src]="isNewUser ? '' : currentUser.avatar" id="avatar" alt="User avatar" width="200px"
-            (drop)="dropHandler($event)" (dragover)="dragOverHandler($event)" (click)=clickOnInputFile($event)>
+          <img [src]=""
+             id="avatar"
+             alt="User avatar"
+             width="200px"
+             (error)="handleImageError($event)">
           <button mat-raised-button (click)=clickOnInputFile($event)>Change avatar</button>
         </div>
       </div>
-      <!--
-       NOTE: Material doesn't support input type file
-      https://github.com/angular/material2/issues/3262
-      -->
       <input type="file" formControlName="avatar" accept="image/*" id="fileInput" (change)="onFileInput($event)"
         hidden />
       <mat-error *ngIf="avatar.hasError('invalidFile')" id="invalidFileError">{{ avatar.getError('invalidFile')
@@ -34,7 +33,7 @@
           <mat-spinner [diameter]="150">
           </mat-spinner>
         </div>
-      </div> 
+      </div>
     </mat-grid-tile>
     <mat-grid-tile colspan="2" rowspan="1">
       <mat-form-field>
@@ -46,21 +45,21 @@
     </mat-grid-tile>
     <mat-grid-tile colspan="2" rowspan="1">
       <mat-form-field>
-        <input matInput id="firstName" placeholder="First name" formControlName="firstName" 
+        <input matInput id="firstName" placeholder="First name" formControlName="firstName"
           [value]="firstName.value" (keydown.enter)="toAnotherField($event, 'lastName')">
         <mat-error *ngIf="firstName.hasError('required')">Field mustn't be empty</mat-error>
       </mat-form-field>
     </mat-grid-tile>
     <mat-grid-tile colspan="2" rowspan="1">
       <mat-form-field>
-        <input matInput id="lastName" placeholder="Last name" formControlName="lastName" 
+        <input matInput id="lastName" placeholder="Last name" formControlName="lastName"
           [value]="lastName.value" (keydown.enter)="toAnotherField($event, 'email')">
         <mat-error *ngIf="lastName.hasError('required')">Field mustn't be empty</mat-error>
       </mat-form-field>
     </mat-grid-tile>
     <mat-grid-tile colspan="2" rowspan="1">
       <mat-form-field>
-        <input type="email" matInput id="email" placeholder="User email" formControlName="email" 
+        <input type="email" matInput id="email" placeholder="User email" formControlName="email"
           [value]="email.value" (keydown.enter)="toAnotherField($event, 'password')">
         <mat-error *ngIf="email.hasError('required')">Field mustn't be empty</mat-error>
         <mat-error *ngIf="email.hasError('email')">E-mail is invalid</mat-error>
@@ -69,7 +68,7 @@
     </mat-grid-tile>
     <mat-grid-tile colspan="2" rowspan="1">
       <mat-form-field>
-        <input type="password" matInput id="password" placeholder="Enter password" formControlName="password" 
+        <input type="password" matInput id="password" placeholder="Enter password" formControlName="password"
           [value]="password.value" (keydown.enter)="toAnotherField($event, 'firstName')">
         <mat-hint align="end"> {{ password.value.length }} / 6</mat-hint>
         <mat-error align="end">{{ password.value.length }} / 6</mat-error>

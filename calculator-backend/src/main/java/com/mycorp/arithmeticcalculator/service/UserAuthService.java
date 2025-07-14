@@ -68,7 +68,7 @@ public class UserAuthService implements IUserAuthService {
         }
         final User user = new User();
         
-        validateInputWithInjetedValidator(accountDto);
+        validateInputWithInjectedValidator(accountDto);
 
         user.setFirstName(accountDto.getFirstName());
         user.setLastName(accountDto.getLastName());
@@ -228,7 +228,7 @@ public class UserAuthService implements IUserAuthService {
         return users;
     }
     
-    private void validateInputWithInjetedValidator(UserDto user) {
+    private void validateInputWithInjectedValidator(UserDto user) {
     	Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
     	if (!violations.isEmpty()) {
     		throw new ConstraintViolationException(violations);

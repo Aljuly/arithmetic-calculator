@@ -140,20 +140,20 @@ public class UserResponce {
 	public UserResponce(User user) {
 		this(
 				user.getId(),
-				user.getLogin(), 
-				"", //password 
+				user.getLogin(),
+				"", //password
 				user.getEmail(), 
 				user.getFirstName(), 
 				user.getLastName(), 
-				"", //avatar, 
+				user.getAvatarId(),
 				"", //lastlogin,
-				user.isEnabled(), 
-				false, //banned, 
-				true, //verified, 
-				"", //banReason, 
+				user.isEnabled(),
+				user.isBanned(),
+				user.isVerified(),
+				user.getBanReason(),
 			 	Optional.ofNullable(user.getRoles())
 			 	.orElseGet(ArrayList::new).stream()
-			 	.map(r -> new RoleDto(r))
+			 	.map(RoleDto::new)
 			 	.collect(Collectors.toList())
 				);
 	}

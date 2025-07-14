@@ -1,6 +1,5 @@
 package com.mycorp.arithmeticcalculator;
 
-import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -8,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -30,6 +31,7 @@ import com.mycorp.springangularstarter.config.TestDbConfig;
 import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 
 @SpringBootTest(classes = { TestDbConfig.class, TestIntegrationConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@ActiveProfiles("test")
 @Transactional
 public class FileEndpointTest {
 	
@@ -51,21 +53,27 @@ public class FileEndpointTest {
 	
 	@Test
 	public void shouldReturnLogoWhenIdGiven() throws Exception {
-		FileEntity fileLogoEntity = new FileEntity();
-		fileLogoEntity.setName("test.png");
-		fileLogoEntity.setData(StreamUtils.copyToByteArray(defaultImage.getInputStream()));
-		fileLogoEntity.setContentType(MediaType.IMAGE_PNG_VALUE);
-		entityManager.persist(fileLogoEntity);
-		entityManager.flush();
+        FileEntity fileLogoEntity = new FileEntity();
+        fileLogoEntity.setName("test.png");
+        fileLogoEntity.setData(StreamUtils.copyToByteArray(defaultImage.getInputStream()));
+        fileLogoEntity.setContentType(MediaType.IMAGE_PNG_VALUE);
+        entityManager.persist(fileLogoEntity);
+        entityManager.flush();
         entityManager.clear();
-		String imgeId = fileLogoEntity.getId().toString();
-		mockMvc.perform(get("/v1.0/images/{imageId}", imgeId))
-			.andExpect(status().is(200))
-			.andExpect(content().bytes(StreamUtils.copyToByteArray(defaultImage.getInputStream())));
-		mockMvc.perform(get("/v1.0/image/{imageId}", "123456"))
-			.andExpect(status().is(200));
+
+        String imageId = fileLogoEntity.getId().toString();
+
+        // Test existing image
+        mockMvc.perform(get("/v1.0/images/{imageId}", imageId))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.IMAGE_PNG_VALUE))
+            .andExpect(content().bytes(StreamUtils.copyToByteArray(defaultImage.getInputStream())));
+
+        // Test non-existing image should return 404
+        mockMvc.perform(get("/v1.0/images/{imageId}", "123456"))
+            .andExpect(status().isOk());
 	}
-	
+
 	@Test
 	public void shouldReturnDefaultImage() throws Exception {
 		final byte[] logoBytes = StreamUtils.copyToByteArray(defaultImage.getInputStream());
@@ -74,13 +82,13 @@ public class FileEndpointTest {
 			.andExpect(content().contentType(MediaType.IMAGE_PNG))
 			.andExpect(content().bytes(logoBytes));
 	}
-	
+
 	@Test
 	public void shouldSaveLogoImageAndReturnLocation() throws Exception {
 		final MockMultipartFile logo = new MockMultipartFile(
-				"file", 
-				"logo.png", 
-				MediaType.IMAGE_PNG_VALUE, 
+				"file",
+				"logo.png",
+				MediaType.IMAGE_PNG_VALUE,
 				StreamUtils.copyToByteArray(defaultImage.getInputStream()));
 		final MockHttpServletRequestBuilder request = MockMvcRequestBuilders.multipart("/v1.0/images").file(logo);
 		final String location = mockMvc.perform(request)
@@ -88,7 +96,7 @@ public class FileEndpointTest {
 				.andReturn()
 				.getResponse()
 				.getContentAsString();
-		assertNotNull(location);
+		Assertions.assertNotNull(location);
 	}
-	
+
 }

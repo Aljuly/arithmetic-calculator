@@ -1,5 +1,6 @@
 package com.mycorp.arithmeticcalculator;
 
+import java.util.Objects;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -47,7 +48,7 @@ public class PersistenceJPAConfig {
     @Bean
 	protected DataSource dataSource() {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(env.getProperty("spring.datasource.driverClassName"));
+		dataSource.setDriverClassName(Objects.requireNonNull(env.getProperty("spring.datasource.driverClassName")));
 		dataSource.setUrl(env.getProperty("spring.datasource.url"));
 		dataSource.setUsername(env.getProperty("spring.datasource.username"));
 		dataSource.setPassword(env.getProperty("spring.datasource.password"));

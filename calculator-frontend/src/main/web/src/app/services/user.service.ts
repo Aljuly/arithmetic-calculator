@@ -4,7 +4,7 @@ import { HttpResponse } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Page } from '../model/page'; 
+import { Page } from '../model/page';
 
 import { User } from '../model/User';
 import { NGXLogger } from 'ngx-logger';
@@ -156,28 +156,27 @@ export class UserService {
 
     /**
      * Load a file to the storage in backend
-     *
-     * @param {number} userId is user id which the file belongs
-     * @param {string} description is short description about what the file is, for example "avatar" for user avatar
      * @param {File} file is the file which is loading
      * @returns {Observable<any>} all response
      */
-    loadFile(userId: number, description: string, file: File): Observable<any> {
+    loadFile(file: File): Observable<any> {
         const formData = new FormData();
-        formData.append('userId', userId.toString());
-        formData.append('description', description);
         formData.append('file', file, file.name);
-        return this.http.post<any>(`${this.BASE_IMAGE_URL + this.image_endpoints.uploadImage}/${userId}`, formData, { observe: 'response' });
+        return this.http.post<any>(`${this.BASE_IMAGE_URL + this.image_endpoints.uploadImage}`, formData, { observe: 'response' });
     }
 
+    getImageUrl(avatarId: string): string {
+      // Use the configured endpoint to get the image
+      return `${this.BASE_IMAGE_URL}${this.image_endpoints.getImage}${avatarId}`;
+    }
     /**
-     * Convert User JSON to User class
-     * 
-     * @param {String} asJson is a JSON representation of the User class
-     * @returns {User} class
+     * Read an image file
+     * @param avatarId
      */
-    mapSingleUser(asJson: String): User {
-        return User.fromJson(asJson.toString());
+    getAvatarBlob(avatarId: string): Observable<Blob> {
+      return this.http.get(`${this.BASE_IMAGE_URL}${this.image_endpoints.getImage}${avatarId}`, {
+        responseType: 'blob'
+      });
     }
 
 }

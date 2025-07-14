@@ -31,7 +31,7 @@ export class RoleFormDialogComponent implements OnInit {
         this.isNewRole = this.data.isNewRole;
         if (!this.isNewRole) {
             // copy data field from data
-            //const ret: Role = Role.fromJson(this.data.role);
+            // const ret: Role = Role.fromJson(this.data.role);
             this.log.info('RoleFormDialogComponent: ngOnInit(). Role to edit', this.data.role);
             this.currentRole = this.data.role;
         }
@@ -54,7 +54,6 @@ export class RoleFormDialogComponent implements OnInit {
             checked: new FormControl(false),
             name: new FormControl(o.name),
             description: new FormControl(o.description)})));
-            
         if (!this.isNewRole) {
             if (this.name) {
                 this.name.setValue(this.currentRole.name);
@@ -119,7 +118,6 @@ export class RoleFormDialogComponent implements OnInit {
         const sortedArr2 = [...arr2].sort();
         return sortedArr1.every((value, index) => value === sortedArr2[index]);
     }
-    
     private copyValuesIfChanged(fromRole: Role, toRole: Role) {
         this.log.trace('RoleFormDialogComponent: copyValuesIfChanged()');
         if (fromRole.description && fromRole.description !== toRole.description) {
