@@ -4,7 +4,7 @@ import { HttpResponse } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { Page } from '../model/page';
+import { Page } from '../model/Page';
 
 import { User } from '../model/User';
 import { NGXLogger } from 'ngx-logger';

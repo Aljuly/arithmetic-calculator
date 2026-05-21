@@ -13,8 +13,9 @@ RUN npm install
 # Copy the rest of the application code to the working directory
 COPY . .
 
-# Build the Angular application
-RUN npm run build
+# Build the Angular application (call ng directly — node:16 uses OpenSSL 1.x,
+# which doesn't need --openssl-legacy-provider and rejects it in NODE_OPTIONS)
+RUN node_modules/.bin/ng build --prod
 
 # Use the official Nginx image for serving the application
 FROM nginx:alpine

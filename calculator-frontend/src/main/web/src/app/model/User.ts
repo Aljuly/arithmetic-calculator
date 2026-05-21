@@ -1,5 +1,5 @@
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { Entity } from './Entity';
+import { Entity } from './entity';
 import { OAuth2AccessToken } from './OAuth2AccessToken';
 import { Role } from './Role';
 

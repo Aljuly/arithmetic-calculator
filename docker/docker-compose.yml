@@ -1,29 +1,73 @@
-version: '2'
+
+version: '3.9'
 
 services:
 
-#  angular: # name of the first service
-#    build: angular # specify the directory of the Dockerfile
-#    ports:
-#      - "4200:4200" # specify port forewarding
-
-#  app-web:
-#    build: ./web
-#    ports:
-#      - "8080:8080"
-#    links:
-#      - app-db
-#      - redis
-
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
   app-db:
     build: ./db
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB:       ${POSTGRES_DB}
     ports:
       - "5432:5432"
-    volumes_from:
-      - app-db-data
-
-  app-db-data:
-    image: busybox
-    command: echo 'Data Container for PostgreSQL'
     volumes:
-      - /var/lib/postgresql/data
+      - app-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+
+  # ── Redis ───────────────────────────────────────────────────────────────────
+  # app-redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - app-redis-data:/data
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #   restart: unless-stopped
+
+  # ── Spring Boot backend ─────────────────────────────────────────────────────
+  app-backend:
+    build:
+      context: ../                              # project root — Dockerfile reads both modules
+      dockerfile: calculator-backend/Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      POSTGRES_USER:        ${POSTGRES_USER}
+      POSTGRES_PASSWORD:    ${POSTGRES_PASSWORD}
+      SPRING_MAIL_USERNAME: ${MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${MAIL_PASSWORD}
+    ports:
+      - "8080:8080"
+    depends_on:
+      app-db:
+        condition: service_healthy
+      app-redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Angular frontend (Nginx) ────────────────────────────────────────────────
+  app-frontend:
+    build:
+      context: ../calculator-frontend/src/main/web
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - app-backend
+    restart: unless-stopped
+
+volumes:
+  app-db-data:
+  #app-redis-data:
+

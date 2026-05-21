@@ -1,0 +1,5 @@
+# Send only the compiled JAR to the Docker build daemon.
+*
+!target/
+target/*
+!target/*.jar

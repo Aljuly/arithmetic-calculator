@@ -1,9 +1,5 @@
-#execute netsh int ipv4 add excludedportrange protocol=tcp startport=2375 numberofports=1 and reboot 
-FROM postgres:latest
-LABEL key="aljuly"
+FROM postgres:16-alpine
 
-ENV POSTGRES_USER postgres
-ENV POSTGRES_PASSWORD passw0rd
-ENV POSTGRES_DB AdminDB
-# COPY schema.sql /docker-entrypoint-initdb.d/
-# COPY operations.sql /docker-entrypoint-initdb.d/
+# Credentials are injected at runtime via docker-compose environment variables.
+# init.sql runs once on first container startup to create the application schema.
+COPY init.sql /docker-entrypoint-initdb.d/01_init.sql
