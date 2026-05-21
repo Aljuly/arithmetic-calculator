@@ -130,6 +130,10 @@ export class MemberFormDialogComponent implements OnInit, OnDestroy {
     event.preventDefault();
   }
 
+  handleImageError(event: Event) {
+    this.isAvatarExist = false;
+  }
+
   private addFile(file: File) {
     this.avatar?.setErrors(null);
     if (file) {
@@ -253,7 +257,7 @@ export class MemberFormDialogComponent implements OnInit, OnDestroy {
 
   /**
    *
-   * Copy values from user to another user if they are different
+   * Copy values from a user to another user if they are different
    *
    * @param fromUser user from which values are copying
    *

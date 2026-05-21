@@ -81,7 +81,9 @@ public class PersistenceJPAConfig {
 
 	protected Properties additionalProperties() {
 		final Properties hibernateProperties = new Properties();
-		hibernateProperties.setProperty("spring.jpa.hibernate.ddl-auto", env.getProperty("spring.jpa.hibernate.ddl-auto"));
+		// Must use Hibernate's own property name; Spring Boot only translates
+		// spring.jpa.hibernate.ddl-auto for its auto-configured EntityManagerFactory.
+		hibernateProperties.setProperty("hibernate.hbm2ddl.auto", env.getProperty("spring.jpa.hibernate.ddl-auto"));
 		return hibernateProperties;
 	}
 
