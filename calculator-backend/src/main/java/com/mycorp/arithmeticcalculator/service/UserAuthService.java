@@ -75,6 +75,7 @@ public class UserAuthService implements IUserAuthService {
         user.setPassword(passwordEncoder.encode(accountDto.getPassword()));
         user.setEmail(accountDto.getEmail());
         user.setUsing2FA(accountDto.isUsing2FA());
+        user.setVerified(false);
         user.setRoles(Arrays.asList(roleRepository.findByName("USER")));
         
         return repository.save(user);
@@ -186,8 +187,9 @@ public class UserAuthService implements IUserAuthService {
             return TOKEN_EXPIRED;
         }
 
-        user.setEnabled(true);
+        user.setVerified(true);
         repository.save(user);
+        tokenRepository.delete(verificationToken);
         return TOKEN_VALID;
     }
 
