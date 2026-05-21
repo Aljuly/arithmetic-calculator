@@ -11,10 +11,25 @@ import com.mycorp.arithmeticcalculator.dto.UserDto;
 import com.mycorp.arithmeticcalculator.error.UserAlreadyExistException;
 
 public interface IUserAuthService {
+	
+    static final String TOKEN_INVALID = "invalidToken";
+    static final String TOKEN_EXPIRED = "expired";
+    static final String TOKEN_VALID = "valid";
+
+    static String QR_PREFIX = "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
+    static String APP_NAME = "SpringRegistration";
 
     User registerNewUserAccount(UserDto accountDto) throws UserAlreadyExistException;
 
     User getUser(String verificationToken);
+    
+    User getUserByPasswordResetToken(String token);
+    
+    User findUserByEmail(String email);
+    
+    User findUserByName(String name);
+    
+    Optional<User> getUserByID(long id);
 
     void saveRegisteredUser(User user);
 
@@ -28,13 +43,7 @@ public interface IUserAuthService {
 
     void createPasswordResetTokenForUser(User user, String token);
 
-    User findUserByEmail(String email);
-
     PasswordResetToken getPasswordResetToken(String token);
-
-    User getUserByPasswordResetToken(String token);
-
-    Optional<User> getUserByID(long id);
 
     void changeUserPassword(User user, String password);
 

@@ -13,7 +13,7 @@
       </mat-toolbar>
       <main>
         <mat-table #table [dataSource]="dataSource" matSort>
-  
+
           <ng-container matColumnDef="position">
             <mat-header-cell *matHeaderCellDef mat-sort-header> ID </mat-header-cell>
             <mat-cell *matCellDef="let user"> {{user.id}} </mat-cell>
@@ -21,9 +21,11 @@
 
           <ng-container matColumnDef="avatar">
             <mat-header-cell *matHeaderCellDef mat-sort-header> Avatar </mat-header-cell>
-            <mat-cell *matCellDef="let user"><img class="avatar-image" [src]="user.avatar"></mat-cell>
+            <mat-cell *matCellDef="let user">
+              <img class="avatar-image" [src]="service.getImageUrl(user.avatar) | secureImage | async">
+            </mat-cell>
           </ng-container>
-            
+
           <ng-container matColumnDef="title">
             <mat-header-cell *matHeaderCellDef mat-sort-header> Login </mat-header-cell>
             <mat-cell *matCellDef="let user"> {{user.login}} </mat-cell>
@@ -42,7 +44,7 @@
           <ng-container matColumnDef="email">
             <mat-header-cell *matHeaderCellDef> Email </mat-header-cell>
             <mat-cell *matCellDef="let user"> {{user.email}}  </mat-cell>
-          </ng-container>	
+          </ng-container>
 
           <ng-container matColumnDef="lastLogin">
             <mat-header-cell *matHeaderCellDef mat-sort-header> LastLogin </mat-header-cell>
@@ -53,7 +55,7 @@
             <mat-header-cell *matHeaderCellDef> Roles </mat-header-cell>
             <mat-cell *matCellDef="let user">
               <mat-list>
-                <mat-list-item *ngFor="let role of user.roles">{{role}}</mat-list-item>
+                <mat-list-item *ngFor="let role of user.userRoles">{{role.name}}</mat-list-item>
               </mat-list>
             </mat-cell>
           </ng-container>
@@ -100,21 +102,29 @@
               </mat-menu>
             </mat-cell>
           </ng-container>
-  
+
           <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
           <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-          
+
         </mat-table>
-  
-        <mat-paginator #paginator id="paginator"
-          [pageSize]="5"
-          [pageSizeOptions]="[1, 5, 10, 20, 50]" 
-          (page)="pageEvent()">
-        </mat-paginator>
-  
+
+      <mat-paginator
+        [pageSizeOptions]="pageSizeOptions"
+        [showFirstLastButtons]="true"
+        (page)="onPageChange($event)">
+      </mat-paginator>
+
+        <div class="mat-elevation-z8" *ngIf="dataSource.data.length === 0">
+          <mat-card class="no-data-card">
+            <mat-card-content>
+              <p>No data available</p>
+            </mat-card-content>
+          </mat-card>
+        </div>
       </main>
-   
+
     </div>
+
     <div id="add_button">
       <button mat-fab disableRipple="false" color="primary" matTooltip="Add new user" matTooltipShowDelay="500"
         matTooltipHideDelay="1000" (click)="onAddUser()">
@@ -122,4 +132,4 @@
       </button>
     </div>
   </div>
-  
+

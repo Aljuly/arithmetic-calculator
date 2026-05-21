@@ -63,7 +63,7 @@ public class RegistrationPasswordLiveTest {
         param.put("matchingPassword", pass);
         RestAssured.port = port;
         RestAssured.baseURI = BASE_URI;
-        final Response response = RestAssured.given().formParams(param).accept(MediaType.APPLICATION_JSON_VALUE).post(BASE_URI + "/user/registration");
+        final Response response = RestAssured.given().formParams(param).accept(MediaType.APPLICATION_JSON_VALUE).post(BASE_URI + "/v1.0/user/register");
         return response.getStatusCode();
     }
 }

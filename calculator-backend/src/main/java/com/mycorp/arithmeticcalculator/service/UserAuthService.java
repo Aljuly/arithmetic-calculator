@@ -59,13 +59,6 @@ public class UserAuthService implements IUserAuthService {
     @Autowired
     private Validator validator;
     
-    public static final String TOKEN_INVALID = "invalidToken";
-    public static final String TOKEN_EXPIRED = "expired";
-    public static final String TOKEN_VALID = "valid";
-
-    public static String QR_PREFIX = "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
-    public static String APP_NAME = "SpringRegistration";
-
     // API
 
     @Override
@@ -75,14 +68,15 @@ public class UserAuthService implements IUserAuthService {
         }
         final User user = new User();
         
-        validateInputWithInjetedValidator(accountDto);
+        validateInputWithInjectedValidator(accountDto);
 
         user.setFirstName(accountDto.getFirstName());
         user.setLastName(accountDto.getLastName());
         user.setPassword(passwordEncoder.encode(accountDto.getPassword()));
         user.setEmail(accountDto.getEmail());
         user.setUsing2FA(accountDto.isUsing2FA());
-        user.setRoles(Arrays.asList(roleRepository.findByName("ROLE_USER")));
+        user.setVerified(false);
+        user.setRoles(Arrays.asList(roleRepository.findByName("USER")));
         
         return repository.save(user);
     }
@@ -147,6 +141,11 @@ public class UserAuthService implements IUserAuthService {
     public User findUserByEmail(final String email) {
         return repository.findByEmail(email);
     }
+    
+	@Override
+	public User findUserByName(String loginName) {
+		return repository.findByLogin(loginName);
+	}
 
     @Override
     public PasswordResetToken getPasswordResetToken(final String token) {
@@ -188,8 +187,9 @@ public class UserAuthService implements IUserAuthService {
             return TOKEN_EXPIRED;
         }
 
-        user.setEnabled(true);
+        user.setVerified(true);
         repository.save(user);
+        tokenRepository.delete(verificationToken);
         return TOKEN_VALID;
     }
 
@@ -230,7 +230,7 @@ public class UserAuthService implements IUserAuthService {
         return users;
     }
     
-    private void validateInputWithInjetedValidator(UserDto user) {
+    private void validateInputWithInjectedValidator(UserDto user) {
     	Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
     	if (!violations.isEmpty()) {
     		throw new ConstraintViolationException(violations);

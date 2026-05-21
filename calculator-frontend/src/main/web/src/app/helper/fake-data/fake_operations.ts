@@ -1,8 +1,6 @@
 export const ALL_OPERATIONS = [
-    {name: 'OP_USER_VIEW', description: 'View user'},
-    {name: 'OP_USER_EXTEND', description: 'Edit user'},
-    {name: 'OP_USER_MANAGE', description: 'Delete user'},
-    {name: 'OP_ROLE_VIEW', description: 'View role'},
-    {name: 'OP_ROLE_EXTEND', description: 'Edit role'},
-    {name: 'OP_ROLE_MANAGE', description: 'Delete role'}
+    {name: 'READ_PRIVILEGE', description: 'View users'},
+    {name: 'WRITE_PRIVILEGE', description: 'Edit users and their roles'},
+    {name: 'CHANGE_PASSWORD_PRIVILEGE', description: 'Change user password'},
+    {name: 'DELETE_PRIVILEGE', description: 'Delete users and roles'},
 ];

@@ -74,7 +74,7 @@
       >
         <img
           class="app-userknob-avatar-img"
-          src="../../../assets/img/unknown-person.png"
+          [src]="service.getImageUrl(authService.currentUser.avatar) | secureImage | async"
           alt="Your avatar"
         />
         {{ authService.currentUser.login }}

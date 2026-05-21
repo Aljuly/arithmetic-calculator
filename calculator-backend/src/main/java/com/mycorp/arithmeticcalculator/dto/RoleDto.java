@@ -22,12 +22,20 @@ public class RoleDto {
 	@ValidRoleName
 	private String role;
 	
+	@JsonProperty("description")
 	private String description;
 	
 	@JsonProperty("operations")
 	@NotNull
 	@NotEmpty
 	private List<String> privileges;
+	
+	/**
+	* No args constructor for use in serialization
+	*
+	*/
+	public RoleDto() {
+	}
 	
 	public RoleDto(Long id, String role, String description, List<String> privileges) {
 		this.id = id;

@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,14 +27,16 @@ import lombok.extern.slf4j.Slf4j;
 public class UserListingService implements IUserListingService {
 	
 	private UserRepository userRepository;
-	
+	private PasswordEncoder passwordEncoder;
 	private IRoleService roleService;
 	
 	UserListingService(
 			UserRepository userRepository,
-			IRoleService roleService) {
+			IRoleService roleService,
+			PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
 		this.roleService = roleService;
+		this.passwordEncoder = passwordEncoder;
 	}
 	
 	@Override
@@ -69,6 +72,9 @@ public class UserListingService implements IUserListingService {
 				.filter(Objects::nonNull)
 				.map(RoleDto::getRole)
 				.toList()));
+		if (user.getPassword() != null && !user.getPassword().isBlank()) {
+			user.setPassword(passwordEncoder.encode(user.getPassword()));
+		}
 		userRepository.saveAndFlush(user);
 		log.debug("User Record saved successfully with Id: {}", user.getId());
 		return new UserResponce(user);
@@ -92,10 +98,15 @@ public class UserListingService implements IUserListingService {
 						.filter(Objects::nonNull)
 						.map(RoleDto::getRole)
 						.toList()));
+				if (user.getPassword() != null 
+						&& !user.getPassword().isBlank() 
+						&& !user.getPassword().isEmpty()) {
+					user.setPassword(passwordEncoder.encode(user.getPassword()));
+				}
 				userRepository.saveAndFlush(user);
 				log.debug("Updated user record with Id: {}", userId);
 			} catch (NoSuchElementException e) {
-				throw new UserNotFoundException(String.format("User with Id: {} not found in DB", userId));
+				throw new UserNotFoundException(String.format("User with Id: %d not found in DB", userId));
 			}
 		}
 	}

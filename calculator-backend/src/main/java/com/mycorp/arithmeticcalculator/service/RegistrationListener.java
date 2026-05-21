@@ -38,9 +38,8 @@ public class RegistrationListener implements
         final User user = event.getUser();
         final String token = UUID.randomUUID().toString();
         service.createVerificationTokenForUser(user, token);
-
         final SimpleMailMessage email = constructEmailMessage(event, user, token);
-        //mailSender.send(email);
+        mailSender.send(email);
     }
 
     //

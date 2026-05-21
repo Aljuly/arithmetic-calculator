@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"let d='';process.stdin.on('data',c=>d+=c);process.stdin.on('end',()=>{const j=JSON.parse(d);const f=(j.tool_input||{}).file_path||'';if(!f.endsWith('.ts')||!f.includes('calculator-frontend')||f.includes('node_modules'))return;const {execSync}=require('child_process');try{execSync('npx tslint -c tslint.json -p src/tsconfig.app.json '+f,{cwd:'C:/ForWork/arithmetic-calculator/calculator-frontend/src/main/web',stdio:'pipe'});}catch(e){const out=(e.stdout||'').toString().trim();if(out)process.stdout.write(JSON.stringify({systemMessage:'TSLint: '+out}));}})\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node -e \"const {execSync}=require('child_process');try{const r=execSync('git diff --stat',{cwd:'C:/ForWork/arithmetic-calculator/calculator-backend'}).toString().trim();if(r)process.stdout.write(JSON.stringify({systemMessage:'Changed files:\\n'+r}));else process.stdout.write(JSON.stringify({systemMessage:'No uncommitted changes.'}));}catch(e){}\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

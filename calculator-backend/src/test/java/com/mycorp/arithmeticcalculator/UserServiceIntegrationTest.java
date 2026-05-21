@@ -57,7 +57,7 @@ public class UserServiceIntegrationTest {
 
     @Test
     public void givenNewUser_whenRegistered_thenCorrect() throws EmailExistsException {
-        final String userEmail = UUID.randomUUID().toString();
+        final String userEmail = createUserEmail();
         final UserDto userDto = createUserDto(userEmail);
 
         final User user = userService.registerNewUserAccount(userDto);
@@ -97,20 +97,21 @@ public class UserServiceIntegrationTest {
     @Test
     public void givenUserRegistered_whenDuplicatedRegister_thenCorrect() {
         assertThrows(UserAlreadyExistException.class, () -> {
-        	final String email = UUID.randomUUID().toString();
+        	final String email = createUserEmail();
         	final UserDto userDto = createUserDto(email);
         	userService.registerNewUserAccount(userDto);
         	userService.registerNewUserAccount(userDto);
         });
     }
 
+    @Test
     @Transactional
     public void givenUserRegistered_whenDtoRoleAdmin_thenUserNotAdmin() {
         assertNotNull(roleRepository);
         final UserDto userDto = new UserDto();
-        userDto.setEmail(UUID.randomUUID().toString());
-        userDto.setPassword("SecretPassword");
-        userDto.setMatchingPassword("SecretPassword");
+        userDto.setEmail(createUserEmail());
+        userDto.setPassword("Passw0rd!");
+        userDto.setMatchingPassword("Passw0rd!");
         userDto.setFirstName("First");
         userDto.setLastName("Last");
         assertNotNull(roleRepository.findByName("ROLE_ADMIN"));
@@ -210,7 +211,7 @@ public class UserServiceIntegrationTest {
         userService.createVerificationTokenForUser(user, token);
         final long userId = user.getId();
         final String token_status = userService.validateVerificationToken(token);
-        assertEquals(token_status, UserService.TOKEN_VALID);
+        assertEquals(token_status, IUserAuthService.TOKEN_VALID);
         user = userService.getUserByID(userId).get();
         assertTrue(user.isEnabled());
     }
@@ -223,7 +224,7 @@ public class UserServiceIntegrationTest {
         userService.createVerificationTokenForUser(user, token);
         userService.getVerificationToken(token).getId();
         final String token_status = userService.validateVerificationToken(invalid_token);
-        token_status.equals(UserService.TOKEN_INVALID);
+        token_status.equals(IUserAuthService.TOKEN_INVALID);
     }
 
     @Test
@@ -237,16 +238,20 @@ public class UserServiceIntegrationTest {
         tokenRepository.saveAndFlush(verificationToken);
         final String token_status = userService.validateVerificationToken(token);
         assertNotNull(token_status);
-        token_status.equals(UserService.TOKEN_EXPIRED);
+        token_status.equals(IUserAuthService.TOKEN_EXPIRED);
     }
 
-    //
+    // helper methods
 
+    private String createUserEmail() {
+    	return UUID.randomUUID().toString() + "@x.xxx";
+    }
+    
     private UserDto createUserDto(final String email) {
         final UserDto userDto = new UserDto();
         userDto.setEmail(email);
-        userDto.setPassword("SecretPassword");
-        userDto.setMatchingPassword("SecretPassword");
+        userDto.setPassword("Passw0rd!");
+        userDto.setMatchingPassword("Passw0rd!");
         userDto.setFirstName("First");
         userDto.setLastName("Last");
         userDto.setRole(0);
@@ -254,7 +259,7 @@ public class UserServiceIntegrationTest {
     }
 
     private User registerUser() {
-        final String email = UUID.randomUUID().toString();
+        final String email = createUserEmail();
         final UserDto userDto = createUserDto(email);
         final User user = userService.registerNewUserAccount(userDto);
         assertNotNull(user);

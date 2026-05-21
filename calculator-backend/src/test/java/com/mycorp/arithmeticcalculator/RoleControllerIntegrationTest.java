@@ -65,7 +65,7 @@ public class RoleControllerIntegrationTest {
     @Test
 	public void shouldReturnRolesList() throws Exception {
 		final MockHttpServletRequestBuilder requestBuilder = 
-				get("/api/roles").contentType(MediaType.APPLICATION_JSON_VALUE);
+				get("/v1.0/roles").contentType(MediaType.APPLICATION_JSON_VALUE);
 		mockMvc.perform(requestBuilder)
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("@", iterableWithSize(2)));	
@@ -79,7 +79,7 @@ public class RoleControllerIntegrationTest {
     	role.setPrivileges(Arrays.asList(privilege));
     	roleRepository.saveAndFlush(role);
     	Long roleId = role.getId();
-    	mockMvc.perform(delete("/api/roles/{roleId}", 123456))
+    	mockMvc.perform(delete("/v1.0/roles/{roleId}", 123456))
     		.andExpect(status().is(404))
     		.andExpect(result -> assertTrue(result.getResolvedException() instanceof RoleNotFoundException))
     		.andExpect(result -> assertEquals("Role to delete not found", result.getResolvedException().getMessage()));
@@ -108,7 +108,7 @@ public class RoleControllerIntegrationTest {
 	public void shouldCreateNewRoleIfWrongId() throws Exception {
 		String body = "{ \"id\": "
 				+ 123456L + ", \"name\": \"ROLE_MENTOR\", \"description\": \"mentor\", \"operations\": [\"WRITE_PRIVILEGE\"] }";
-		mockMvc.perform(post("/api/roles")
+		mockMvc.perform(post("/v1.0/roles")
 				.characterEncoding("utf-8")
 				.content(body)
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
@@ -133,7 +133,7 @@ public class RoleControllerIntegrationTest {
     	Long roleId = role.getId();
 		String body = "{ \"id\": "
 				+ roleId.toString() + ", \"name\": \"ROLE_MODER\", \"description\": \"moder\", \"operations\": [\"WRITE_PRIVILEGE\"] }";
-		mockMvc.perform(post("/api/roles")
+		mockMvc.perform(post("/v1.0/roles")
 				.characterEncoding("utf-8")
 				.content(body)
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))

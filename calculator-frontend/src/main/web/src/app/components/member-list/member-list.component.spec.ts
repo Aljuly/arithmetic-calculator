@@ -6,6 +6,7 @@ describe('MemberListComponent', () => {
   let component: MemberListComponent;
   let fixture: ComponentFixture<MemberListComponent>;
 
+  // @ts-ignore
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ MemberListComponent ]

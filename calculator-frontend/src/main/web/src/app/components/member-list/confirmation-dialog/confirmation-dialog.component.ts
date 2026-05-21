@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { NGXLogger } from 'ngx-logger';
 
@@ -7,9 +7,9 @@ import { NGXLogger } from 'ngx-logger';
   templateUrl: './confirmation-dialog.component.html',
   styleUrls: ['./confirmation-dialog.component.scss']
 })
-export class ConfirmationDialogComponent {
+export class _ConfirmationDialogComponent {
 
-  constructor(public dialogRef: MatDialogRef<ConfirmationDialogComponent>,
+  constructor(public dialogRef: MatDialogRef<_ConfirmationDialogComponent>,
               private logger: NGXLogger,
               @Inject(MAT_DIALOG_DATA) public data: any) {
   }

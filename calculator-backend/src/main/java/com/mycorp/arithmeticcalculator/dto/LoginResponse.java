@@ -2,9 +2,13 @@ package com.mycorp.arithmeticcalculator.dto;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class LoginResponse {
 	
     private String login;
+    
+    @JsonProperty("access_token")
     private String token;
     
 	public LoginResponse(String login, String token) {

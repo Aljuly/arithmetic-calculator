@@ -28,6 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -109,9 +112,10 @@ public class UserControllerIntegrationTest {
 	}
 	
     @Test
+    @WithMockUser("bob")
     public void shouldReturnUsersList() throws Exception {
     	final MockHttpServletRequestBuilder requestBuilder = 
-				get("/api/users").contentType(MediaType.APPLICATION_JSON_VALUE);
+				get("/v1.0/users").contentType(MediaType.APPLICATION_JSON_VALUE);
 		mockMvc.perform(requestBuilder)
 			.andDo(print())
 			.andExpect(status().isOk())
@@ -121,9 +125,10 @@ public class UserControllerIntegrationTest {
     }
     
     @Test
+    @WithMockUser("test")
     public void shouldReturnUserByName() throws Exception {
     	log.info("Get the user with name: " + "\"testUser\"");
-    	mockMvc.perform(get("/api/users/by-name/{name}", "bob"))
+    	mockMvc.perform(get("/v1.0/users/by-name/{name}", "bob"))
     		.andDo(print())
     		.andExpect(status().isOk())
     		.andExpect(jsonPath("$.login", is("bob")))
@@ -132,7 +137,7 @@ public class UserControllerIntegrationTest {
     
     @Test
     public void shouldDeleteUser() throws Exception {
-    	mockMvc.perform(delete("/api/users/{userId}", 123456))
+    	mockMvc.perform(delete("/v1.0/users/{userId}", 123456))
 		.andExpect(status().is(404))
 		.andExpect(result -> assertTrue(result.getResolvedException() instanceof UserNotFoundException))
 		.andExpect(result -> assertEquals("User to delete not found", result.getResolvedException().getMessage()));
@@ -171,7 +176,7 @@ public class UserControllerIntegrationTest {
     			+ "  ],  \r\n"
     			+ "  \"banReason\": \"\"\r\n"
     			+ "}";
-		mockMvc.perform(post("/api/users")
+		mockMvc.perform(post("/v1.0/users")
 				.characterEncoding("utf-8")
 				.content(body)
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
@@ -208,14 +213,14 @@ public class UserControllerIntegrationTest {
     			+ "  ],  \r\n"
     			+ "  \"banReason\": \"\"\r\n"
     			+ "}";
-		mockMvc.perform(put("/api/users")
+		mockMvc.perform(put("/v1.0/users")
 				.characterEncoding("utf-8")
 				.content(body)
 				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isOk());
 		
-		mockMvc.perform(get("/api/users/by-name/{name}", "testUser"))
+		mockMvc.perform(get("/v1.0/users/by-name/{name}", "testUser"))
 				.andDo(print())
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.firstName", is("Bobus")))
@@ -225,7 +230,7 @@ public class UserControllerIntegrationTest {
     
     @Test
     public void gotTrueWhenEmailUnique() throws Exception {
-    	mockMvc.perform(get("/api/users/email-check").param("email", "bob@test.com"))
+    	mockMvc.perform(get("/v1.0/users/email-check").param("email", "bob@test.com"))
     			.andDo(print())
     			.andExpect(status().isOk())
     			.andExpect(jsonPath("$.isUniqueEmail", is(false)));
@@ -233,7 +238,7 @@ public class UserControllerIntegrationTest {
     
     @Test
     public void gotTrueWhenUserLoginUnique() throws Exception {
-    	mockMvc.perform(get("/api/users/login-check").param("username", "bob"))
+    	mockMvc.perform(get("/v1.0/users/login-check").param("username", "bob"))
     			.andDo(print())
     	    	.andExpect(status().isOk())
     	    	.andExpect(jsonPath("$.isUniqueUsername", is(false)));

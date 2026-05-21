@@ -6,8 +6,16 @@ public class PasswordDto {
 
 	private String oldPassword;
 
+	public PasswordDto() {
+	}
+
 	@ValidPassword
 	private String newPassword;
+
+	public PasswordDto(String oldPassword, String newPassword) {
+		this.oldPassword = oldPassword;
+		this.newPassword = newPassword;
+	}
 
 	public String getOldPassword() {
 		return oldPassword;

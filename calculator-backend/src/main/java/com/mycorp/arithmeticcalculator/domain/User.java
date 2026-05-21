@@ -2,6 +2,7 @@ package com.mycorp.arithmeticcalculator.domain;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,9 +28,11 @@ public class User {
 	private Long id;
 
 	private String login;
-	
+
+	@Column(name = "first_name", length = 50)
 	private String firstName;
 
+	@Column(name = "last_name", length = 50)
 	private String lastName;
 
 	private String email;
@@ -39,9 +42,20 @@ public class User {
 
 	private boolean enabled;
 
+	@Column(name = "is_using2fa")
 	private boolean isUsing2FA;
 
 	private String secret;
+
+	@Column(name = "avatarId")
+	private String avatarId;
+
+	private boolean banned;
+
+	private boolean verified;
+
+	@Column(columnDefinition = "TEXT")
+	private String banReason;
 
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
@@ -52,17 +66,21 @@ public class User {
 		this.secret = Base32.random();
 		this.enabled = false;
 	}
-	
+
 	public User(
 			String login,
-			String firstName, 
-			String lastName, 
-			String email, 
-			String password, 
+			String firstName,
+			String lastName,
+			String email,
+			String password,
 			boolean enabled,
-			boolean isUsing2FA, 
-			String secret
-			) {
+			boolean isUsing2FA,
+			String secret,
+			String avatarId,
+			boolean banned,
+			boolean verified,
+			String banReason
+	) {
 		super();
 		this.login = login;
 		this.firstName = firstName;
@@ -72,6 +90,10 @@ public class User {
 		this.enabled = enabled;
 		this.isUsing2FA = isUsing2FA;
 		this.secret = secret;
+		this.avatarId = avatarId;
+		this.banned = banned;
+		this.verified = verified;
+		this.banReason = banReason;
 	}
 
 	public User(UserResponce userResponse) {
@@ -83,11 +105,15 @@ public class User {
 				userResponse.getPassword(),
 				userResponse.isEnabled(),
 				false,
-				""
+				"",
+				userResponse.getAvatar(),
+				userResponse.isBanned(),
+				userResponse.isVerified(),
+				userResponse.getBanReason()
 				);
 	}
-	
-	public User updateUser(UserResponce userResponse) {
+
+	public void updateUser(UserResponce userResponse) {
 		this.login = userResponse.getLogin();
 		this.firstName = userResponse.getFirstName();
 		this.lastName = userResponse.getLastName();
@@ -96,9 +122,12 @@ public class User {
 		this.enabled = userResponse.isEnabled();
 		this.isUsing2FA = false;
 		this.secret = "";
-		return this;
+		this.avatarId = userResponse.getAvatar();
+		this.banned = userResponse.isBanned();
+		this.verified = userResponse.isVerified();
+		this.banReason = userResponse.getBanReason();
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -110,11 +139,11 @@ public class User {
 	public void setLogin(String login) {
 		this.login = login;
 	}
-	
+
 	public String getLogin() {
 		return login;
 	}
-	
+
 	public String getFirstName() {
 		return firstName;
 	}
@@ -179,6 +208,38 @@ public class User {
 		this.secret = secret;
 	}
 
+	public String getAvatarId() {
+		return avatarId;
+	}
+
+	public void setAvatarId(String avatarId) {
+		this.avatarId = avatarId;
+	}
+
+	public boolean isBanned() {
+		return banned;
+	}
+
+	public void setBanned(boolean banned) {
+		this.banned = banned;
+	}
+
+	public boolean isVerified() {
+		return verified;
+	}
+
+	public void setVerified(boolean verified) {
+		this.verified = verified;
+	}
+
+	public String getBanReason() {
+		return banReason;
+	}
+
+	public void setBanReason(String banReason) {
+		this.banReason = banReason;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -192,27 +253,31 @@ public class User {
 		if (this == obj) {
 			return true;
 		}
-		if (obj == null) {
-			return false;
-		}
-		if (getClass() != obj.getClass()) {
+		if (obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
 		final User user = (User) obj;
-		if (!email.equals(user.email)) {
-			return false;
-		}
-		return true;
+		return Objects.equals(email, user.email) &&
+				Objects.equals(avatarId, user.avatarId) &&
+				banned == user.banned &&
+				verified == user.verified;
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("User [id=").append(id).append(", firstName=").append(firstName).append(", lastName=")
-				.append(lastName).append(", email=").append(email).append(", password=").append(password)
-				.append(", enabled=").append(enabled).append(", isUsing2FA=").append(isUsing2FA).append(", secret=")
-				.append(secret).append(", roles=").append(roles).append("]");
-		return builder.toString();
+		return "User [id=" + id +
+				", firstName=" + firstName +
+				", lastName=" + lastName +
+				", email=" + email +
+				", password=" + password +
+				", enabled=" + enabled +
+				", isUsing2FA=" + isUsing2FA +
+				", secret=" + secret +
+				", avatarId=" + avatarId +
+				", banned=" + banned +
+				", verified=" + verified +
+				", banReason=" + banReason +
+				", roles=" + roles + "]";
 	}
-
 }
+

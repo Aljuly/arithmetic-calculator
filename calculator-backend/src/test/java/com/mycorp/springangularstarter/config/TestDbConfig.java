@@ -27,8 +27,7 @@ public class TestDbConfig extends PersistenceJPAConfig {
 
     @Bean
 	protected DataSource dataSource() {
-        EmbeddedDatabase datasource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
-        return datasource;
+        return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
     }
 
     @Override

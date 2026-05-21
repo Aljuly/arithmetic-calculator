@@ -10,9 +10,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.TemporalAmount;
 import java.util.Date;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -26,14 +26,17 @@ import com.mycorp.arithmeticcalculator.repository.UserRepository;
 @Service
 public class TokenService {
 	
-    private static final String CLAIM_ROLE = "role";
+	private static final String CLAIM_ROLE = "role";
 
     private static final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS256;
 	private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SIGNATURE_ALGORITHM);
     private static final TemporalAmount TOKEN_VALIDITY = Duration.ofHours(4L);
 
-    @Autowired
     private UserRepository userRepository;
+    
+    public TokenService(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}    
     
     /**
      * Builds a JWT with the given subject and role and returns it as a JWS signed compact String.
@@ -76,15 +79,57 @@ public class TokenService {
         }
 	}
 	
+	/**
+	 * Returns user name got from the token 
+	 * @param token
+	 * @return User name
+	 */
+	public UserResponce getUserName(String token) {
+		String userData = parseSignedClaims(token, Claims::getSubject);
+		try {
+			return UserResponce.fromJson(userData);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	/**
+	 * check token validity
+	 * @param token
+	 * @param userDetails
+	 * @return true if token valid
+	 */
+	public boolean isTokenValid(String token, UserDetails userDetails) {
+		final String userName = getUserName(token).getEmail();
+		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
+	}
+	
+	/**
+	 * check if token is expired
+	 * @param token
+	 * @return true if token is expired
+	 */
+	private boolean isTokenExpired(String token) {
+		Date tokenExpirationDate = parseSignedClaims(token, Claims::getExpiration);
+		return tokenExpirationDate.before(new Date());
+	}
+	
     /**
      * Parses the given JWS signed compact JWT, returning the claims.
      * If this method returns without throwing an exception, the token can be trusted.
      */
-    public Claims parseToken(final String compactToken) {       
+    private Claims parseToken(final String compactToken) {       
         return Jwts.parser()
-                .verifyWith(SECRET_KEY)
+        		.setSigningKey(SECRET_KEY)
                 .build()
-                .parseSignedClaims(compactToken)
-                .getPayload();
+                .parseClaimsJws(compactToken)
+                .getBody();
     }
+    
+    private <T> T parseSignedClaims(String token, Function<Claims, T> claimsResolvers) {
+    	final Claims claims = parseToken(token);
+    	return claimsResolvers.apply(claims);
+    }
+    
+    
 }

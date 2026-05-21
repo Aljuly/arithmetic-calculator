@@ -1,5 +1,6 @@
 package com.mycorp.arithmeticcalculator;
 
+import java.util.Objects;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -33,8 +34,6 @@ public class PersistenceJPAConfig {
 		super();
 	}
 
-    //
-
     @Bean
     LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		final LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
@@ -49,7 +48,7 @@ public class PersistenceJPAConfig {
     @Bean
 	protected DataSource dataSource() {
 		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
-		dataSource.setDriverClassName(env.getProperty("spring.datasource.driverClassName"));
+		dataSource.setDriverClassName(Objects.requireNonNull(env.getProperty("spring.datasource.driverClassName")));
 		dataSource.setUrl(env.getProperty("spring.datasource.url"));
 		dataSource.setUsername(env.getProperty("spring.datasource.username"));
 		dataSource.setPassword(env.getProperty("spring.datasource.password"));
@@ -60,6 +59,7 @@ public class PersistenceJPAConfig {
     Flyway flyway() {
         return new Flyway(Flyway.configure()
                 .baselineOnMigrate(false)
+                .baselineVersion("0")
                 .dataSource(
                 		env.getRequiredProperty("spring.datasource.url"),
                 		env.getRequiredProperty("spring.datasource.username"),

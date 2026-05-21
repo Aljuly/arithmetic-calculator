@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -8,22 +8,20 @@ import { MatTableDataSource } from '@angular/material/table';
 import { NGXLogger } from 'ngx-logger';
 
 import { User } from '../../model/User';
-import { UserService } from 'src/app/services/user.service';
+import { UserService } from '../../services/user.service';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
-//import { UserFormDialogComponent } from './user-form-dialog/user-form-dialog.component';
 import { MemberFormDialogComponent } from '../member-list/member-form-dialog/member-form-dialog.component';
-import { JsonConvert } from 'json2typescript';
 
 @Component({
     selector: 'app-user-list',
     templateUrl: 'user-list.component.html',
     styleUrls: ['user-list.component.scss']
 })
-export class UserListComponent implements OnInit, AfterViewInit {
+export class UserListComponent implements OnInit, OnDestroy, AfterViewInit {
     users: User[];
     displayedColumns = ['position', 'avatar', 'title', 'firstName', 'lastName', 'email', 'userRoles', 'enabled', 'verified', 'banned', 'lastLogin', 'menuAction'];
+    pageSizeOptions: number[] = [10, 20, 50];
     dataSource: MatTableDataSource<User> = new MatTableDataSource<User>();
-    private jsonConvert: JsonConvert = new JsonConvert();
     @ViewChild(MatPaginator) paginator!: MatPaginator;
     @ViewChild(MatSort) sort!: MatSort;
 
@@ -39,49 +37,66 @@ export class UserListComponent implements OnInit, AfterViewInit {
         this.updateUserList();
     }
 
-    pageEvent() {
-        // Use MatTableDataSource for paginatin and filtering
-        this.users = this.dataSource._pageData(this.dataSource.filteredData);
+    ngAfterViewInit(): void {
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+    }
+
+    ngOnDestroy(): void {
     }
 
     getValue(event: Event): string {
         return (event.target as HTMLInputElement).value;
     }
 
+    onPageChange(event: any) {
+        this.logger.info('UserListComponent: onPageChange()', event);
+        this.updateUserList();
+    }
+
     private updateUserList() {
         this.logger.info('UserListComponent: updateUserList()');
-        this.service.getAll()
+        const pageIndex = this.paginator?.pageIndex || 0;
+        const pageSize = this.paginator?.pageSize || 10;
+
+        this.service.getPaginated(pageIndex, pageSize)
             .subscribe(
-                (list) => {
-                    this.logger.info('UserListComponent: received users ', list);
-                    this.users = list.slice();
-                    this.dataSource.data = list.slice();
+                (response) => {
+                    this.logger.info('UserListComponent: received paginated users', response);
+                    this.users = response.content.slice();
+                    this.dataSource.data = response.content.slice();
+                    setTimeout(() => {
+                        if (this.dataSource.paginator) {
+                            this.dataSource.paginator.length = response.totalElements;
+                            this.dataSource.paginator.pageIndex = pageIndex;
+                            this.dataSource.paginator.pageSize = pageSize;
+                        }
+                    });
+                    this.logger.info('UserListComponent: total records', response.totalElements);
+                },
+                (error) => {
+                    this.logger.error('UserListComponent: error fetching paginated users', error);
+                    this.snackBar.open('Failed to fetch user list', '', {
+                        duration: 5000,
+                    });
                 }
             );
     }
-
-    ngAfterViewInit(): void {
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-    }
-
     applyFilter(filterValue: string) {
         filterValue = filterValue.trim(); // Remove whitespace
         filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
         this.dataSource.filter = filterValue;
     }
-
     onEditUser(user: User) {
         this.logger.debug('UserListComponent: onEditUser()');
-        let userData: string = this.jsonConvert.serialize(user, User);
         const dialogRef = this.dialog.open(MemberFormDialogComponent, {
             width: '50%',
             height: '57%',
             disableClose: true,
-            panelClass: ['no-padding-dialog'], // delete padding in this dialog https://material.angular.io/guide/customizing-component-styles
+            panelClass: ['no-padding-dialog'],
             data: {
                 isNewUser: false,
-                user: userData
+                user: user
             }
         });
         dialogRef.afterClosed().subscribe(user_ => {
@@ -94,13 +109,12 @@ export class UserListComponent implements OnInit, AfterViewInit {
             }
         });
     }
-
     onAddUser() {
         this.logger.trace('UserListComponent: onAddUser()');
         const dialogRef = this.dialog.open(MemberFormDialogComponent, {
             width: '50%',
             height: '57%',
-            panelClass: ['no-padding-dialog'], // delete padding in this dialog https://material.angular.io/guide/customizing-component-styles
+            panelClass: ['no-padding-dialog'],
             disableClose: true,
             data: {isNewUser: true}
         });
@@ -137,6 +151,9 @@ export class UserListComponent implements OnInit, AfterViewInit {
             }
         });
     }
-
+    getUserAvatar(user: User): string {
+      const avatarId = user?.avatar?.toString() || 'default';
+      // Return the direct URL - let the browser handle loading
+      return this.service.getImageUrl(avatarId);
+    }
 }
-

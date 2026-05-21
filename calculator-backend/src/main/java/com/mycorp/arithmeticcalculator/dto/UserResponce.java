@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mycorp.arithmeticcalculator.domain.User;
 import com.mycorp.arithmeticcalculator.validators.ValidEmail;
@@ -139,20 +140,20 @@ public class UserResponce {
 	public UserResponce(User user) {
 		this(
 				user.getId(),
-				user.getLogin(), 
-				"", //password 
+				user.getLogin(),
+				"", //password
 				user.getEmail(), 
 				user.getFirstName(), 
 				user.getLastName(), 
-				"", //avatar, 
+				user.getAvatarId(),
 				"", //lastlogin,
-				user.isEnabled(), 
-				false, //banned, 
-				true, //verified, 
-				"", //banReason, 
+				user.isEnabled(),
+				user.isBanned(),
+				user.isVerified(),
+				user.getBanReason(),
 			 	Optional.ofNullable(user.getRoles())
 			 	.orElseGet(ArrayList::new).stream()
-			 	.map(r -> new RoleDto(r))
+			 	.map(RoleDto::new)
 			 	.collect(Collectors.toList())
 				);
 	}
@@ -296,6 +297,11 @@ public class UserResponce {
 	public String toJson() throws JsonProcessingException {
 		return (new ObjectMapper()).writeValueAsString(this);
 	}
+	
+	public static UserResponce fromJson(String json) throws JsonMappingException, JsonProcessingException {
+		return (new ObjectMapper()).readValue(json, UserResponce.class);
+	}
+	
 }
 
 

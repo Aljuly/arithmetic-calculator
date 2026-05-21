@@ -5,8 +5,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableDataSource } from '@angular/material/table';
 import { NGXLogger } from 'ngx-logger';
 import { User } from '../../model/User';
-import { UserService } from 'src/app/services/user.service';
 import { MemberFormDialogComponent } from './member-form-dialog/member-form-dialog.component';
+import { UserService } from '../../services/user.service';
 
 @Component({
     selector: 'app-member-list',
@@ -65,7 +65,7 @@ export class MemberListComponent implements OnInit, AfterViewInit {
                     this.logger.trace('MemberListComponent: received users ', list);
 
                     // Use MatTableDataSource for paginatin and filtering
-                    this.dataSource.data = list.slice();
+                    this.dataSource.data = list.content.slice();
                     this.users = this.dataSource._pageData(this.dataSource.filteredData);
                     this.loaded = true;
                 }
@@ -77,6 +77,7 @@ export class MemberListComponent implements OnInit, AfterViewInit {
         const dialogRef = this.dialog.open(MemberFormDialogComponent, {
             width: '95%',
             height: '80%',
+          // tslint:disable-next-line:max-line-length
             panelClass: ['no-padding-dialog'], // delete padding in this dialog https://material.angular.io/guide/customizing-component-styles
             disableClose: true,
             data: {isNewUser: true}

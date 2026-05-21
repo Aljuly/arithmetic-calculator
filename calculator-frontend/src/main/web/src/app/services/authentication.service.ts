@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { NGXLogger } from 'ngx-logger';
 
@@ -8,21 +7,15 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 
 import config from '../config/index';
 import { User } from '../model/User';
-import { UserService } from './user.service';
 import { LocalStorageService } from './local-storage.service';
 import { Role } from '../model/Role';
 
 @Injectable()
 export class AuthenticationService {
-    private readonly oauthClientUsername = 'microlms360';
-    private readonly oauthClientPassword = 'microlms360';
-    private readonly authorizationHeader;
 
     constructor(private http: HttpClient,
-                private userService: UserService,
                 private localStorageService: LocalStorageService,
                 private logger: NGXLogger) { 
-        this.authorizationHeader = `Basic ${btoa(this.oauthClientUsername + ':' + this.oauthClientPassword)}`;
     }
 
     /**
@@ -32,31 +25,27 @@ export class AuthenticationService {
      */
     login(loginObject: any) {
         this.logger.debug('AuthenticationService: login(); loginObgect: ', loginObject);
-        const body: FormData = new FormData();
-        body.append('scope', 'webclient');
-        Object.keys(loginObject).forEach(key => body.append(key, loginObject[key]));
         const httpOptions = {
             headers: new HttpHeaders({
-                'Authorization': this.authorizationHeader
+                'Content-Type' : 'application/json'
             })
         };
-
-        this.logger.debug('AuthenticationService: HTTP POST to url: ', config.endpoint.auth.issueNewToken);
-        return this.http.post<any>(config.endpoint.auth.issueNewToken, body, httpOptions)
+        const url = config.api.protocol + '://' + config.api.host + ':' + config.api.port + config.endpoint.auth.issueNewToken
+        this.logger.debug('AuthenticationService: HTTP POST to url: ', url);
+        return this.http.post<any>(url, loginObject, httpOptions)
             .pipe(map(payload => {
                 this.logger.debug('AuthenticationService: received payload: ', payload);
-
                 // login successful if there's a jwt token in the response
                 if (payload && payload.access_token) {
                     // store user details and jwt token in local storage to keep user logged in between page refreshes
                     const currentUser = new User(payload);
                     this.localStorageService.saveCurrentUser(currentUser);
+                    this.logger.info('Got current user: ', currentUser);
                     console.log('Was saved next user', currentUser);
                     this.logger.info('AuthenticationService: user logged-in successfully');
                 } else {
                     this.logger.warn('AuthenticationService: invalid format, no access token in the payload!');
                 }
-
                 return payload;
             }));
     }
@@ -80,12 +69,12 @@ export class AuthenticationService {
             this.logger.trace('AuthenticationService: logged-in user not found');
             return false;
         }
+        //this.logger.debug('AuthenticationService: found user: ', user);
         const token = user.tokens.access_token;
         if (!token) {
             this.logger.error('AuthenticationService: access_token not found');
             return false;
         }
-        // return !jwtHelper.isTokenExpired(token);
         if (jwtHelper.isTokenExpired(token, 1)) {
             this.logger.warn('AuthenticationService: access_token expired');
             return false;
@@ -113,7 +102,7 @@ export class AuthenticationService {
         currentUser.userRoles.forEach((curRole: { name: any; }) => {
             requiredRoles.forEach(expRole => {
                 // Here we have check what Role info stored in Tocken and add 'Role.id'
-                if (expRole.description === curRole.name) {
+                if (expRole.name === curRole.name) {
                     has = true;
                 }
             });
@@ -127,7 +116,6 @@ export class AuthenticationService {
         }
         return has;
     }
-
 
     get currentUser(): User {
         return this.localStorageService.readCurrentUser();

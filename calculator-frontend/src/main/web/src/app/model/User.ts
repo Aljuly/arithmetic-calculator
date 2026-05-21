@@ -1,6 +1,5 @@
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { JsonObject, JsonProperty } from 'json2typescript';
-import { Entity } from './entity';
+import { Entity } from './Entity';
 import { OAuth2AccessToken } from './OAuth2AccessToken';
 import { Role } from './Role';
 
@@ -9,39 +8,28 @@ import { Role } from './Role';
  * @author Alexander Zhulinsky
  * @version 2.0 26 Apr 2023
  */
-@JsonObject('User')
 export class User extends Entity {
-  @JsonProperty('firstName', String)
+
   private _firstName: String;
-  @JsonProperty('lastName', String)
   private _lastName: String;
-  @JsonProperty('login', String)
   private _login: String;
-  @JsonProperty('avatar', String)
   private _avatar: String;
-  @JsonProperty('email', String)
   private _email: String;
-  @JsonProperty('password', String)
   private _password: String;
-  @JsonProperty('roles', [Role])
   private _userRoles: Role[] = new Array();
-  @JsonProperty('last-login', String)
   private _lastlogin: String;
-  @JsonProperty('enabled', Boolean)
   private _enabled: Boolean;
-  @JsonProperty('bnned', Boolean)
   private _banned: Boolean;
-  @JsonProperty('verified', Boolean)
   private _verified: Boolean;
-  @JsonProperty('banReasone', String)
   private _banReason: String;
 
   constructor(private _tokens?: OAuth2AccessToken) {
-    super();
+    super(0);
     if (_tokens && _tokens.access_token) {
-      const accessToken = new JwtHelperService().decodeToken(
+      const token = new JwtHelperService().decodeToken(
         _tokens.access_token.toString()
       );
+      const accessToken = JSON.parse(token['sub']);
       this.id = accessToken['id'];
       this._firstName = accessToken['firstName'];
       this._lastName = accessToken['lastName'];
@@ -56,8 +44,8 @@ export class User extends Entity {
       this._banReason = accessToken['banReason'];
       const roles = accessToken['userRoles'];
       if (roles) {
-        roles.forEach((el: { name: string; description: string }) => {
-          const role = new Role(el.name, el.description);
+        roles.forEach((el: { id: number, name: string; description: string }) => {
+          const role = new Role(el.id, el.name, el.description);
           this._userRoles.push(role);
         });
       }
@@ -78,31 +66,55 @@ export class User extends Entity {
     }
   }
 
-  static fromLocaleStorage(userDto: any): User {
+  static fromJson(userDto: any): User {
+    if (typeof userDto === 'string' || userDto instanceof String) {
+      userDto = JSON.parse(userDto.toString());
+    }
     const user: User = new User();
-    user.id = userDto._id;
-    user.firstName = userDto._firstName || '';
-    user.lastName = userDto._lastName || '';
-    user.avatar = userDto._avatar || '';
-    user.login = userDto._login || '';
-    user.email = userDto._email || '';
-    user.password = userDto._password || '';
-    user.lastlogin = userDto._lastlogin || '';
-    user.enabled = userDto._enabled || false;
-    user.banned = userDto._banned || false;
-    user.verified = userDto._verified || false;
-    user.banReason = userDto._banReason || '';
-    const roles = userDto._userRoles;
+    user.id = userDto.id;
+    user.firstName = userDto.firstName || '';
+    user.lastName = userDto.lastName || '';
+    user.avatar = userDto.avatar || '';
+    user.login = userDto.login || '';
+    user.email = userDto.email || '';
+    user.password = userDto.password || '';
+    user.lastlogin = userDto.lastlogin || '';
+    user.enabled = userDto.enabled || false;
+    user.banned = userDto.banned || false;
+    user.verified = userDto.verified || false;
+    user.banReason = userDto.banReason || '';
+    const roles = userDto.userRoles;
     if (roles) {
         roles.forEach(role => {
-        user._userRoles.push(new Role(role.name, role.description));
+        user.userRoles.push(new Role(role.id, role.name, role.description, role.operations));
       });
     }
+    user.tokens = userDto.tokens ? userDto.tokens : null;
     return user;
   }
 
-  static fromUserDto(userDto: any): User {
-    return this.fromLocaleStorage(userDto);
+  static fromAccessToken(json: string): User {
+    const user = JSON.parse(json);
+    return new User(user._tokens);
+  }
+
+  public toJson(): string {
+    return JSON.stringify({
+      id: this.id,
+      firstName: this._firstName,
+      lastName: this._lastName,
+      login: this._login,
+      email: this._email,
+      password: this._password,
+      avatar: this._avatar,
+      lastlogin: this._lastlogin,
+      enabled: this._enabled,
+      banned: this._banned,
+      verified: this._verified,
+      banReason: this._banReason,
+      userRoles: this._userRoles.map(role => role.toJson()),
+      tokens: this._tokens ? this._tokens : null
+    });
   }
 
   public get email(): string {
@@ -156,6 +168,10 @@ export class User extends Entity {
     return this._tokens;
   }
 
+  public set tokens(value: OAuth2AccessToken | undefined) {
+    this._tokens = value;
+  }
+
   public get avatar(): string {
     return this._avatar?.toString();
   }
@@ -201,14 +217,6 @@ export class User extends Entity {
 
   public set banReason(value: string) {
     this._banReason = value;
-  }
-
-  static fromJsonString(json: string) {
-    return new User(JSON.parse(json)['_tokens']);
-  }
-
-  public toJsonString(): string {
-    return JSON.stringify(this);
   }
 
   public isEmpty(): boolean {

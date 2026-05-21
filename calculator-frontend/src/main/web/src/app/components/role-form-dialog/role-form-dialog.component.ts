@@ -3,10 +3,9 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NGXLogger } from 'ngx-logger';
-import { Role } from 'src/app/model/Role';
-import { RoleService } from 'src/app/services/role.service';
-import { ALL_OPERATIONS } from 'src/app/helper/fake-data/fake_operations';
-import { JsonConvert } from 'json2typescript';
+import { Role } from '../../model/Role';
+import { RoleService } from '../../services/role.service';
+import { ALL_OPERATIONS } from '../../helper/fake-data/fake_operations';
 
 @Component({
     selector: 'app-role',
@@ -18,7 +17,6 @@ export class RoleFormDialogComponent implements OnInit {
     currentRole: Role;
     reactiveForm: FormGroup;
     allOperations = ALL_OPERATIONS;
-    private jsonConvert: JsonConvert = new JsonConvert();
 
     constructor(private log: NGXLogger,
                 private roleService: RoleService,
@@ -33,8 +31,9 @@ export class RoleFormDialogComponent implements OnInit {
         this.isNewRole = this.data.isNewRole;
         if (!this.isNewRole) {
             // copy data field from data
-            const ret = this.jsonConvert.deserialize({...this.data.role}, Role);
-            this.currentRole = Array.isArray(ret) ? ret[0] : ret;
+            // const ret: Role = Role.fromJson(this.data.role);
+            this.log.info('RoleFormDialogComponent: ngOnInit(). Role to edit', this.data.role);
+            this.currentRole = this.data.role;
         }
         this.log.info('Current Role: ' + JSON.stringify(this.currentRole));
         this.createForm();
@@ -55,13 +54,18 @@ export class RoleFormDialogComponent implements OnInit {
             checked: new FormControl(false),
             name: new FormControl(o.name),
             description: new FormControl(o.description)})));
-            
         if (!this.isNewRole) {
-            this.name.setValue(this.currentRole.name);
-            this.description.setValue(this.currentRole.description);
+            if (this.name) {
+                this.name.setValue(this.currentRole.name);
+            }
+            if (this.currentRole?.description) {
+                if (this.description) {
+                    this.description.setValue(this.currentRole.description);
+                }
+            }
             this.operations.value.forEach((o, i) => {
                 this.reactiveForm.get(`operations.${i}.checked`)
-                    .setValue(this.currentRole.operations.includes(o.name));
+                    ?.setValue(this.currentRole.operations.includes(o.name));
             });
         }
     }
@@ -73,11 +77,10 @@ export class RoleFormDialogComponent implements OnInit {
     }
 
     saveRole() {
-        this.log.trace('RoleFormDialogComponent: onSubmit()');
         const role: Role = Role.fromRoleDto(this.reactiveForm.value);
+        this.log.info('RoleFormDialogComponent: onSubmit(). Data: ' + JSON.stringify(role));
         if (this.isNewRole) {
-            this.log.trace('Add new role', this.name.value, this.description.value);
-            this.roleService.create(role).subscribe(response => {
+            this.roleService.create(role.toJson()).subscribe(response => {
                 if (response.status === 201) {
                     this.log.trace('RoleFormDialogComponent: onSubmit(). Role was crated.');
                     this.dialogRef.close(response.body);
@@ -88,11 +91,10 @@ export class RoleFormDialogComponent implements OnInit {
                 this.log.warn('RoleFormDialog: onSubmit(), cannot create role. Erorr: ', error);
                 this.snackBar.open(error, 'Ok');
             });
-
         } else {
             this.log.trace('Update role', role.name, role.description);
             this.copyValuesIfChanged(role, this.currentRole);
-            this.roleService.update(this.currentRole).subscribe(response => {
+            this.roleService.update(this.currentRole.toJson()).subscribe(response => {
                     if (response.status === 200 || response.status === 201) {
                         this.log.trace('RoleFormDialogComponent: onSubmit(). Role was updated');
                         this.dialogRef.close(response.body);
@@ -108,13 +110,21 @@ export class RoleFormDialogComponent implements OnInit {
         }
     }
 
+    private arraysContainSameValues(arr1: string[], arr2: string[]): boolean {
+        if (arr1.length !== arr2.length) {
+            return false;
+        }
+        const sortedArr1 = [...arr1].sort();
+        const sortedArr2 = [...arr2].sort();
+        return sortedArr1.every((value, index) => value === sortedArr2[index]);
+    }
     private copyValuesIfChanged(fromRole: Role, toRole: Role) {
         this.log.trace('RoleFormDialogComponent: copyValuesIfChanged()');
         if (fromRole.description && fromRole.description !== toRole.description) {
-            toRole.description = fromRole.description;
+            toRole.description = fromRole.description as string;
         }
-        if (fromRole.operations !== toRole.operations) {
-            toRole.operations = fromRole.operations;
+        if (!this.arraysContainSameValues(fromRole.operations, toRole.operations)) {
+            toRole.operations = fromRole.operations.map(op => op.toString());
         }
     }
 
@@ -124,7 +134,7 @@ export class RoleFormDialogComponent implements OnInit {
     }
 
     operationTitle(value) {
-        return (this.showOperationName.value ? value.name + ': ' : '') + value.description;
+        return ((this.showOperationName?.value ?? false) ? value.name + ': ' : '') + value.description;
     }
 
     onEscape() {
