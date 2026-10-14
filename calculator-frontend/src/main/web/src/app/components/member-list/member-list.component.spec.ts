@@ -1,4 +1,9 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { LoggerTestingModule } from 'ngx-logger/testing';
 
 import { MemberListComponent } from './member-list.component';
 
@@ -9,7 +14,9 @@ describe('MemberListComponent', () => {
   // @ts-ignore
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ MemberListComponent ]
+      imports: [ HttpClientTestingModule, LoggerTestingModule, MatDialogModule, MatSnackBarModule ],
+      declarations: [ MemberListComponent ],
+      schemas: [ NO_ERRORS_SCHEMA ]
     })
     .compileComponents();
 

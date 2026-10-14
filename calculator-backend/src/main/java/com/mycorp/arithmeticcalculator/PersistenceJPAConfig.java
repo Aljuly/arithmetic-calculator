@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -56,6 +57,7 @@ public class PersistenceJPAConfig {
 	}
 
 	@Bean(initMethod = "migrate")
+	@ConditionalOnProperty(name = "spring.flyway.enabled", matchIfMissing = true)
 	Flyway flyway() {
 		return new Flyway(Flyway.configure().baselineOnMigrate(false).baselineVersion("0").dataSource(
 				env.getRequiredProperty("spring.datasource.url"), env.getRequiredProperty("spring.datasource.username"),
