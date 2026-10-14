@@ -41,10 +41,7 @@ public class ExpiredPasswordResetTokenPropertyTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.openMocks(this);
-		userSecurityService = new UserSecurityService();
-		// Inject mocked dependencies using reflection
-		setField(userSecurityService, "passwordTokenRepository", passwordResetTokenRepository);
-		setField(userSecurityService, "userDetailsService", userDetailsService);
+		userSecurityService = new UserSecurityService(passwordResetTokenRepository, userDetailsService);
 	}
 
 	/**
@@ -362,16 +359,4 @@ public class ExpiredPasswordResetTokenPropertyTest {
 		return user;
 	}
 
-	/**
-	 * Helper method to set private fields using reflection
-	 */
-	private void setField(Object target, String fieldName, Object value) {
-		try {
-			java.lang.reflect.Field field = target.getClass().getDeclaredField(fieldName);
-			field.setAccessible(true);
-			field.set(target, value);
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to set field " + fieldName, e);
-		}
-	}
 }

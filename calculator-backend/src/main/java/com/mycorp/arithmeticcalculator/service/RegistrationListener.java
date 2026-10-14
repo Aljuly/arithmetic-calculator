@@ -2,7 +2,6 @@ package com.mycorp.arithmeticcalculator.service;
 
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.MessageSource;
 import org.springframework.core.env.Environment;
@@ -16,17 +15,21 @@ import com.mycorp.arithmeticcalculator.domain.User;
 @Component
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
 
-	@Autowired
-	private IUserAuthService service;
+	private final IUserAuthService service;
 
-	@Autowired
-	private MessageSource messages;
+	private final MessageSource messages;
 
-	@Autowired
-	private JavaMailSender mailSender;
+	private final JavaMailSender mailSender;
 
-	@Autowired
-	private Environment env;
+	private final Environment env;
+
+	public RegistrationListener(IUserAuthService service, MessageSource messages, JavaMailSender mailSender,
+			Environment env) {
+		this.service = service;
+		this.messages = messages;
+		this.mailSender = mailSender;
+		this.env = env;
+	}
 
 	@Override
 	public void onApplicationEvent(OnRegistrationCompleteEvent event) {

@@ -2,12 +2,10 @@ package com.mycorp.arithmeticcalculator.security;
 
 import java.io.IOException;
 import java.util.Locale;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.WebAttributes;
@@ -18,11 +16,14 @@ import org.springframework.web.servlet.LocaleResolver;
 @Component("authenticationFailureHandler")
 public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
-	@Autowired
-	private MessageSource messages;
+	private final MessageSource messages;
 
-	@Autowired
-	private LocaleResolver localeResolver;
+	private final LocaleResolver localeResolver;
+
+	public CustomAuthenticationFailureHandler(MessageSource messages, LocaleResolver localeResolver) {
+		this.messages = messages;
+		this.localeResolver = localeResolver;
+	}
 
 	@Override
 	public void onAuthenticationFailure(final HttpServletRequest request, final HttpServletResponse response,

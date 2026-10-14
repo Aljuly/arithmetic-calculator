@@ -6,7 +6,6 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -28,11 +27,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories(basePackages = "com.mycorp.arithmeticcalculator.repository")
 public class PersistenceJPAConfig {
 
-	@Autowired
-	private Environment env;
+	private final Environment env;
 
-	public PersistenceJPAConfig() {
-		super();
+	public PersistenceJPAConfig(Environment env) {
+		this.env = env;
 	}
 
 	@Bean

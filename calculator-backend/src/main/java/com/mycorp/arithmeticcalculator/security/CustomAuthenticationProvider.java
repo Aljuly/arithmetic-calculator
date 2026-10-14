@@ -3,7 +3,6 @@ package com.mycorp.arithmeticcalculator.security;
 import com.mycorp.arithmeticcalculator.error.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.aerogear.security.otp.Totp;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -15,8 +14,11 @@ import com.mycorp.arithmeticcalculator.service.IUserAuthService;
 @Slf4j
 public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
 
-	@Autowired
-	private IUserAuthService userAuthService;
+	private final IUserAuthService userAuthService;
+
+	public CustomAuthenticationProvider(IUserAuthService userAuthService) {
+		this.userAuthService = userAuthService;
+	}
 
 	@Override
 	public Authentication authenticate(Authentication auth) {

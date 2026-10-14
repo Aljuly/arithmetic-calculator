@@ -15,6 +15,9 @@
 	<properties>
 		<java.version>21</java.version>
 		<project.version>0.0.1-SNAPSHOT</project.version>
+		<!-- Overrides Boot's managed 1.18.30; IDE compilers on newer JDKs (e.g. the
+		     Oracle Java extension's nb-javac 27) need a Lombok that supports them. -->
+		<lombok.version>1.18.48</lombok.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -338,7 +341,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.40</version>
+                            <version>${lombok.version}</version>
                         </path>
                     </annotationProcessorPaths>
                     <release>16</release>

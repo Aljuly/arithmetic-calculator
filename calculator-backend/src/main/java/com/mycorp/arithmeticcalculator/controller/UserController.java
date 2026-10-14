@@ -3,7 +3,6 @@ package com.mycorp.arithmeticcalculator.controller;
 import java.util.List;
 import java.util.Locale;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +27,17 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping("/api/users")
 public class UserController {
 
-	@Autowired
-	private ActiveUserStore activeUserStore;
+	private final ActiveUserStore activeUserStore;
 
-	@Autowired
-	private IUserAuthService userService;
+	private final IUserAuthService userService;
 
-	@Autowired
-	private MessageSource messages;
+	private final MessageSource messages;
+
+	public UserController(ActiveUserStore activeUserStore, IUserAuthService userService, MessageSource messages) {
+		this.activeUserStore = activeUserStore;
+		this.userService = userService;
+		this.messages = messages;
+	}
 
 	@ApiOperation(value = "Retrieves all LoggedIn users")
 	@ApiResponses(value = {@ApiResponse(code = 200, message = "Retrieves all LoggedIn users")})

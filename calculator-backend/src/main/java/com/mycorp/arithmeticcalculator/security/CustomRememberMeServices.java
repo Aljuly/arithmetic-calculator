@@ -5,7 +5,6 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,8 +23,7 @@ import com.mycorp.arithmeticcalculator.repository.UserRepository;
 
 public class CustomRememberMeServices extends PersistentTokenBasedRememberMeServices {
 
-	@Autowired
-	private UserRepository userRepository;
+	private final UserRepository userRepository;
 
 	private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 	private AuthenticationDetailsSource<HttpServletRequest, ?> authenticationDetailsSource = new WebAuthenticationDetailsSource();
@@ -33,10 +31,11 @@ public class CustomRememberMeServices extends PersistentTokenBasedRememberMeServ
 	private String key;
 
 	public CustomRememberMeServices(String key, UserDetailsService userDetailsService,
-			PersistentTokenRepository tokenRepository) {
+			PersistentTokenRepository tokenRepository, UserRepository userRepository) {
 		super(key, userDetailsService, tokenRepository);
 		this.tokenRepository = tokenRepository;
 		this.key = key;
+		this.userRepository = userRepository;
 	}
 
 	@Override
