@@ -32,59 +32,46 @@ import io.swagger.annotations.ApiResponses;
 @RestController
 @RequestMapping(value = "/v1.0/images")
 public class FileEndpoint {
-	
+
 	private final IFileService fileService;
-	
+
 	public FileEndpoint(IFileService fileService) {
 		this.fileService = fileService;
 	}
-	
-	private final Function<FileEntity, ResponseEntity<Resource>> entityResponseMapping = fileEntity ->
-		ResponseEntity.ok()
-			.contentType(MediaType.parseMediaType(fileEntity.getContentType()))
+
+	private final Function<FileEntity, ResponseEntity<Resource>> entityResponseMapping = fileEntity -> ResponseEntity
+			.ok().contentType(MediaType.parseMediaType(fileEntity.getContentType()))
 			.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileEntity.getName() + "\"")
 			.body((Resource) new ByteArrayResource(fileEntity.getData()));
-	
-	@ApiOperation(value = "Get Image File", nickname = "getImageFile", response = Resource.class, 
-			tags = {"image-file-endpoint"})
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "OK", response = Resource.class),
-    })
-	@GetMapping(value ="/{imageId}", produces = {"image/_*"})
+
+	@ApiOperation(value = "Get Image File", nickname = "getImageFile", response = Resource.class, tags = {
+			"image-file-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Resource.class),})
+	@GetMapping(value = "/{imageId}", produces = {"image/_*"})
 	public ResponseEntity<Resource> getImageFile(
-				@ApiParam(value = "", required = true) 
-				@PathVariable("imageId")	String imageId) {
-		return fileService.getById(imageId)
-				.map(entityResponseMapping)
-				.orElseGet(this::getDefaultImageFile);
+			@ApiParam(value = "", required = true) @PathVariable("imageId") String imageId) {
+		return fileService.getById(imageId).map(entityResponseMapping).orElseGet(this::getDefaultImageFile);
 	}
-	
-	@ApiOperation(value = "Save Image File", nickname = "saveImageFile", response = String.class,
-			tags = {"image-file-endpoint"})
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "Created", response = String.class)
-    })
+
+	@ApiOperation(value = "Save Image File", nickname = "saveImageFile", response = String.class, tags = {
+			"image-file-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "Created", response = String.class)})
 	@PostMapping(produces = {"*/*"}, consumes = {"multipart/form-data"})
 	public ResponseEntity<String> saveImageFile(@RequestParam("file") MultipartFile file) {
 		final String imageId = fileService.persistFile(file);
-		final URI uri = MvcUriComponentsBuilder
-				.fromMethodName(this.getClass(), "getImageFile", imageId)
-				.buildAndExpand(imageId)
-				.toUri();
+		final URI uri = MvcUriComponentsBuilder.fromMethodName(this.getClass(), "getImageFile", imageId)
+				.buildAndExpand(imageId).toUri();
 		return ResponseEntity.ok(imageId);
 	}
-	
-	@ApiOperation(value = "Get Default Logo", nickname = "getDefaultImageFile", response = Resource.class, 
-			tags = {"image-file-endpoint"})
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "OK", response = Resource.class),
-            @ApiResponse(code = 404, message = "Not Found")
-    })
-	@GetMapping(value ="/default", produces = {"image/_*"})
+
+	@ApiOperation(value = "Get Default Logo", nickname = "getDefaultImageFile", response = Resource.class, tags = {
+			"image-file-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Resource.class),
+			@ApiResponse(code = 404, message = "Not Found")})
+	@GetMapping(value = "/default", produces = {"image/_*"})
 	public ResponseEntity<Resource> getDefaultImageFile() {
-		return fileService.getDefaultBackground()
-				.map(entityResponseMapping)
+		return fileService.getDefaultBackground().map(entityResponseMapping)
 				.orElseGet(() -> ResponseEntity.notFound().build());
 	}
-	
+
 }

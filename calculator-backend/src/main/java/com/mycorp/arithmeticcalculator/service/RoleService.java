@@ -36,7 +36,7 @@ public class RoleService implements IRoleService {
 	@Override
 	public List<RoleDto> getAllRoles() {
 		List<RoleDto> roles = new ArrayList<RoleDto>();
-		for(Role role: roleRepository.findAll()) {
+		for (Role role : roleRepository.findAll()) {
 			roles.add(new RoleDto(role));
 		}
 		log.debug("Roles returned: {}", roles.size());
@@ -68,17 +68,14 @@ public class RoleService implements IRoleService {
 		if (Objects.nonNull(roleId)) {
 			Optional<Role> retrievedRole = roleRepository.findById(roleId);
 			role = retrievedRole.equals(Optional.empty()) ? new Role() : retrievedRole.get();
-		} else { 
+		} else {
 			role = new Role();
 		}
 		role.setName(roleDto.getRole());
 		role.setDescription(roleDto.getDescription());
 		role.getPrivileges().clear();
-		role.getPrivileges().addAll(roleDto.getPrivileges()
-				.stream()
-				.map(p -> privilegeRepository.findByName(p))
-				.filter(Objects::nonNull)
-				.collect(Collectors.toList()));
+		role.getPrivileges().addAll(roleDto.getPrivileges().stream().map(p -> privilegeRepository.findByName(p))
+				.filter(Objects::nonNull).collect(Collectors.toList()));
 		roleRepository.saveAndFlush(role);
 		log.debug("Saved Role with Id: {}", role.getId());
 		return new RoleDto(role);
@@ -88,7 +85,5 @@ public class RoleService implements IRoleService {
 	public List<Role> getRolesByNames(List<String> names) {
 		return roleRepository.findByNameIn(names);
 	}
-	
-	
 
 }

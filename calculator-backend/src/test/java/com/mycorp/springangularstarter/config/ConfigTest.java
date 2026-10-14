@@ -9,14 +9,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class ConfigTest implements WebMvcConfigurer {
 
-    public ConfigTest() {
-        super();
-    }
+	public ConfigTest() {
+		super();
+	}
 
-    // API
-    @Bean
-    PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder(11);
-    }
+	// API
+	@Bean
+	PasswordEncoder encoder() {
+		return new BCryptPasswordEncoder(11);
+	}
 
 }

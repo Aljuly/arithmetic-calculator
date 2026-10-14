@@ -67,20 +67,8 @@ public class User {
 		this.enabled = false;
 	}
 
-	public User(
-			String login,
-			String firstName,
-			String lastName,
-			String email,
-			String password,
-			boolean enabled,
-			boolean isUsing2FA,
-			String secret,
-			String avatarId,
-			boolean banned,
-			boolean verified,
-			String banReason
-	) {
+	public User(String login, String firstName, String lastName, String email, String password, boolean enabled,
+			boolean isUsing2FA, String secret, String avatarId, boolean banned, boolean verified, String banReason) {
 		super();
 		this.login = login;
 		this.firstName = firstName;
@@ -97,20 +85,9 @@ public class User {
 	}
 
 	public User(UserResponce userResponse) {
-		this(
-				userResponse.getLogin(),
-				userResponse.getFirstName(),
-				userResponse.getLastName(),
-				userResponse.getEmail(),
-				userResponse.getPassword(),
-				userResponse.isEnabled(),
-				false,
-				"",
-				userResponse.getAvatar(),
-				userResponse.isBanned(),
-				userResponse.isVerified(),
-				userResponse.getBanReason()
-				);
+		this(userResponse.getLogin(), userResponse.getFirstName(), userResponse.getLastName(), userResponse.getEmail(),
+				userResponse.getPassword(), userResponse.isEnabled(), false, "", userResponse.getAvatar(),
+				userResponse.isBanned(), userResponse.isVerified(), userResponse.getBanReason());
 	}
 
 	public void updateUser(UserResponce userResponse) {
@@ -257,27 +234,15 @@ public class User {
 			return false;
 		}
 		final User user = (User) obj;
-		return Objects.equals(email, user.email) &&
-				Objects.equals(avatarId, user.avatarId) &&
-				banned == user.banned &&
-				verified == user.verified;
+		return Objects.equals(email, user.email) && Objects.equals(avatarId, user.avatarId) && banned == user.banned
+				&& verified == user.verified;
 	}
 
 	@Override
 	public String toString() {
-		return "User [id=" + id +
-				", firstName=" + firstName +
-				", lastName=" + lastName +
-				", email=" + email +
-				", password=" + password +
-				", enabled=" + enabled +
-				", isUsing2FA=" + isUsing2FA +
-				", secret=" + secret +
-				", avatarId=" + avatarId +
-				", banned=" + banned +
-				", verified=" + verified +
-				", banReason=" + banReason +
-				", roles=" + roles + "]";
+		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
+				+ ", password=" + password + ", enabled=" + enabled + ", isUsing2FA=" + isUsing2FA + ", secret="
+				+ secret + ", avatarId=" + avatarId + ", banned=" + banned + ", verified=" + verified + ", banReason="
+				+ banReason + ", roles=" + roles + "]";
 	}
 }
-

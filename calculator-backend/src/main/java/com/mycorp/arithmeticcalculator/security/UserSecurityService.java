@@ -19,29 +19,30 @@ import com.mycorp.arithmeticcalculator.repository.PasswordResetTokenRepository;
 @Transactional
 public class UserSecurityService implements ISecurityUserService {
 
-    @Autowired
-    private PasswordResetTokenRepository passwordTokenRepository;
+	@Autowired
+	private PasswordResetTokenRepository passwordTokenRepository;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+	@Autowired
+	private UserDetailsService userDetailsService;
 
-    // API
+	// API
 
-    public String validatePasswordResetToken(long id, String token) {
-        final PasswordResetToken passToken = passwordTokenRepository.findByToken(token);
-        if ((passToken == null) || (passToken.getUser().getId() != id)) {
-            return "invalidToken";
-        }
+	public String validatePasswordResetToken(long id, String token) {
+		final PasswordResetToken passToken = passwordTokenRepository.findByToken(token);
+		if ((passToken == null) || (passToken.getUser().getId() != id)) {
+			return "invalidToken";
+		}
 
-        final Calendar cal = Calendar.getInstance();
-        if ((passToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
-            return "expired";
-        }
+		final Calendar cal = Calendar.getInstance();
+		if ((passToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+			return "expired";
+		}
 
-        final User user = passToken.getUser();
-        final Authentication auth = new UsernamePasswordAuthenticationToken(user, null, userDetailsService.loadUserByUsername(user.getEmail()).getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        return null;
-    }
+		final User user = passToken.getUser();
+		final Authentication auth = new UsernamePasswordAuthenticationToken(user, null,
+				userDetailsService.loadUserByUsername(user.getEmail()).getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(auth);
+		return null;
+	}
 
 }

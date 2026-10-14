@@ -25,62 +25,53 @@ import com.mycorp.arithmeticcalculator.repository.UserRepository;
 @SuppressWarnings("deprecation")
 @Service
 public class TokenService {
-	
+
 	private static final String CLAIM_ROLE = "role";
 
-    private static final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS256;
+	private static final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS256;
 	private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SIGNATURE_ALGORITHM);
-    private static final TemporalAmount TOKEN_VALIDITY = Duration.ofHours(4L);
+	private static final TemporalAmount TOKEN_VALIDITY = Duration.ofHours(4L);
 
-    private UserRepository userRepository;
-    
-    public TokenService(UserRepository userRepository) {
+	private UserRepository userRepository;
+
+	public TokenService(UserRepository userRepository) {
 		this.userRepository = userRepository;
-	}    
-    
-    /**
-     * Builds a JWT with the given subject and role and returns it as a JWS signed compact String.
-     */
+	}
+
+	/**
+	 * Builds a JWT with the given subject and role and returns it as a JWS signed
+	 * compact String.
+	 */
 	public String createToken(final String subject, final String role) {
-        final Instant now = Instant.now();
-        final Date expiryDate = Date.from(now.plus(TOKEN_VALIDITY));
-        return Jwts.builder()
-                .setSubject(subject)
-                .claim(CLAIM_ROLE, role)
-                .setExpiration(expiryDate)
-                .setIssuedAt(Date.from(now))
-                .signWith(SECRET_KEY)
-                .compact();
-    }
+		final Instant now = Instant.now();
+		final Date expiryDate = Date.from(now.plus(TOKEN_VALIDITY));
+		return Jwts.builder().setSubject(subject).claim(CLAIM_ROLE, role).setExpiration(expiryDate)
+				.setIssuedAt(Date.from(now)).signWith(SECRET_KEY).compact();
+	}
 
 	public String createToken(UserDetails userDetails) {
-        final Instant now = Instant.now();
-        final Date expiryDate = Date.from(now.plus(TOKEN_VALIDITY));
-        
-        String scope = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
-        try {
-        	final User user = userRepository.findByEmail(userDetails.getUsername());
-        	if (user == null) {
-        		throw new UsernameNotFoundException("No user found during tocken generation");
-        	} else {
-        		UserResponce response = new UserResponce(user);
-        		return Jwts.builder()
-	                .setSubject(response.toJson())
-	                .claim(CLAIM_ROLE, scope)
-	                .setExpiration(expiryDate)
-	                .setIssuedAt(Date.from(now))
-	                .signWith(SECRET_KEY)
-	                .compact();
-        	}
-        } catch (final Exception e) {
-        	throw new RuntimeException(e);
-        }
+		final Instant now = Instant.now();
+		final Date expiryDate = Date.from(now.plus(TOKEN_VALIDITY));
+
+		String scope = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+				.collect(Collectors.joining(" "));
+		try {
+			final User user = userRepository.findByEmail(userDetails.getUsername());
+			if (user == null) {
+				throw new UsernameNotFoundException("No user found during tocken generation");
+			} else {
+				UserResponce response = new UserResponce(user);
+				return Jwts.builder().setSubject(response.toJson()).claim(CLAIM_ROLE, scope).setExpiration(expiryDate)
+						.setIssuedAt(Date.from(now)).signWith(SECRET_KEY).compact();
+			}
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
-	
+
 	/**
-	 * Returns user name got from the token 
+	 * Returns user name got from the token
+	 *
 	 * @param token
 	 * @return User name
 	 */
@@ -92,9 +83,10 @@ public class TokenService {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	/**
 	 * check token validity
+	 *
 	 * @param token
 	 * @param userDetails
 	 * @return true if token valid
@@ -103,9 +95,10 @@ public class TokenService {
 		final String userName = getUserName(token).getEmail();
 		return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
 	}
-	
+
 	/**
 	 * check if token is expired
+	 *
 	 * @param token
 	 * @return true if token is expired
 	 */
@@ -113,23 +106,18 @@ public class TokenService {
 		Date tokenExpirationDate = parseSignedClaims(token, Claims::getExpiration);
 		return tokenExpirationDate.before(new Date());
 	}
-	
-    /**
-     * Parses the given JWS signed compact JWT, returning the claims.
-     * If this method returns without throwing an exception, the token can be trusted.
-     */
-    private Claims parseToken(final String compactToken) {       
-        return Jwts.parser()
-        		.setSigningKey(SECRET_KEY)
-                .build()
-                .parseClaimsJws(compactToken)
-                .getBody();
-    }
-    
-    private <T> T parseSignedClaims(String token, Function<Claims, T> claimsResolvers) {
-    	final Claims claims = parseToken(token);
-    	return claimsResolvers.apply(claims);
-    }
-    
-    
+
+	/**
+	 * Parses the given JWS signed compact JWT, returning the claims. If this method
+	 * returns without throwing an exception, the token can be trusted.
+	 */
+	private Claims parseToken(final String compactToken) {
+		return Jwts.parser().setSigningKey(SECRET_KEY).build().parseClaimsJws(compactToken).getBody();
+	}
+
+	private <T> T parseSignedClaims(String token, Function<Claims, T> claimsResolvers) {
+		final Claims claims = parseToken(token);
+		return claimsResolvers.apply(claims);
+	}
+
 }

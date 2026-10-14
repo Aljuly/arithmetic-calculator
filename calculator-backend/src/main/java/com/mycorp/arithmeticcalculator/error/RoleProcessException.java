@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class RoleProcessException extends RuntimeException {
-	
+
 	private static final long serialVersionUID = -3128681006635769411L;
 
 	public RoleProcessException(String message, Throwable cause) {
@@ -20,6 +20,4 @@ public class RoleProcessException extends RuntimeException {
 		super(cause);
 	}
 
-
-	
 }

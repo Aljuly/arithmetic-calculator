@@ -22,21 +22,21 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class FileService implements IFileService {
-	
+
 	private static final String DEFAUL_RESOURCE_URI = "clsspath:img/default_background.png";
 	private FileEntityRepository fileEntityRepository;
-	
+
 	@Value(DEFAUL_RESOURCE_URI)
 	private Resource defaultBackgroundResource;
-	
+
 	private byte[] defaultBackgroundBytes;
-	
+
 	public static final String DEFAUL_BACKGROUND_CONTENT_TYPE = MediaType.IMAGE_PNG_VALUE;
-	
+
 	public FileService(FileEntityRepository fileEntityRepository) {
 		this.fileEntityRepository = fileEntityRepository;
 	}
-	
+
 	@PostConstruct
 	public void setDefaultBackground() {
 		try {
@@ -46,7 +46,7 @@ public class FileService implements IFileService {
 			log.error("Error loading defult picture from {} : {}", DEFAUL_RESOURCE_URI, e);
 		}
 	}
-	
+
 	@Transactional
 	public String persistFile(MultipartFile multipartFile) {
 		try {
@@ -61,12 +61,12 @@ public class FileService implements IFileService {
 			return "";
 		}
 	}
-	
+
 	@Transactional
 	public Optional<FileEntity> getById(String id) {
 		return fileEntityRepository.findById(Long.parseLong(id));
 	}
-	
+
 	public Optional<FileEntity> getDefaultBackground() {
 		FileEntity fileEntity = new FileEntity();
 		fileEntity.setName(defaultBackgroundResource.getFilename());

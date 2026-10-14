@@ -25,20 +25,17 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class UserListingService implements IUserListingService {
-	
+
 	private UserRepository userRepository;
 	private PasswordEncoder passwordEncoder;
 	private IRoleService roleService;
-	
-	UserListingService(
-			UserRepository userRepository,
-			IRoleService roleService,
-			PasswordEncoder passwordEncoder) {
+
+	UserListingService(UserRepository userRepository, IRoleService roleService, PasswordEncoder passwordEncoder) {
 		this.userRepository = userRepository;
 		this.roleService = roleService;
 		this.passwordEncoder = passwordEncoder;
 	}
-	
+
 	@Override
 	public Page<UserResponce> findAll(Integer pageNumber, int pageSize, String sortBy, String sortDirection) {
 		Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
@@ -66,12 +63,8 @@ public class UserListingService implements IUserListingService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public UserResponce createUserRecord(UserResponce userData) {
 		User user = new User(userData);
-		user.setRoles(
-				roleService.getRolesByNames(
-				userData.getUserRoles().stream()
-				.filter(Objects::nonNull)
-				.map(RoleDto::getRole)
-				.toList()));
+		user.setRoles(roleService.getRolesByNames(
+				userData.getUserRoles().stream().filter(Objects::nonNull).map(RoleDto::getRole).toList()));
 		if (user.getPassword() != null && !user.getPassword().isBlank()) {
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
 		}
@@ -82,25 +75,19 @@ public class UserListingService implements IUserListingService {
 
 	@Override
 	// ?!!!!!!!!
-	//@Transactional(propagation = Propagation.REQUIRES_NEW)
+	// @Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void updateUserRecord(UserResponce userData) throws UserNotFoundException {
-		Long userId = Optional.ofNullable(userData)
-				.orElseThrow(() -> new UserNotFoundException("User Not Set")).getId();
+		Long userId = Optional.ofNullable(userData).orElseThrow(() -> new UserNotFoundException("User Not Set"))
+				.getId();
 		log.debug("Getting user with Id: {}", userId);
 		if (userId != null) {
 			User user = userRepository.findUserById(userId);
 			log.debug("Got user: {}", user);
 			try {
 				user.updateUser(userData);
-				user.setRoles(
-						roleService.getRolesByNames(
-						userData.getUserRoles().stream()
-						.filter(Objects::nonNull)
-						.map(RoleDto::getRole)
-						.toList()));
-				if (user.getPassword() != null 
-						&& !user.getPassword().isBlank() 
-						&& !user.getPassword().isEmpty()) {
+				user.setRoles(roleService.getRolesByNames(
+						userData.getUserRoles().stream().filter(Objects::nonNull).map(RoleDto::getRole).toList()));
+				if (user.getPassword() != null && !user.getPassword().isBlank() && !user.getPassword().isEmpty()) {
 					user.setPassword(passwordEncoder.encode(user.getPassword()));
 				}
 				userRepository.saveAndFlush(user);

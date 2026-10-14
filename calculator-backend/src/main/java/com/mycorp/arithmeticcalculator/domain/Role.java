@@ -25,17 +25,15 @@ public class Role {
 	@ManyToMany(mappedBy = "roles")
 	private List<User> users = new ArrayList<>();
 
-	//ToDo change type of a variable to Set/HashSet
+	// ToDo change type of a variable to Set/HashSet
 	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(name = "role_privilege", 
-		joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"), 
-		inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
+	@JoinTable(name = "role_privilege", joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "privilege_id", referencedColumnName = "id"))
 	private List<Privilege> privileges = new ArrayList<>();
 
 	private String name;
 
 	private String description;
-	
+
 	public Role() {
 		super();
 	}
@@ -68,7 +66,7 @@ public class Role {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
 	public Collection<User> getUsers() {
 		return users;
 	}
@@ -113,6 +111,6 @@ public class Role {
 
 	@Override
 	public String toString() {
-        return "Role [name=" + name + "]" + "[id=" + id + "]";
+		return "Role [name=" + name + "]" + "[id=" + id + "]";
 	}
 }

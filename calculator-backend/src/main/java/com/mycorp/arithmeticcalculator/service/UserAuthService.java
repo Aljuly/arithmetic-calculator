@@ -34,207 +34,209 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 
-
 @Service
 public class UserAuthService implements IUserAuthService {
 
-    @Autowired
-    private UserRepository repository;
+	@Autowired
+	private UserRepository repository;
 
-    @Autowired
-    private VerificationTokenRepository tokenRepository;
+	@Autowired
+	private VerificationTokenRepository tokenRepository;
 
-    @Autowired
-    private PasswordResetTokenRepository passwordTokenRepository;
+	@Autowired
+	private PasswordResetTokenRepository passwordTokenRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RoleRepository roleRepository;
+	@Autowired
+	private RoleRepository roleRepository;
 
-    @Autowired
-    private SessionRegistry sessionRegistry;
+	@Autowired
+	private SessionRegistry sessionRegistry;
 
-    @Autowired
-    private Validator validator;
-    
-    // API
+	@Autowired
+	private Validator validator;
 
-    @Override
-    public User registerNewUserAccount(final UserDto accountDto) throws UserAlreadyExistException, ConstraintViolationException {
-        if (emailExist(accountDto.getEmail())) {
-            throw new UserAlreadyExistException("There is an account with that email adress: " + accountDto.getEmail());
-        }
-        final User user = new User();
-        
-        validateInputWithInjectedValidator(accountDto);
+	// API
 
-        user.setFirstName(accountDto.getFirstName());
-        user.setLastName(accountDto.getLastName());
-        user.setPassword(passwordEncoder.encode(accountDto.getPassword()));
-        user.setEmail(accountDto.getEmail());
-        user.setUsing2FA(accountDto.isUsing2FA());
-        user.setVerified(false);
-        user.setRoles(Arrays.asList(roleRepository.findByName("USER")));
-        
-        return repository.save(user);
-    }
+	@Override
+	public User registerNewUserAccount(final UserDto accountDto)
+			throws UserAlreadyExistException, ConstraintViolationException {
+		if (emailExist(accountDto.getEmail())) {
+			throw new UserAlreadyExistException("There is an account with that email adress: " + accountDto.getEmail());
+		}
+		final User user = new User();
 
-    @Override
-    public User getUser(final String verificationToken) {
-        final VerificationToken token = tokenRepository.findByToken(verificationToken);
-        if (token != null) {
-            return token.getUser();
-        }
-        return null;
-    }
-    
-    @Override
-    public VerificationToken getVerificationToken(final String VerificationToken) {
-        return tokenRepository.findByToken(VerificationToken);
-    }
+		validateInputWithInjectedValidator(accountDto);
 
-    @Override
-    public void saveRegisteredUser(final User user) {
-        repository.save(user);
-    }
+		user.setFirstName(accountDto.getFirstName());
+		user.setLastName(accountDto.getLastName());
+		user.setPassword(passwordEncoder.encode(accountDto.getPassword()));
+		user.setEmail(accountDto.getEmail());
+		user.setUsing2FA(accountDto.isUsing2FA());
+		user.setVerified(false);
+		user.setRoles(Arrays.asList(roleRepository.findByName("USER")));
 
-    @Override
-    public void deleteUser(final User user) {
-        final VerificationToken verificationToken = tokenRepository.findByUser(user);
+		return repository.save(user);
+	}
 
-        if (verificationToken != null) {
-            tokenRepository.delete(verificationToken);
-        }
+	@Override
+	public User getUser(final String verificationToken) {
+		final VerificationToken token = tokenRepository.findByToken(verificationToken);
+		if (token != null) {
+			return token.getUser();
+		}
+		return null;
+	}
 
-        final PasswordResetToken passwordToken = passwordTokenRepository.findByUser(user);
+	@Override
+	public VerificationToken getVerificationToken(final String VerificationToken) {
+		return tokenRepository.findByToken(VerificationToken);
+	}
 
-        if (passwordToken != null) {
-            passwordTokenRepository.delete(passwordToken);
-        }
+	@Override
+	public void saveRegisteredUser(final User user) {
+		repository.save(user);
+	}
 
-        repository.delete(user);
-    }
+	@Override
+	public void deleteUser(final User user) {
+		final VerificationToken verificationToken = tokenRepository.findByUser(user);
 
-    @Override
-    public void createVerificationTokenForUser(final User user, final String token) {
-        final VerificationToken myToken = new VerificationToken(token, user);
-        tokenRepository.save(myToken);
-    }
+		if (verificationToken != null) {
+			tokenRepository.delete(verificationToken);
+		}
 
-    @Override
-    public VerificationToken generateNewVerificationToken(final String existingVerificationToken) {
-        VerificationToken vToken = tokenRepository.findByToken(existingVerificationToken);
-        vToken.updateToken(UUID.randomUUID().toString());
-        vToken = tokenRepository.save(vToken);
-        return vToken;
-    }
+		final PasswordResetToken passwordToken = passwordTokenRepository.findByUser(user);
 
-    @Override
-    public void createPasswordResetTokenForUser(final User user, final String token) {
-        final PasswordResetToken myToken = new PasswordResetToken(token, user);
-        passwordTokenRepository.save(myToken);
-    }
+		if (passwordToken != null) {
+			passwordTokenRepository.delete(passwordToken);
+		}
 
-    @Override
-    public User findUserByEmail(final String email) {
-        return repository.findByEmail(email);
-    }
-    
+		repository.delete(user);
+	}
+
+	@Override
+	public void createVerificationTokenForUser(final User user, final String token) {
+		final VerificationToken myToken = new VerificationToken(token, user);
+		tokenRepository.save(myToken);
+	}
+
+	@Override
+	public VerificationToken generateNewVerificationToken(final String existingVerificationToken) {
+		VerificationToken vToken = tokenRepository.findByToken(existingVerificationToken);
+		vToken.updateToken(UUID.randomUUID().toString());
+		vToken = tokenRepository.save(vToken);
+		return vToken;
+	}
+
+	@Override
+	public void createPasswordResetTokenForUser(final User user, final String token) {
+		final PasswordResetToken myToken = new PasswordResetToken(token, user);
+		passwordTokenRepository.save(myToken);
+	}
+
+	@Override
+	public User findUserByEmail(final String email) {
+		return repository.findByEmail(email);
+	}
+
 	@Override
 	public User findUserByName(String loginName) {
 		return repository.findByLogin(loginName);
 	}
 
-    @Override
-    public PasswordResetToken getPasswordResetToken(final String token) {
-        return passwordTokenRepository.findByToken(token);
-    }
+	@Override
+	public PasswordResetToken getPasswordResetToken(final String token) {
+		return passwordTokenRepository.findByToken(token);
+	}
 
-    @Override
-    public User getUserByPasswordResetToken(final String token) {
-        return passwordTokenRepository.findByToken(token).getUser();
-    }
+	@Override
+	public User getUserByPasswordResetToken(final String token) {
+		return passwordTokenRepository.findByToken(token).getUser();
+	}
 
-    @Override
-    public Optional<User> getUserByID(final long id) {
-        return repository.findById(id);
-    }
+	@Override
+	public Optional<User> getUserByID(final long id) {
+		return repository.findById(id);
+	}
 
-    @Override
-    public void changeUserPassword(final User user, final String password) {
-        user.setPassword(passwordEncoder.encode(password));
-        repository.save(user);
-    }
+	@Override
+	public void changeUserPassword(final User user, final String password) {
+		user.setPassword(passwordEncoder.encode(password));
+		repository.save(user);
+	}
 
-    @Override
-    public boolean checkIfValidOldPassword(final User user, final String oldPassword) {
-        return passwordEncoder.matches(oldPassword, user.getPassword());
-    }
+	@Override
+	public boolean checkIfValidOldPassword(final User user, final String oldPassword) {
+		return passwordEncoder.matches(oldPassword, user.getPassword());
+	}
 
-    @Override
-    public String validateVerificationToken(String token) {
-        final VerificationToken verificationToken = tokenRepository.findByToken(token);
-        if (verificationToken == null) {
-            return TOKEN_INVALID;
-        }
+	@Override
+	public String validateVerificationToken(String token) {
+		final VerificationToken verificationToken = tokenRepository.findByToken(token);
+		if (verificationToken == null) {
+			return TOKEN_INVALID;
+		}
 
-        final User user = verificationToken.getUser();
-        final Calendar cal = Calendar.getInstance();
-        if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
-            tokenRepository.delete(verificationToken);
-            return TOKEN_EXPIRED;
-        }
+		final User user = verificationToken.getUser();
+		final Calendar cal = Calendar.getInstance();
+		if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+			tokenRepository.delete(verificationToken);
+			return TOKEN_EXPIRED;
+		}
 
-        user.setVerified(true);
-        repository.save(user);
-        tokenRepository.delete(verificationToken);
-        return TOKEN_VALID;
-    }
+		user.setVerified(true);
+		repository.save(user);
+		tokenRepository.delete(verificationToken);
+		return TOKEN_VALID;
+	}
 
-    @Override
-    public String generateQRUrl(User user) throws UnsupportedEncodingException {
-        return QR_PREFIX + URLEncoder.encode(String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", APP_NAME, user.getEmail(), user.getSecret(), APP_NAME), "UTF-8");
-    }
+	@Override
+	public String generateQRUrl(User user) throws UnsupportedEncodingException {
+		return QR_PREFIX + URLEncoder.encode(String.format("otpauth://totp/%s:%s?secret=%s&issuer=%s", APP_NAME,
+				user.getEmail(), user.getSecret(), APP_NAME), "UTF-8");
+	}
 
-    @Override
-    public User updateUser2FA(boolean use2FA) {
-        final Authentication curAuth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = (User) curAuth.getPrincipal();
-        currentUser.setUsing2FA(use2FA);
-        currentUser = repository.save(currentUser);
-        final Authentication auth = new UsernamePasswordAuthenticationToken(currentUser, currentUser.getPassword(), curAuth.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(auth);
-        return currentUser;
-    }
+	@Override
+	public User updateUser2FA(boolean use2FA) {
+		final Authentication curAuth = SecurityContextHolder.getContext().getAuthentication();
+		User currentUser = (User) curAuth.getPrincipal();
+		currentUser.setUsing2FA(use2FA);
+		currentUser = repository.save(currentUser);
+		final Authentication auth = new UsernamePasswordAuthenticationToken(currentUser, currentUser.getPassword(),
+				curAuth.getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(auth);
+		return currentUser;
+	}
 
-    private boolean emailExist(final String email) {
-        final User user = repository.findByEmail(email);
-        return user != null;
-    }
+	private boolean emailExist(final String email) {
+		final User user = repository.findByEmail(email);
+		return user != null;
+	}
 
-    @Override
-    public List<User> getUsersFromSessionRegistry() {
-        List<User> users = new ArrayList<>();
+	@Override
+	public List<User> getUsersFromSessionRegistry() {
+		List<User> users = new ArrayList<>();
 
-        List<Object> allUsers = sessionRegistry.getAllPrincipals();
+		List<Object> allUsers = sessionRegistry.getAllPrincipals();
 
-        for (final Object user : allUsers) {
-            List<SessionInformation> activeUserSessions = sessionRegistry.getAllSessions(user, false);
+		for (final Object user : allUsers) {
+			List<SessionInformation> activeUserSessions = sessionRegistry.getAllSessions(user, false);
 
-            if (!activeUserSessions.isEmpty()) {
-                users.add((User) user);
-            }
-        }
-        return users;
-    }
-    
-    private void validateInputWithInjectedValidator(UserDto user) {
-    	Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
-    	if (!violations.isEmpty()) {
-    		throw new ConstraintViolationException(violations);
-    	}
-    }
-    
+			if (!activeUserSessions.isEmpty()) {
+				users.add((User) user);
+			}
+		}
+		return users;
+	}
+
+	private void validateInputWithInjectedValidator(UserDto user) {
+		Set<ConstraintViolation<UserDto>> violations = validator.validate(user);
+		if (!violations.isEmpty()) {
+			throw new ConstraintViolationException(violations);
+		}
+	}
+
 }

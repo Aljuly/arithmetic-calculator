@@ -5,18 +5,18 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LoginResponse {
-	
-    private String login;
-    
-    @JsonProperty("access_token")
-    private String token;
-    
+
+	private String login;
+
+	@JsonProperty("access_token")
+	private String token;
+
 	public LoginResponse(String login, String token) {
 		super();
 		this.login = login;
 		this.token = token;
 	}
-	
+
 	public String getLogin() {
 		return login;
 	}
@@ -37,7 +37,7 @@ public class LoginResponse {
 	public int hashCode() {
 		return Objects.hash(login, token);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -49,10 +49,10 @@ public class LoginResponse {
 		LoginResponse other = (LoginResponse) obj;
 		return Objects.equals(login, other.login) && Objects.equals(token, other.token);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "LoginResponse [email=" + login + ", token=" + token + "]";
 	}
-    
+
 }

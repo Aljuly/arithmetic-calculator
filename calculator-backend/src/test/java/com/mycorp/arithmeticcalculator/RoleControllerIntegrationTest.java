@@ -41,7 +41,8 @@ import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 
 import lombok.extern.slf4j.Slf4j;
 
-@SpringBootTest(classes = { TestDbConfig.class, TestIntegrationConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = {TestDbConfig.class,
+		TestIntegrationConfig.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Transactional
 @Slf4j
 public class RoleControllerIntegrationTest {
@@ -50,95 +51,81 @@ public class RoleControllerIntegrationTest {
 	private WebApplicationContext webApplicationContext;
 
 	@Autowired
-    private RoleRepository roleRepository;
+	private RoleRepository roleRepository;
 
 	@Autowired
-    private PrivilegeRepository privilegeRepository;
-    
-    private MockMvc mockMvc;
-    
-    @BeforeEach
-    public void setUp() {
-    	mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
-    
-    @Test
-	public void shouldReturnRolesList() throws Exception {
-		final MockHttpServletRequestBuilder requestBuilder = 
-				get("/v1.0/roles").contentType(MediaType.APPLICATION_JSON_VALUE);
-		mockMvc.perform(requestBuilder)
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("@", iterableWithSize(2)));	
+	private PrivilegeRepository privilegeRepository;
+
+	private MockMvc mockMvc;
+
+	@BeforeEach
+	public void setUp() {
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 	}
-    	
+
 	@Test
-    public void testDeleteRole() throws Exception {
-    	Role role = new Role("TEST_ROLE");
-    	Privilege privilege = new Privilege("TEST_PRIVILEGE");
-    	privilegeRepository.save(privilege);
-    	role.setPrivileges(Arrays.asList(privilege));
-    	roleRepository.saveAndFlush(role);
-    	Long roleId = role.getId();
-    	mockMvc.perform(delete("/v1.0/roles/{roleId}", 123456))
-    		.andExpect(status().is(404))
-    		.andExpect(result -> assertTrue(result.getResolvedException() instanceof RoleNotFoundException))
-    		.andExpect(result -> assertEquals("Role to delete not found", result.getResolvedException().getMessage()));
-    	mockMvc.perform(delete("/api/roles/{roleId}", roleId)).andExpect(status().is(200));
-    	assertTrue(roleRepository.findById(roleId).equals(Optional.empty()));
-    }
-	
+	public void shouldReturnRolesList() throws Exception {
+		final MockHttpServletRequestBuilder requestBuilder = get("/v1.0/roles")
+				.contentType(MediaType.APPLICATION_JSON_VALUE);
+		mockMvc.perform(requestBuilder).andExpect(status().isOk()).andExpect(jsonPath("@", iterableWithSize(2)));
+	}
+
+	@Test
+	public void testDeleteRole() throws Exception {
+		Role role = new Role("TEST_ROLE");
+		Privilege privilege = new Privilege("TEST_PRIVILEGE");
+		privilegeRepository.save(privilege);
+		role.setPrivileges(Arrays.asList(privilege));
+		roleRepository.saveAndFlush(role);
+		Long roleId = role.getId();
+		mockMvc.perform(delete("/v1.0/roles/{roleId}", 123456)).andExpect(status().is(404))
+				.andExpect(result -> assertTrue(result.getResolvedException() instanceof RoleNotFoundException))
+				.andExpect(
+						result -> assertEquals("Role to delete not found", result.getResolvedException().getMessage()));
+		mockMvc.perform(delete("/api/roles/{roleId}", roleId)).andExpect(status().is(200));
+		assertTrue(roleRepository.findById(roleId).equals(Optional.empty()));
+	}
+
 	@Test
 	public void shouldCreateRoleWhenPassed() throws Exception {
 		String body = "{ \"name\": \"ROLE_MODERATOR\", \"description\": \"moderator\", \"operations\": [\"WRITE_PRIVILEGE\", "
 				+ "\"WRONG_PRIVILEGE\"] }";
-		mockMvc.perform(post("/api/roles")
-				.characterEncoding("utf-8")
-				.content(body)
-				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
-				.andDo(print())
-				.andExpect(status().isOk());
+		mockMvc.perform(post("/api/roles").characterEncoding("utf-8").content(body).header(HttpHeaders.CONTENT_TYPE,
+				MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
 		Role role = roleRepository.findByName("ROLE_MODERATOR");
 		assertNotNull(role);
 		Collection<Privilege> privileges = role.getPrivileges();
 		assertEquals(1, privileges.size());
 		assertEquals("WRITE_PRIVILEGE", privileges.stream().findFirst().get().getName());
 	}
-	
+
 	@Test
 	public void shouldCreateNewRoleIfWrongId() throws Exception {
-		String body = "{ \"id\": "
-				+ 123456L + ", \"name\": \"ROLE_MENTOR\", \"description\": \"mentor\", \"operations\": [\"WRITE_PRIVILEGE\"] }";
-		mockMvc.perform(post("/v1.0/roles")
-				.characterEncoding("utf-8")
-				.content(body)
-				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
-				.andDo(print())
-				.andExpect(status().isOk());
+		String body = "{ \"id\": " + 123456L
+				+ ", \"name\": \"ROLE_MENTOR\", \"description\": \"mentor\", \"operations\": [\"WRITE_PRIVILEGE\"] }";
+		mockMvc.perform(post("/v1.0/roles").characterEncoding("utf-8").content(body).header(HttpHeaders.CONTENT_TYPE,
+				MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
 		Role role = roleRepository.findByName("ROLE_MENTOR");
 		assertNotNull(role);
 		Collection<Privilege> privileges = role.getPrivileges();
 		assertEquals(1, privileges.size());
 		assertEquals("WRITE_PRIVILEGE", privileges.stream().findFirst().get().getName());
 	}
-	
+
 	@Test
 	public void shoulUpdateRoleNameAndPrivileges() throws Exception {
-    	Role role = new Role("TEST_ROLE");
-    	role.setDescription("moderator");
-    	Privilege privilege = new Privilege("TEST_PRIVILEGE");
-    	privilegeRepository.save(privilege);
-    	role.setPrivileges(Stream.of(privilege).collect(Collectors.toCollection(ArrayList::new)));
-    	roleRepository.save(role);
-    	log.debug("Found in the Repo: {}", roleRepository.findAll());
-    	Long roleId = role.getId();
-		String body = "{ \"id\": "
-				+ roleId.toString() + ", \"name\": \"ROLE_MODER\", \"description\": \"moder\", \"operations\": [\"WRITE_PRIVILEGE\"] }";
-		mockMvc.perform(post("/v1.0/roles")
-				.characterEncoding("utf-8")
-				.content(body)
-				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
-				.andDo(print())
-				.andExpect(status().isOk());
+		Role role = new Role("TEST_ROLE");
+		role.setDescription("moderator");
+		Privilege privilege = new Privilege("TEST_PRIVILEGE");
+		privilegeRepository.save(privilege);
+		role.setPrivileges(Stream.of(privilege).collect(Collectors.toCollection(ArrayList::new)));
+		roleRepository.save(role);
+		log.debug("Found in the Repo: {}", roleRepository.findAll());
+		Long roleId = role.getId();
+		String body = "{ \"id\": " + roleId.toString()
+				+ ", \"name\": \"ROLE_MODER\", \"description\": \"moder\", \"operations\": [\"WRITE_PRIVILEGE\"] }";
+		mockMvc.perform(post("/v1.0/roles").characterEncoding("utf-8").content(body).header(HttpHeaders.CONTENT_TYPE,
+				MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk());
 		Role changedRole = roleRepository.findByName("ROLE_MODER");
 		assertNotNull(changedRole);
 		Collection<Privilege> privileges = changedRole.getPrivileges();

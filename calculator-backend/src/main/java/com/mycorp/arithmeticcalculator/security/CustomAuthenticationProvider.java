@@ -10,44 +10,43 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.core.Authentication;
 
 import com.mycorp.arithmeticcalculator.domain.User;
-import com.mycorp.arithmeticcalculator.repository.UserRepository;
 import com.mycorp.arithmeticcalculator.service.IUserAuthService;
 
 @Slf4j
 public class CustomAuthenticationProvider extends DaoAuthenticationProvider {
-    
-    @Autowired
-    private IUserAuthService userAuthService;
 
-    @Override
-    public Authentication authenticate(Authentication auth) {
-        final User user = userAuthService.findUserByName(auth.getName());
-        if ((user == null)) {
-            throw new UserNotFoundException("Invalid username or password");
-        }
-        // to verify verification code
-        if (user.isUsing2FA()) {
-            final String verificationCode = ((CustomWebAuthenticationDetails) auth.getDetails()).getVerificationCode();
-            final Totp totp = new Totp(user.getSecret());
-            if (!isValidLong(verificationCode) || !totp.verify(verificationCode)) {
-                throw new BadCredentialsException("Invalid verification code");
-            }
-        }
-        final Authentication result = super.authenticate(auth);
-        return new UsernamePasswordAuthenticationToken(user, result.getCredentials(), result.getAuthorities());
-    }
+	@Autowired
+	private IUserAuthService userAuthService;
 
-    private boolean isValidLong(String code) {
-        try {
-            Long.parseLong(code);
-        } catch (final NumberFormatException e) {
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public Authentication authenticate(Authentication auth) {
+		final User user = userAuthService.findUserByName(auth.getName());
+		if ((user == null)) {
+			throw new UserNotFoundException("Invalid username or password");
+		}
+		// to verify verification code
+		if (user.isUsing2FA()) {
+			final String verificationCode = ((CustomWebAuthenticationDetails) auth.getDetails()).getVerificationCode();
+			final Totp totp = new Totp(user.getSecret());
+			if (!isValidLong(verificationCode) || !totp.verify(verificationCode)) {
+				throw new BadCredentialsException("Invalid verification code");
+			}
+		}
+		final Authentication result = super.authenticate(auth);
+		return new UsernamePasswordAuthenticationToken(user, result.getCredentials(), result.getAuthorities());
+	}
 
-    @Override
-    public boolean supports(Class<?> authentication) {
-        return authentication.equals(UsernamePasswordAuthenticationToken.class);
-    }
+	private boolean isValidLong(String code) {
+		try {
+			Long.parseLong(code);
+		} catch (final NumberFormatException e) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean supports(Class<?> authentication) {
+		return authentication.equals(UsernamePasswordAuthenticationToken.class);
+	}
 }
