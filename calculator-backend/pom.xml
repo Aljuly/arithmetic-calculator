@@ -15,8 +15,6 @@
 	<properties>
 		<java.version>21</java.version>
 		<project.version>0.0.1-SNAPSHOT</project.version>
-		<junit-jupiter.version>5.2.0</junit-jupiter.version>
-		<junit-platform.version>1.2.0</junit-platform.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -215,7 +213,6 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${junit-jupiter.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -323,10 +320,12 @@
 					</includes>
 				</configuration>
 				<dependencies>
+					<!-- Force the JUnit Platform provider: groovy-all pulls TestNG onto the
+					     classpath, which otherwise makes Surefire pick the TestNG provider. -->
 					<dependency>
-						<groupId>org.junit.platform</groupId>
-						<artifactId>junit-platform-surefire-provider</artifactId>
-						<version>1.2.0</version>
+						<groupId>org.apache.maven.surefire</groupId>
+						<artifactId>surefire-junit-platform</artifactId>
+						<version>${maven-surefire-plugin.version}</version>
 					</dependency>
 				</dependencies>
 			</plugin>

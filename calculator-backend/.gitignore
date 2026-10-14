@@ -32,3 +32,12 @@ build/
 
 ### Claude Code ###
 .claude/settings.local.json
+
+### Kiro ###
+.kiro/
+
+### jqwik ###
+.jqwik-database
+
+### Office lock files ###
+~$*
