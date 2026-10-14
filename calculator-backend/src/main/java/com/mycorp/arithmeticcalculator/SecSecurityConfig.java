@@ -1,6 +1,5 @@
 package com.mycorp.arithmeticcalculator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +22,10 @@ import org.springframework.security.web.authentication.rememberme.InMemoryTokenR
 import org.springframework.web.cors.CorsConfiguration;
 
 import com.mycorp.arithmeticcalculator.filter.JwtAuthenticationFilter;
+import com.mycorp.arithmeticcalculator.repository.UserRepository;
 import com.mycorp.arithmeticcalculator.security.CustomAuthenticationProvider;
 import com.mycorp.arithmeticcalculator.security.CustomRememberMeServices;
+import com.mycorp.arithmeticcalculator.service.IUserAuthService;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
@@ -36,17 +37,24 @@ import java.util.List;
 @EnableWebSecurity(debug = true)
 public class SecSecurityConfig {
 
-	@Autowired
-	private UserDetailsService userDetailsService;
+	private final UserDetailsService userDetailsService;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 
-	@Autowired
-	private JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-	public SecSecurityConfig() {
-		super();
+	private final IUserAuthService userAuthService;
+
+	private final UserRepository userRepository;
+
+	public SecSecurityConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder,
+			JwtAuthenticationFilter jwtAuthenticationFilter, IUserAuthService userAuthService,
+			UserRepository userRepository) {
+		this.userDetailsService = userDetailsService;
+		this.passwordEncoder = passwordEncoder;
+		this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+		this.userAuthService = userAuthService;
+		this.userRepository = userRepository;
 	}
 
 	protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
@@ -85,7 +93,7 @@ public class SecSecurityConfig {
 
 	@Bean
 	DaoAuthenticationProvider authProvider() {
-		final CustomAuthenticationProvider authProvider = new CustomAuthenticationProvider();
+		final CustomAuthenticationProvider authProvider = new CustomAuthenticationProvider(userAuthService);
 		authProvider.setUserDetailsService(userDetailsService);
 		authProvider.setPasswordEncoder(passwordEncoder);
 		return authProvider;
@@ -98,6 +106,7 @@ public class SecSecurityConfig {
 
 	@Bean
 	RememberMeServices rememberMeServices() {
-		return new CustomRememberMeServices("theKey", userDetailsService, new InMemoryTokenRepositoryImpl());
+		return new CustomRememberMeServices("theKey", userDetailsService, new InMemoryTokenRepositoryImpl(),
+				userRepository);
 	}
 }

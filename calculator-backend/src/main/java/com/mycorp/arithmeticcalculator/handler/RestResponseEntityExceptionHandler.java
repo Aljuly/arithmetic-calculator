@@ -12,7 +12,6 @@ import com.mycorp.arithmeticcalculator.error.UserAlreadyExistException;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpHeaders;
@@ -33,12 +32,10 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@Qualifier("messageSource")
-	@Autowired
-	private MessageSource messages;
+	private final MessageSource messages;
 
-	public RestResponseEntityExceptionHandler() {
-		super();
+	public RestResponseEntityExceptionHandler(@Qualifier("messageSource") MessageSource messages) {
+		this.messages = messages;
 	}
 
 	// API

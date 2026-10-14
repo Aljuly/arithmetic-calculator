@@ -50,12 +50,8 @@ public class RegistrationCreatesUnverifiedUserPropertyTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.openMocks(this);
-		userAuthService = new UserAuthService();
-		// Inject mocked dependencies using reflection
-		setField(userAuthService, "repository", userRepository);
-		setField(userAuthService, "roleRepository", roleRepository);
-		setField(userAuthService, "passwordEncoder", passwordEncoder);
-		setField(userAuthService, "validator", validator);
+		userAuthService = new UserAuthService(userRepository, null, null, passwordEncoder, roleRepository, null,
+				validator);
 	}
 
 	/**
@@ -338,16 +334,4 @@ public class RegistrationCreatesUnverifiedUserPropertyTest {
 		});
 	}
 
-	/**
-	 * Helper method to set private fields using reflection
-	 */
-	private void setField(Object target, String fieldName, Object value) {
-		try {
-			java.lang.reflect.Field field = target.getClass().getDeclaredField(fieldName);
-			field.setAccessible(true);
-			field.set(target, value);
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to set field " + fieldName, e);
-		}
-	}
 }

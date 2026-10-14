@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,18 +25,17 @@ import com.mycorp.arithmeticcalculator.security.LoginAttemptService;
 @Transactional
 public class MyUserDetailsService implements UserDetailsService {
 
-	@Autowired
-	private IUserAuthService userAuthService;
+	private final IUserAuthService userAuthService;
 
-	@Autowired
-	@Qualifier("loginAttemptService")
-	private LoginAttemptService loginAttemptService;
+	private final LoginAttemptService loginAttemptService;
 
-	@Autowired
-	private HttpServletRequest request;
+	private final HttpServletRequest request;
 
-	public MyUserDetailsService() {
-		super();
+	public MyUserDetailsService(IUserAuthService userAuthService,
+			@Qualifier("loginAttemptService") LoginAttemptService loginAttemptService, HttpServletRequest request) {
+		this.userAuthService = userAuthService;
+		this.loginAttemptService = loginAttemptService;
+		this.request = request;
 	}
 
 	@Override

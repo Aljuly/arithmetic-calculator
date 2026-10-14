@@ -14,7 +14,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Validator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -37,26 +36,31 @@ import org.springframework.security.core.session.SessionRegistry;
 @Service
 public class UserAuthService implements IUserAuthService {
 
-	@Autowired
-	private UserRepository repository;
+	private final UserRepository repository;
 
-	@Autowired
-	private VerificationTokenRepository tokenRepository;
+	private final VerificationTokenRepository tokenRepository;
 
-	@Autowired
-	private PasswordResetTokenRepository passwordTokenRepository;
+	private final PasswordResetTokenRepository passwordTokenRepository;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
 
-	@Autowired
-	private RoleRepository roleRepository;
+	private final RoleRepository roleRepository;
 
-	@Autowired
-	private SessionRegistry sessionRegistry;
+	private final SessionRegistry sessionRegistry;
 
-	@Autowired
-	private Validator validator;
+	private final Validator validator;
+
+	public UserAuthService(UserRepository repository, VerificationTokenRepository tokenRepository,
+			PasswordResetTokenRepository passwordTokenRepository, PasswordEncoder passwordEncoder,
+			RoleRepository roleRepository, SessionRegistry sessionRegistry, Validator validator) {
+		this.repository = repository;
+		this.tokenRepository = tokenRepository;
+		this.passwordTokenRepository = passwordTokenRepository;
+		this.passwordEncoder = passwordEncoder;
+		this.roleRepository = roleRepository;
+		this.sessionRegistry = sessionRegistry;
+		this.validator = validator;
+	}
 
 	// API
 

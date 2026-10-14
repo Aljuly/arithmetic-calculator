@@ -4,7 +4,6 @@ import java.util.Calendar;
 
 import javax.transaction.Transactional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,11 +18,15 @@ import com.mycorp.arithmeticcalculator.repository.PasswordResetTokenRepository;
 @Transactional
 public class UserSecurityService implements ISecurityUserService {
 
-	@Autowired
-	private PasswordResetTokenRepository passwordTokenRepository;
+	private final PasswordResetTokenRepository passwordTokenRepository;
 
-	@Autowired
-	private UserDetailsService userDetailsService;
+	private final UserDetailsService userDetailsService;
+
+	public UserSecurityService(PasswordResetTokenRepository passwordTokenRepository,
+			UserDetailsService userDetailsService) {
+		this.passwordTokenRepository = passwordTokenRepository;
+		this.userDetailsService = userDetailsService;
+	}
 
 	// API
 

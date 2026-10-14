@@ -1,6 +1,5 @@
 package com.mycorp.arithmeticcalculator.task;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,11 +14,15 @@ import java.util.Date;
 @Transactional
 public class TokensPurgeTask {
 
-	@Autowired
-	VerificationTokenRepository tokenRepository;
+	private final VerificationTokenRepository tokenRepository;
 
-	@Autowired
-	PasswordResetTokenRepository passwordTokenRepository;
+	private final PasswordResetTokenRepository passwordTokenRepository;
+
+	public TokensPurgeTask(VerificationTokenRepository tokenRepository,
+			PasswordResetTokenRepository passwordTokenRepository) {
+		this.tokenRepository = tokenRepository;
+		this.passwordTokenRepository = passwordTokenRepository;
+	}
 
 	@Scheduled(cron = "${purge.cron.expression}")
 	public void purgeExpired() {

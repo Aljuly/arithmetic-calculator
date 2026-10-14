@@ -5,6 +5,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,6 +21,10 @@ import java.util.Properties;
 @PropertySource("classpath:test-db.properties")
 @ComponentScan({"com.mycorp.arithmeticcalculator.repository"})
 public class TestDbConfig extends PersistenceJPAConfig {
+
+	public TestDbConfig(Environment env) {
+		super(env);
+	}
 
 	@Bean
 	PasswordEncoder encoder() {
