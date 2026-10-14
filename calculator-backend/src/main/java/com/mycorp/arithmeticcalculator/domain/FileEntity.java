@@ -8,26 +8,26 @@ import javax.persistence.*;
 @Entity
 @Table(name = "file")
 public class FileEntity {
-	
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@Lob
 	private byte[] data;
 	private String name;
 
 	@Column(name = "content_type")
 	private String contentType;
-	
+
 	public FileEntity() {
 		super();
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
-	
+
 	public void setId(Long id) {
 		this.id = id;
 	}
@@ -35,27 +35,27 @@ public class FileEntity {
 	public byte[] getData() {
 		return data;
 	}
-	
+
 	public void setData(byte[] data) {
 		this.data = data;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public String getContentType() {
 		return contentType;
 	}
-	
+
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -64,7 +64,7 @@ public class FileEntity {
 		result = prime * result + Objects.hash(contentType, id, name);
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -83,5 +83,5 @@ public class FileEntity {
 		return "FileEntity [id=" + id + ", data=" + Arrays.toString(data) + ", name=" + name + ", contentType="
 				+ contentType + "]";
 	}
-	
+
 }

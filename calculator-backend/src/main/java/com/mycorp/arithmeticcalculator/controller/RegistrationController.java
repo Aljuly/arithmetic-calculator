@@ -63,12 +63,9 @@ public class RegistrationController {
 
 	private final Environment env;
 
-	public RegistrationController(IUserAuthService userService,
-								  ISecurityUserService securityUserService,
-								  MessageSource messages,
-								  JavaMailSender mailSender,
-								  ApplicationEventPublisher eventPublisher,
-								  Environment env) {
+	public RegistrationController(IUserAuthService userService, ISecurityUserService securityUserService,
+			MessageSource messages, JavaMailSender mailSender, ApplicationEventPublisher eventPublisher,
+			Environment env) {
 		super();
 		this.userService = userService;
 		this.securityUserService = securityUserService;
@@ -81,13 +78,12 @@ public class RegistrationController {
 	// Registration
 
 	@ApiOperation(value = "Performing user registration")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Success"),
-			@ApiResponse(code = 400, message = "Bad Request")
-	})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 400, message = "Bad Request")})
 	@PostMapping(value = "/register")
 	@ResponseBody
-	public GenericResponse registerUserAccount(@Valid @RequestBody final UserDto accountDto, final HttpServletRequest request) {
+	public GenericResponse registerUserAccount(@Valid @RequestBody final UserDto accountDto,
+			final HttpServletRequest request) {
 		LOGGER.debug("Registering user account with information: {}", accountDto);
 		final User registered = userService.registerNewUserAccount(accountDto);
 		eventPublisher
@@ -96,19 +92,15 @@ public class RegistrationController {
 	}
 
 	@GetMapping(value = "/registrationConfirm")
-	public GenericResponse confirmRegistration(@RequestParam() final String token)
-			throws UnsupportedEncodingException {
+	public GenericResponse confirmRegistration(@RequestParam() final String token) throws UnsupportedEncodingException {
 		final String result = userService.validateVerificationToken(token);
 		return new GenericResponse(result);
 	}
 
 	// user activation - verification
-	@ApiOperation(value = "user activation - verification. \r\n"
-	+ "Sends Email to user with registration conformation")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Success"),
-			@ApiResponse(code = 500, message = "Server Error")
-	})
+	@ApiOperation(value = "user activation - verification. \r\n" + "Sends Email to user with registration conformation")
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "Success"),
+			@ApiResponse(code = 500, message = "Server Error")})
 	@GetMapping(value = "/resendRegistrationToken")
 	@ResponseBody
 	public GenericResponse resendRegistrationToken(final HttpServletRequest request,
@@ -169,8 +161,7 @@ public class RegistrationController {
 
 	@PostMapping(value = "/update/2fa")
 	@ResponseBody
-	public GenericResponse modifyUser2FA(@RequestParam() final boolean use2FA)
-			throws UnsupportedEncodingException {
+	public GenericResponse modifyUser2FA(@RequestParam() final boolean use2FA) throws UnsupportedEncodingException {
 		final User user = userService.updateUser2FA(use2FA);
 		if (use2FA) {
 			return new GenericResponse(userService.generateQRUrl(user));

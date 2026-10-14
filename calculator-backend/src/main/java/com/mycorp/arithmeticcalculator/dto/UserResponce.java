@@ -20,106 +20,83 @@ import com.mycorp.arithmeticcalculator.domain.User;
 import com.mycorp.arithmeticcalculator.validators.ValidEmail;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({
-"id",
-"login",
-"password",
-"email",
-"firstName",
-"lastName",
-"avatar",
-"lastlogin",
-"enabled",
-"banned",
-"verified",
-"banReason",
-"userRoles"
-})
+@JsonPropertyOrder({"id", "login", "password", "email", "firstName", "lastName", "avatar", "lastlogin", "enabled",
+		"banned", "verified", "banReason", "userRoles"})
 public class UserResponce {
-	
+
 	@JsonProperty("id")
 	private Long id;
-	
+
 	@JsonProperty("login")
 	private String login;
-	
+
 	@JsonProperty("password")
 	private String password;
-    
+
 	@ValidEmail
-    @NotNull
-    @Size(min = 3)
+	@NotNull
+	@Size(min = 3)
 	@JsonProperty("email")
 	private String email;
-    
+
 	@NotNull
-    @Size(min = 1)
+	@Size(min = 1)
 	@JsonProperty("firstName")
 	private String firstName;
-	
+
 	@NotNull
-    @Size(min = 1)
+	@Size(min = 1)
 	@JsonProperty("lastName")
 	private String lastName;
-	
+
 	@JsonProperty("avatar")
 	private String avatar;
-	
+
 	@JsonProperty("lastlogin")
 	private String lastlogin;
-	
+
 	@JsonProperty("enabled")
 	private boolean enabled;
-	
+
 	@JsonProperty("banned")
 	private boolean banned;
-	
+
 	@JsonProperty("verified")
 	private boolean verified;
-	
+
 	@JsonProperty("banReason")
 	private String banReason;
-	
+
 	@JsonProperty("userRoles")
 	@Valid
 	private List<RoleDto> userRoles = new ArrayList<>();
-	
+
 	/**
-	* No args constructor for use in serialization
-	*
-	*/
+	 * No args constructor for use in serialization
+	 *
+	 */
 	public UserResponce() {
 	}
 
 	/**
-	*
-	* @param lastName
-	* @param last login
-	* @param verified
-	* @param avatar
-	* @param login
-	* @param enabled
-	* @param banReason
-	* @param firstName
-	* @param userRoles
-	* @param password
-	* @param id
-	* @param banned
-	* @param email
-	*/
-	public UserResponce(
-			Long id, 
-			String login, 
-			String password, 
-			String email, 
-			String firstName, 
-			String lastName, 
-			String avatar, 
-			String lastlogin, 
-			boolean enabled, 
-			boolean banned, 
-			boolean verified, 
-			String banReason, 
+	 *
+	 * @param lastName
+	 * @param last
+	 *            login
+	 * @param verified
+	 * @param avatar
+	 * @param login
+	 * @param enabled
+	 * @param banReason
+	 * @param firstName
+	 * @param userRoles
+	 * @param password
+	 * @param id
+	 * @param banned
+	 * @param email
+	 */
+	public UserResponce(Long id, String login, String password, String email, String firstName, String lastName,
+			String avatar, String lastlogin, boolean enabled, boolean banned, boolean verified, String banReason,
 			List<RoleDto> userRoles) {
 		super();
 		this.id = id;
@@ -138,26 +115,13 @@ public class UserResponce {
 	}
 
 	public UserResponce(User user) {
-		this(
-				user.getId(),
-				user.getLogin(),
-				"", //password
-				user.getEmail(), 
-				user.getFirstName(), 
-				user.getLastName(), 
-				user.getAvatarId(),
-				"", //lastlogin,
-				user.isEnabled(),
-				user.isBanned(),
-				user.isVerified(),
-				user.getBanReason(),
-			 	Optional.ofNullable(user.getRoles())
-			 	.orElseGet(ArrayList::new).stream()
-			 	.map(RoleDto::new)
-			 	.collect(Collectors.toList())
-				);
+		this(user.getId(), user.getLogin(), "", // password
+				user.getEmail(), user.getFirstName(), user.getLastName(), user.getAvatarId(), "", // lastlogin,
+				user.isEnabled(), user.isBanned(), user.isVerified(), user.getBanReason(),
+				Optional.ofNullable(user.getRoles()).orElseGet(ArrayList::new).stream().map(RoleDto::new)
+						.collect(Collectors.toList()));
 	}
-	
+
 	public Long getId() {
 		return id;
 	}
@@ -261,7 +225,7 @@ public class UserResponce {
 	public void setUserRoles(List<RoleDto> userRoles) {
 		this.userRoles = userRoles;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(avatar, banReason, banned, email, enabled, firstName, id, lastName, lastlogin, login,
@@ -292,16 +256,14 @@ public class UserResponce {
 				+ lastlogin + ", enabled=" + enabled + ", banned=" + banned + ", verified=" + verified + ", banReason="
 				+ banReason + ", userRoles=" + userRoles + "]";
 	}
-	
+
 	// ToDo add to the Helper class
 	public String toJson() throws JsonProcessingException {
 		return (new ObjectMapper()).writeValueAsString(this);
 	}
-	
+
 	public static UserResponce fromJson(String json) throws JsonMappingException, JsonProcessingException {
 		return (new ObjectMapper()).readValue(json, UserResponce.class);
 	}
-	
+
 }
-
-

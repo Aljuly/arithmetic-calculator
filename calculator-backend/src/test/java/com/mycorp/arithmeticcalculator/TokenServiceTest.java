@@ -29,39 +29,33 @@ import lombok.extern.slf4j.Slf4j;
 @TestInstance(Lifecycle.PER_CLASS)
 @Slf4j
 public class TokenServiceTest {
-	
+
 	private TokenService tokenService;
-	
+
 	@Mock
 	private UserRepository userRepository;
-	
+
 	private UserDetails userDetails;
-	
+
 	private User user;
-	
+
 	@SuppressWarnings("deprecation")
 	@BeforeEach
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		tokenService = spy(new TokenService(userRepository));
-		userDetails = new org.springframework.security.core.userdetails.User(
-    			"test", 
-    			"Passw0rd!", 
-    			true, 
-    			true, 
-    			true, 
-    			true, 
-    			Stream.of(new SimpleGrantedAuthority("ADMIN")).toList());
+		userDetails = new org.springframework.security.core.userdetails.User("test", "Passw0rd!", true, true, true,
+				true, Stream.of(new SimpleGrantedAuthority("ADMIN")).toList());
 		user = new User();
 		user.setLogin("test");
-    	user.setFirstName("Test");
-    	user.setLastName("Test");
-    	user.setPassword("Password!");
-    	user.setEmail("test@test.com");
-    	user.setEnabled(true);
-    	user.setRoles(Stream.of(new Role("ADMIN")).toList());
+		user.setFirstName("Test");
+		user.setLastName("Test");
+		user.setPassword("Password!");
+		user.setEmail("test@test.com");
+		user.setEnabled(true);
+		user.setRoles(Stream.of(new Role("ADMIN")).toList());
 	}
-	
+
 	@Test
 	public void shouldCreateTokenFromUserDetails() {
 		doReturn(user).when(userRepository).findByEmail(anyString());

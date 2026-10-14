@@ -18,7 +18,7 @@ public class Privilege {
 	private Long id;
 	private String name;
 	private String description;
-	
+
 	@ManyToMany(mappedBy = "privileges")
 	private List<Role> roles = new ArrayList<Role>();
 
@@ -28,8 +28,8 @@ public class Privilege {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}	
-	
+	}
+
 	public Privilege() {
 		super();
 	}

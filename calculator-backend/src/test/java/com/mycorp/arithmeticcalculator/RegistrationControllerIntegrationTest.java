@@ -37,66 +37,65 @@ import com.mycorp.arithmeticcalculator.domain.VerificationToken;
 import com.mycorp.springangularstarter.config.TestDbConfig;
 import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 
-@SpringBootTest(classes = { TestDbConfig.class, TestIntegrationConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = {TestDbConfig.class,
+		TestIntegrationConfig.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Transactional
 public class RegistrationControllerIntegrationTest {
 
-    @Autowired
-    private WebApplicationContext webApplicationContext;
+	@Autowired
+	private WebApplicationContext webApplicationContext;
 
-    @PersistenceContext
-    private EntityManager entityManager;
+	@PersistenceContext
+	private EntityManager entityManager;
 
-    private MockMvc mockMvc;
-    private String token;
+	private MockMvc mockMvc;
+	private String token;
 
-    @BeforeEach
-    public void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+	@BeforeEach
+	public void setUp() {
+		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-        User user = new User();
-        user.setEmail(UUID.randomUUID().toString() + "@example.com");
-        user.setPassword(UUID.randomUUID().toString());
-        user.setFirstName("First");
-        user.setLastName("Last");
+		User user = new User();
+		user.setEmail(UUID.randomUUID().toString() + "@example.com");
+		user.setPassword(UUID.randomUUID().toString());
+		user.setFirstName("First");
+		user.setLastName("Last");
 
-        entityManager.persist(user);
-        token = UUID.randomUUID().toString();
-        VerificationToken verificationToken = new VerificationToken(token, user);
-        verificationToken.setExpiryDate(Date.from(Instant.now().plus(2, ChronoUnit.DAYS)));
+		entityManager.persist(user);
+		token = UUID.randomUUID().toString();
+		VerificationToken verificationToken = new VerificationToken(token, user);
+		verificationToken.setExpiryDate(Date.from(Instant.now().plus(2, ChronoUnit.DAYS)));
 
-        entityManager.persist(verificationToken);
+		entityManager.persist(verificationToken);
 
-        /*
-            flush managed entities to the database to populate identifier field
-         */
-        entityManager.flush();
-        entityManager.clear();
-    }
+		/*
+		 * flush managed entities to the database to populate identifier field
+		 */
+		entityManager.flush();
+		entityManager.clear();
+	}
 
-    @Test
-    public void testRegistrationConfirm() throws Exception {
-        ResultActions resultActions = this.mockMvc.perform(get("/registrationConfirm.html?token=" + token));
-        resultActions.andExpect(status().is3xxRedirection());
-        resultActions.andExpect(model().attribute("message", "Your account verified successfully"));
-        resultActions.andExpect(view().name("redirect:/console.html?lang=en"));
-    }
+	@Test
+	public void testRegistrationConfirm() throws Exception {
+		ResultActions resultActions = this.mockMvc.perform(get("/registrationConfirm.html?token=" + token));
+		resultActions.andExpect(status().is3xxRedirection());
+		resultActions.andExpect(model().attribute("message", "Your account verified successfully"));
+		resultActions.andExpect(view().name("redirect:/console.html?lang=en"));
+	}
 
-    @Test
-    public void testRegistrationValidation() throws Exception {
+	@Test
+	public void testRegistrationValidation() throws Exception {
 
-        final MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
-        param.add("firstName", "First");
-        param.add("lastName", "Last");
-        param.add("email", UUID.randomUUID().toString());
-        param.add("password", "Passw0rd!");
-        param.add("matchingPassword", "Passw0rd!");
+		final MultiValueMap<String, String> param = new LinkedMultiValueMap<>();
+		param.add("firstName", "First");
+		param.add("lastName", "Last");
+		param.add("email", UUID.randomUUID().toString());
+		param.add("password", "Passw0rd!");
+		param.add("matchingPassword", "Passw0rd!");
 
-        ResultActions resultActions = 
-        		mockMvc.perform(post("/v1.0/user/register").params(param))
-        		.andDo(print());
-        resultActions.andExpect(status().is(400));
-        resultActions.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.message", containsString("Invalid email")));
-    }
+		ResultActions resultActions = mockMvc.perform(post("/v1.0/user/register").params(param)).andDo(print());
+		resultActions.andExpect(status().is(400));
+		resultActions.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.message", containsString("Invalid email")));
+	}
 }

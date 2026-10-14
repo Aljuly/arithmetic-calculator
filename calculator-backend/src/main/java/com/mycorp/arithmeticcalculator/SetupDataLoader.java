@@ -52,16 +52,17 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 		final Privilege passwordPrivilege = createPrivilegeIfNotFound("CHANGE_PASSWORD_PRIVILEGE");
 
 		// == create initial roles
-		final List<Privilege> adminPrivileges = 
-				Stream.of(readPrivilege, writePrivilege, deletePrivilege, passwordPrivilege).collect(Collectors.toCollection(ArrayList::new));
-		final List<Privilege> userPrivileges = 
-				Stream.of(readPrivilege, passwordPrivilege).collect(Collectors.toCollection(ArrayList::new));
+		final List<Privilege> adminPrivileges = Stream
+				.of(readPrivilege, writePrivilege, deletePrivilege, passwordPrivilege)
+				.collect(Collectors.toCollection(ArrayList::new));
+		final List<Privilege> userPrivileges = Stream.of(readPrivilege, passwordPrivilege)
+				.collect(Collectors.toCollection(ArrayList::new));
 		final Role adminRole = createRoleIfNotFound("ROLE_ADMIN", adminPrivileges);
 		createRoleIfNotFound("ROLE_USER", userPrivileges);
 
 		// == create initial user
-		createUserIfNotFound("testUser", "test@test.com", "Test", "Test", "Passw0rd!", Stream.of(adminRole)
-				.collect(Collectors.toList()));
+		createUserIfNotFound("testUser", "test@test.com", "Test", "Test", "Passw0rd!",
+				Stream.of(adminRole).collect(Collectors.toList()));
 		alreadySetup = true;
 	}
 
@@ -88,7 +89,7 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
 	@Transactional
 	User createUserIfNotFound(final String login, final String email, final String firstName, final String lastName,
-							  final String password, final List<Role> roles) {
+			final String password, final List<Role> roles) {
 		User user = userRepository.findByEmail(email);
 		if (user == null) {
 			user = new User();

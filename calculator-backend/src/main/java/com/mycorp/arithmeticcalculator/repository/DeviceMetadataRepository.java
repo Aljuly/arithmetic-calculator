@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface DeviceMetadataRepository extends JpaRepository<DeviceMetadata, Long> {
 
-    List<DeviceMetadata> findByUserId(Long userId);
+	List<DeviceMetadata> findByUserId(Long userId);
 }

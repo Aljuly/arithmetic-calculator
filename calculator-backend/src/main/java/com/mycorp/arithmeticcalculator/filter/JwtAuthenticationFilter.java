@@ -23,10 +23,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private static final String BEARER_PREFIX = "Bearer ";
 	private static final String HEADER_NAME = "Authorization";
-	
+
 	private final TokenService tokenService;
 	private final UserDetailsService myUserDetailsService;
-	
+
 	public JwtAuthenticationFilter(TokenService tokenService, UserDetailsService myUserDetailsService) {
 		super();
 		this.tokenService = tokenService;
@@ -43,14 +43,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 		String jwtToken = authHeader.substring(BEARER_PREFIX.length());
 		String userName = tokenService.getUserName(jwtToken).getLogin();
-		if (userName != null && userName.length() > 0 && SecurityContextHolder.getContext().getAuthentication() == null) {
+		if (userName != null && userName.length() > 0
+				&& SecurityContextHolder.getContext().getAuthentication() == null) {
 			UserDetails userDetails = myUserDetailsService.loadUserByUsername(userName);
 			if (tokenService.isTokenValid(jwtToken, userDetails)) {
 				SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-						userDetails, 
-						null, 
-						userDetails.getAuthorities());
+				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails,
+						null, userDetails.getAuthorities());
 				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				securityContext.setAuthentication(authToken);
 				SecurityContextHolder.setContext(securityContext);

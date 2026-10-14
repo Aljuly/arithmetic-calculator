@@ -11,14 +11,14 @@ import javax.validation.Payload;
 
 @Documented
 @Constraint(validatedBy = RoleConstraintValidator.class)
-@Target({ ElementType.TYPE, ElementType.FIELD, ElementType.ANNOTATION_TYPE })
+@Target({ElementType.TYPE, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidRoleName {
-	
+
 	String message() default "Invalid Role Name";
 
 	Class<?>[] groups() default {};
 
 	Class<? extends Payload>[] payload() default {};
-	
+
 }

@@ -31,77 +31,73 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 import java.util.List;
 
 @Configuration
-@ComponentScan(basePackages = { "com.mycorp.arithmeticcalculator.security" })
+@ComponentScan(basePackages = {"com.mycorp.arithmeticcalculator.security"})
 @EnableMethodSecurity
 @EnableWebSecurity(debug = true)
 public class SecSecurityConfig {
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+	@Autowired
+	private UserDetailsService userDetailsService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-    @Autowired
+	@Autowired
 	private JwtAuthenticationFilter jwtAuthenticationFilter;
-    
-    public SecSecurityConfig() {
-        super();
-    }
-    
-    protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(authProvider());
-    }
 
-    public void configure(final WebSecurity web) {
-        web.ignoring().antMatchers("/resources/**");
-    }
+	public SecSecurityConfig() {
+		super();
+	}
+
+	protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
+		auth.authenticationProvider(authProvider());
+	}
+
+	public void configure(final WebSecurity web) {
+		web.ignoring().antMatchers("/resources/**");
+	}
 
 	@Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-		        .cors(cors -> cors.configurationSource(request -> {
-		        	CorsConfiguration corsConfiguration = new CorsConfiguration();
-		            corsConfiguration.setAllowedOriginPatterns(List.of("*"));
-		            corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		            corsConfiguration.setAllowedHeaders(List.of("*"));
-		            corsConfiguration.setAllowCredentials(true);
-		            return corsConfiguration;
-		        }))
-                .authorizeHttpRequests(requests -> requests
-                        .antMatchers("/v1.0/user/register", "/v1.0/registrationConfirm", "/v1.0/user/resendRegistrationToken", "/v1.0/user/resetPassword", "/v1.0/user/changePassword").permitAll()
-                        .antMatchers("/v1.0/user/savePassword", "/v1.0/user/updatePassword", "/v1.0/user/update/2fa").permitAll()
-                        .antMatchers("/v1.0/login").permitAll()
-                        .antMatchers("/v1.0/roles/**").hasRole("ADMIN")
-                        .antMatchers(HttpMethod.GET, "/v1.0/images/**").hasAnyRole("USER", "ADMIN")
-                        .antMatchers("/v1.0/images/**").hasRole("ADMIN")
-                        .antMatchers("/v1.0/users/by-name/{userId}").hasAnyRole("USER", "ADMIN")
-                        .antMatchers("/v1.0/users/**").hasRole("ADMIN")
-                        .antMatchers("/loggedUsers").hasRole("ADMIN")
-                        .anyRequest().authenticated())
-                .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
-                .authenticationProvider(authProvider())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .csrf(AbstractHttpConfigurer::disable);
+	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.cors(cors -> cors.configurationSource(request -> {
+			CorsConfiguration corsConfiguration = new CorsConfiguration();
+			corsConfiguration.setAllowedOriginPatterns(List.of("*"));
+			corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+			corsConfiguration.setAllowedHeaders(List.of("*"));
+			corsConfiguration.setAllowCredentials(true);
+			return corsConfiguration;
+		})).authorizeHttpRequests(requests -> requests
+				.antMatchers("/v1.0/user/register", "/v1.0/registrationConfirm", "/v1.0/user/resendRegistrationToken",
+						"/v1.0/user/resetPassword", "/v1.0/user/changePassword")
+				.permitAll()
+				.antMatchers("/v1.0/user/savePassword", "/v1.0/user/updatePassword", "/v1.0/user/update/2fa")
+				.permitAll().antMatchers("/v1.0/login").permitAll().antMatchers("/v1.0/roles/**").hasRole("ADMIN")
+				.antMatchers(HttpMethod.GET, "/v1.0/images/**").hasAnyRole("USER", "ADMIN")
+				.antMatchers("/v1.0/images/**").hasRole("ADMIN").antMatchers("/v1.0/users/by-name/{userId}")
+				.hasAnyRole("USER", "ADMIN").antMatchers("/v1.0/users/**").hasRole("ADMIN").antMatchers("/loggedUsers")
+				.hasRole("ADMIN").anyRequest().authenticated())
+				.sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
+				.authenticationProvider(authProvider())
+				.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+				.csrf(AbstractHttpConfigurer::disable);
 		return http.build();
 	}
-    
-    @Bean
-    DaoAuthenticationProvider authProvider() {
-        final CustomAuthenticationProvider authProvider = new CustomAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder);
-        return authProvider;
-    }
 
-    @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration config)
-            throws Exception {
-        return config.getAuthenticationManager();
-    }
-    
-    @Bean
-    RememberMeServices rememberMeServices() {
-        return new CustomRememberMeServices("theKey", userDetailsService, new InMemoryTokenRepositoryImpl());
-    }
+	@Bean
+	DaoAuthenticationProvider authProvider() {
+		final CustomAuthenticationProvider authProvider = new CustomAuthenticationProvider();
+		authProvider.setUserDetailsService(userDetailsService);
+		authProvider.setPasswordEncoder(passwordEncoder);
+		return authProvider;
+	}
+
+	@Bean
+	AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		return config.getAuthenticationManager();
+	}
+
+	@Bean
+	RememberMeServices rememberMeServices() {
+		return new CustomRememberMeServices("theKey", userDetailsService, new InMemoryTokenRepositoryImpl());
+	}
 }

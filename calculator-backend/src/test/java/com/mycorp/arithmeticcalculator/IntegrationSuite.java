@@ -5,8 +5,8 @@ import org.junit.platform.suite.api.SelectClasses;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitPlatform.class)
-@SelectClasses({ // @formatter:off 
-    ChangePasswordIntegrationTest.class, 
+@SelectClasses({ // @formatter:off
+    ChangePasswordIntegrationTest.class,
     TokenExpirationIntegrationTest.class,
     RegistrationControllerIntegrationTest.class,
     GetLoggedUsersIntegrationTest.class,
@@ -15,5 +15,5 @@ import org.junit.runner.RunWith;
     SpringSecurityRolesIntegrationTest.class,
 })// @formatter:on
 public class IntegrationSuite {
-    // https://howtodoinjava.com/junit5/junit5-test-suites-examples/
+	// https://howtodoinjava.com/junit5/junit5-test-suites-examples/
 }

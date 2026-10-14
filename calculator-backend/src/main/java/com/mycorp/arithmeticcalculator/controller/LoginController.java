@@ -29,30 +29,24 @@ public class LoginController {
 	private final TokenService tokenService;
 	private final DaoAuthenticationProvider authManager;
 	private final MyUserDetailsService usrDetailsService;
-	
+
 	public LoginController(TokenService tokenService, DaoAuthenticationProvider authManager,
 			MyUserDetailsService usrDetailsService) {
 		super();
 		this.tokenService = tokenService;
 		this.authManager = authManager;
 		this.usrDetailsService = usrDetailsService;
-	}	
-	
+	}
+
 	/**
-	 * Response tocken example
-		{
-		  "sub": "{\"id\":\"6\",\"login\":\"\",\"password\":\"\",\"email\":\"test@test.com\",\"firstName\":\"Test\",\"lastName\":\"Test\",\"avatar\":\"\",\"lastlogin\":\"\",\"enabled\":true,\"banned\":false,\"verified\":true,\"banReason\":\"\",\"userRoles\":[{\"id\":4,\"description\":null,\"name\":\"ROLE_ADMIN\",\"operations\":[\"READ_PRIVILEGE\",\"WRITE_PRIVILEGE\",\"CHANGE_PASSWORD_PRIVILEGE\"]}]}",
-		  "role": "CHANGE_PASSWORD_PRIVILEGE READ_PRIVILEGE WRITE_PRIVILEGE",
-		  "exp": 1717111122,
-		  "iat": 1717096722
-		}
+	 * Response tocken example { "sub":
+	 * "{\"id\":\"6\",\"login\":\"\",\"password\":\"\",\"email\":\"test@test.com\",\"firstName\":\"Test\",\"lastName\":\"Test\",\"avatar\":\"\",\"lastlogin\":\"\",\"enabled\":true,\"banned\":false,\"verified\":true,\"banReason\":\"\",\"userRoles\":[{\"id\":4,\"description\":null,\"name\":\"ROLE_ADMIN\",\"operations\":[\"READ_PRIVILEGE\",\"WRITE_PRIVILEGE\",\"CHANGE_PASSWORD_PRIVILEGE\"]}]}",
+	 * "role": "CHANGE_PASSWORD_PRIVILEGE READ_PRIVILEGE WRITE_PRIVILEGE", "exp":
+	 * 1717111122, "iat": 1717096722 }
 	 */
-	
-	@ApiOperation(value = "Log In User", nickname = "userLogin", response = String.class, 
-			tags = {"login-endpoint"})
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "Token", response = String.class)
-    })
+
+	@ApiOperation(value = "Log In User", nickname = "userLogin", response = String.class, tags = {"login-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "Token", response = String.class)})
 	@PostMapping(value = "/v1.0/login", produces = {"application/json"}, consumes = {"application/json"})
 	public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest)
 			throws BadCredentialsException, UsernameNotFoundException {

@@ -7,14 +7,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 public class LoginRequest {
-	
-    @NotBlank(message = "Login cannot be blank")
-    @Email(message = "Invalid email format")
-    private String email;
 
-    @NotBlank(message = "Password cannot be blank")
-    @Size(min = 6, max = 20, message = "Password must be between 6 and 20 characters")
-    private String password;
+	@NotBlank(message = "Login cannot be blank")
+	@Email(message = "Invalid email format")
+	private String email;
+
+	@NotBlank(message = "Password cannot be blank")
+	@Size(min = 6, max = 20, message = "Password must be between 6 and 20 characters")
+	private String password;
 
 	public LoginRequest(
 			@NotBlank(message = "Login cannot be blank") @Email(message = "Invalid email format") String email,
@@ -61,5 +61,5 @@ public class LoginRequest {
 	public String toString() {
 		return "LoginRequest [email=" + email + ", password=" + password + "]";
 	}
-    
+
 }

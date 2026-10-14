@@ -10,14 +10,14 @@ import org.springframework.web.context.request.RequestContextListener;
 @Configuration
 public class TestIntegrationConfig {
 
-    @Bean
-    @ConditionalOnMissingBean(RequestContextListener.class)
-    RequestContextListener requestContextListener() {
-        return new RequestContextListener();
-    }
+	@Bean
+	@ConditionalOnMissingBean(RequestContextListener.class)
+	RequestContextListener requestContextListener() {
+		return new RequestContextListener();
+	}
 
-    @Bean
-    SessionRegistry sessionRegistry() {
-        return new SessionRegistryImpl();
-    }
+	@Bean
+	SessionRegistry sessionRegistry() {
+		return new SessionRegistryImpl();
+	}
 }

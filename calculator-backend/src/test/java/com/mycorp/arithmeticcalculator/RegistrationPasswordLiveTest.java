@@ -19,51 +19,53 @@ import org.springframework.http.MediaType;
 import com.mycorp.springangularstarter.config.TestDbConfig;
 import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 
-@SpringBootTest(classes = { ArithmeticCalculatorApplication.class, TestDbConfig.class, TestIntegrationConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = {ArithmeticCalculatorApplication.class, TestDbConfig.class,
+		TestIntegrationConfig.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 public class RegistrationPasswordLiveTest {
-    private final String BASE_URI = "http://localhost";
+	private final String BASE_URI = "http://localhost";
 
-    @Value("${local.server.port}")
-    int port;
-    
-    @Test
-    public void givenInvalidPassword_thenBadRequest() {
-        // too short
-        assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("123"));
+	@Value("${local.server.port}")
+	int port;
 
-        // no special character
-        assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("1abZRplYU"));
+	@Test
+	public void givenInvalidPassword_thenBadRequest() {
+		// too short
+		assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("123"));
 
-        // no upper case letter
-        assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("1_abidpsvl"));
+		// no special character
+		assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("1abZRplYU"));
 
-        // no number
-        assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("abZRYUpl"));
+		// no upper case letter
+		assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("1_abidpsvl"));
 
-        // alphabet sequence
-        assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("1_abcdeZRYU"));
+		// no number
+		assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("abZRYUpl"));
 
-        // qwerty sequence
-        assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("1_abZRTYUI"));
+		// alphabet sequence
+		assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("1_abcdeZRYU"));
 
-        // numeric sequence
-        assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("123_zqrtU"));
+		// qwerty sequence
+		assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("1_abZRTYUI"));
 
-        // valid password
-        assertEquals(HttpStatus.OK.value(), getResponseForPassword("12_zwRHIPKA"));
-    }
+		// numeric sequence
+		assertEquals(HttpStatus.BAD_REQUEST.value(), getResponseForPassword("123_zqrtU"));
 
-    private int getResponseForPassword(String pass) {
-        final Map<String, String> param = new HashMap<String, String>();
-        final String randomName = UUID.randomUUID().toString();
-        param.put("firstName", randomName);
-        param.put("lastName", "Doe");
-        param.put("email", randomName + "@x.com");
-        param.put("password", pass);
-        param.put("matchingPassword", pass);
-        RestAssured.port = port;
-        RestAssured.baseURI = BASE_URI;
-        final Response response = RestAssured.given().formParams(param).accept(MediaType.APPLICATION_JSON_VALUE).post(BASE_URI + "/v1.0/user/register");
-        return response.getStatusCode();
-    }
+		// valid password
+		assertEquals(HttpStatus.OK.value(), getResponseForPassword("12_zwRHIPKA"));
+	}
+
+	private int getResponseForPassword(String pass) {
+		final Map<String, String> param = new HashMap<String, String>();
+		final String randomName = UUID.randomUUID().toString();
+		param.put("firstName", randomName);
+		param.put("lastName", "Doe");
+		param.put("email", randomName + "@x.com");
+		param.put("password", pass);
+		param.put("matchingPassword", pass);
+		RestAssured.port = port;
+		RestAssured.baseURI = BASE_URI;
+		final Response response = RestAssured.given().formParams(param).accept(MediaType.APPLICATION_JSON_VALUE)
+				.post(BASE_URI + "/v1.0/user/register");
+		return response.getStatusCode();
+	}
 }

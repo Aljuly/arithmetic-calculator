@@ -11,50 +11,50 @@ import com.mycorp.arithmeticcalculator.dto.UserDto;
 import com.mycorp.arithmeticcalculator.error.UserAlreadyExistException;
 
 public interface IUserAuthService {
-	
-    static final String TOKEN_INVALID = "invalidToken";
-    static final String TOKEN_EXPIRED = "expired";
-    static final String TOKEN_VALID = "valid";
 
-    static String QR_PREFIX = "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
-    static String APP_NAME = "SpringRegistration";
+	static final String TOKEN_INVALID = "invalidToken";
+	static final String TOKEN_EXPIRED = "expired";
+	static final String TOKEN_VALID = "valid";
 
-    User registerNewUserAccount(UserDto accountDto) throws UserAlreadyExistException;
+	static String QR_PREFIX = "https://chart.googleapis.com/chart?chs=200x200&chld=M%%7C0&cht=qr&chl=";
+	static String APP_NAME = "SpringRegistration";
 
-    User getUser(String verificationToken);
-    
-    User getUserByPasswordResetToken(String token);
-    
-    User findUserByEmail(String email);
-    
-    User findUserByName(String name);
-    
-    Optional<User> getUserByID(long id);
+	User registerNewUserAccount(UserDto accountDto) throws UserAlreadyExistException;
 
-    void saveRegisteredUser(User user);
+	User getUser(String verificationToken);
 
-    void deleteUser(User user);
+	User getUserByPasswordResetToken(String token);
 
-    void createVerificationTokenForUser(User user, String token);
+	User findUserByEmail(String email);
 
-    VerificationToken getVerificationToken(String VerificationToken);
+	User findUserByName(String name);
 
-    VerificationToken generateNewVerificationToken(String token);
+	Optional<User> getUserByID(long id);
 
-    void createPasswordResetTokenForUser(User user, String token);
+	void saveRegisteredUser(User user);
 
-    PasswordResetToken getPasswordResetToken(String token);
+	void deleteUser(User user);
 
-    void changeUserPassword(User user, String password);
+	void createVerificationTokenForUser(User user, String token);
 
-    boolean checkIfValidOldPassword(User user, String password);
+	VerificationToken getVerificationToken(String VerificationToken);
 
-    String validateVerificationToken(String token);
+	VerificationToken generateNewVerificationToken(String token);
 
-    String generateQRUrl(User user) throws UnsupportedEncodingException;
+	void createPasswordResetTokenForUser(User user, String token);
 
-    User updateUser2FA(boolean use2FA);
+	PasswordResetToken getPasswordResetToken(String token);
 
-    List<User> getUsersFromSessionRegistry();
+	void changeUserPassword(User user, String password);
+
+	boolean checkIfValidOldPassword(User user, String password);
+
+	String validateVerificationToken(String token);
+
+	String generateQRUrl(User user) throws UnsupportedEncodingException;
+
+	User updateUser2FA(boolean use2FA);
+
+	List<User> getUsersFromSessionRegistry();
 
 }

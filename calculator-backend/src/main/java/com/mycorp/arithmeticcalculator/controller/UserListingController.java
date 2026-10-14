@@ -32,89 +32,68 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/v1.0/users")
 @Slf4j
 public class UserListingController {
-	
+
 	private final IUserListingService userListingService;
 
 	public UserListingController(IUserListingService userListingService) {
 		this.userListingService = userListingService;
 	}
-	
-    @ApiOperation(value = "Get User list", nickname = "getAllUsers", response = List.class, 
-    		tags = {"user-endpoint"})
-    @ApiResponses(value = {
-    		@ApiResponse(code = 200, message = "OK", response = Resource.class)
-    })
-	@GetMapping(produces = { "application/json" })
-	public ResponseEntity<Page<UserResponce>> getAllUsers(
-			@RequestParam(defaultValue = "") String login,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "ASC") String sortOrder) {
-		return ResponseEntity.ok(userListingService.findAll(page, size, sortBy, sortOrder)); 
+
+	@ApiOperation(value = "Get User list", nickname = "getAllUsers", response = List.class, tags = {"user-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Resource.class)})
+	@GetMapping(produces = {"application/json"})
+	public ResponseEntity<Page<UserResponce>> getAllUsers(@RequestParam(defaultValue = "") String login,
+			@RequestParam(defaultValue = "0") Integer page, @RequestParam(defaultValue = "10") Integer size,
+			@RequestParam(defaultValue = "id") String sortBy, @RequestParam(defaultValue = "ASC") String sortOrder) {
+		return ResponseEntity.ok(userListingService.findAll(page, size, sortBy, sortOrder));
 	}
-	
-    @ApiOperation(value = "Delete User", nickname = "deleteUser", response = String.class, 
-    		tags = {"user-endpoint"})
-    @ApiResponses(value = {
-    		@ApiResponse(code = 200, message = "OK", response = Resource.class),
-    		@ApiResponse(code = 404, message = "Not Found")
-    })
-    @DeleteMapping(value = "{userId}", produces = { "application/json"})
+
+	@ApiOperation(value = "Delete User", nickname = "deleteUser", response = String.class, tags = {"user-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Resource.class),
+			@ApiResponse(code = 404, message = "Not Found")})
+	@DeleteMapping(value = "{userId}", produces = {"application/json"})
 	public ResponseEntity<Resource> delete(@PathVariable("userId") Long userId) {
-    	userListingService.deleteUser(userId);
+		userListingService.deleteUser(userId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
-    @ApiOperation(value ="Get user by Login name", nickname = "getByName", response = String.class,
-    		tags = {"user-endpoint"})
-    @ApiResponses(value = {
-    		@ApiResponse(code = 200, message = "OK", response = Resource.class),
-    		@ApiResponse(code = 404, message = "User not found", response = Resource.class)
-    })
-    @GetMapping(value ="/by-name/{name}", produces = {"application/json"})
+
+	@ApiOperation(value = "Get user by Login name", nickname = "getByName", response = String.class, tags = {
+			"user-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Resource.class),
+			@ApiResponse(code = 404, message = "User not found", response = Resource.class)})
+	@GetMapping(value = "/by-name/{name}", produces = {"application/json"})
 	public ResponseEntity<UserResponce> getByName(@PathVariable("name") String name) {
-    	log.info("Getting User by name: {}", name);
+		log.info("Getting User by name: {}", name);
 		return ResponseEntity.ok(userListingService.getByNme(name));
 	}
-	
-    @ApiOperation(value = "Create User", nickname = "createUser", response = Resource.class,
-    		tags = {"user-endpoint"})
-    @ApiResponses(value = {
-    		@ApiResponse(code = 200, message = "OK", response = Resource.class)
-    })
-    @PostMapping(produces = {"application/json"}, consumes = {"application/json"})
+
+	@ApiOperation(value = "Create User", nickname = "createUser", response = Resource.class, tags = {"user-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Resource.class)})
+	@PostMapping(produces = {"application/json"}, consumes = {"application/json"})
 	public ResponseEntity<UserResponce> create(@RequestBody UserResponce user) {
 		return ResponseEntity.ok(userListingService.createUserRecord(user));
 	}
-	
-    @ApiOperation(value = "Updte User", nickname = "updateUser", response = Resource.class,
-    		tags = {"user-endpoint"})
-    @ApiResponses(value = {
-    		@ApiResponse(code = 200, message = "OK", response = Resource.class),
-    		@ApiResponse(code = 400, message = "Invalid status value", response = Resource.class)
-    })
-    @PutMapping(produces = {"application/json"}, consumes = {"application/json"})
+
+	@ApiOperation(value = "Updte User", nickname = "updateUser", response = Resource.class, tags = {"user-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Resource.class),
+			@ApiResponse(code = 400, message = "Invalid status value", response = Resource.class)})
+	@PutMapping(produces = {"application/json"}, consumes = {"application/json"})
 	public ResponseEntity<Resource> update(@RequestBody UserResponce user) {
-    	userListingService.updateUserRecord(user);
-    	return new ResponseEntity<>(HttpStatus.OK);
+		userListingService.updateUserRecord(user);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
-	@ApiOperation(value = "Check if the User email exists", nickname = "isEmailUnique", response = String.class,
-			tags = {"user-endpoint"})
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Unique: true/false", response = String.class)
-	})
+
+	@ApiOperation(value = "Check if the User email exists", nickname = "isEmailUnique", response = String.class, tags = {
+			"user-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "Unique: true/false", response = String.class)})
 	@GetMapping(value = "/email-check", produces = {"application/json"})
 	public ResponseEntity<String> isEmailUnique(@RequestParam("email") String email) {
 		return ResponseEntity.ok(userListingService.checkUserEmail(email));
 	}
-	
-	@ApiOperation(value = "Check if the User Login exists", nickname = "isUsernameUnique", response = String.class,
-			tags = {"user-endpoint"})
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Unique: true/false", response = String.class)
-	})
+
+	@ApiOperation(value = "Check if the User Login exists", nickname = "isUsernameUnique", response = String.class, tags = {
+			"user-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "Unique: true/false", response = String.class)})
 	@GetMapping(value = "/login-check", produces = {"application/json"})
 	public ResponseEntity<String> isUsernameUnique(@RequestParam("username") String username) {
 		return ResponseEntity.ok(userListingService.checkUserName(username));

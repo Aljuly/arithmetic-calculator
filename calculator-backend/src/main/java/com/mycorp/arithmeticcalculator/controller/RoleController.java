@@ -31,53 +31,42 @@ import io.swagger.annotations.ApiResponses;
 @RestController
 @RequestMapping(value = "/v1.0/roles")
 public class RoleController {
-	
+
 	private final IRoleService roleService;
 
 	public RoleController(RoleService roleService) {
 		this.roleService = roleService;
 	}
-	
-    @ApiOperation(value = "Retrieve Roles list", nickname = "getAllRoles", response = List.class, 
-    		tags = {"role-endpoint"})
-    @ApiResponses(value = {
-    		@ApiResponse(code = 200, message = "OK", response = Resource.class)
-    })
-    @GetMapping(produces = { "application/json" })
+
+	@ApiOperation(value = "Retrieve Roles list", nickname = "getAllRoles", response = List.class, tags = {
+			"role-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Resource.class)})
+	@GetMapping(produces = {"application/json"})
 	public ResponseEntity<List<RoleDto>> getAll() {
 		return ResponseEntity.ok(roleService.getAllRoles());
 	}
-	
-    @ApiOperation(value = "Delete Role", nickname = "deleteRole", response = String.class, 
-    		tags = {"role-endpoint"})
-    @ApiResponses(value = {
-    		@ApiResponse(code = 200, message = "OK", response = Resource.class),
-    		@ApiResponse(code = 404, message = "Not Found")
-    })
-    @DeleteMapping(value = "/{roleId}", produces = { "application/json" })
+
+	@ApiOperation(value = "Delete Role", nickname = "deleteRole", response = String.class, tags = {"role-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Resource.class),
+			@ApiResponse(code = 404, message = "Not Found")})
+	@DeleteMapping(value = "/{roleId}", produces = {"application/json"})
 	public ResponseEntity<Resource> delete(@PathVariable("roleId") Long roleId) throws RoleNotFoundException {
-    	roleService.deleteRole(roleId);
+		roleService.deleteRole(roleId);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
-	
-	@ApiOperation(value = "Create Role", nickname = "saveRole", response = String.class, 
-			tags = {"role-endpoint"})
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "Created", response = String.class)
-    })
+
+	@ApiOperation(value = "Create Role", nickname = "saveRole", response = String.class, tags = {"role-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "Created", response = String.class)})
 	@PostMapping(produces = {"application/json"}, consumes = {"application/json"})
 	public ResponseEntity<RoleDto> create(@RequestBody RoleDto role) throws RoleProcessException {
 		return ResponseEntity.ok(roleService.createRole(role));
 	}
-	
+
 	// Not implemented
-	@ApiOperation(value = "Save Role", nickname = "saveRole", response = String.class, 
-			tags = {"role-endpoint"})
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "Saved", response = String.class),
-            @ApiResponse(code = 400, message = "Invalid status value", response = String.class),
-    })
-	@PutMapping(value ="/v1.0/roles", produces = {"application/json"}, consumes = {"application/json"})
+	@ApiOperation(value = "Save Role", nickname = "saveRole", response = String.class, tags = {"role-endpoint"})
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "Saved", response = String.class),
+			@ApiResponse(code = 400, message = "Invalid status value", response = String.class),})
+	@PutMapping(value = "/v1.0/roles", produces = {"application/json"}, consumes = {"application/json"})
 	public ResponseEntity<Resource> update(@RequestBody RoleDto role) {
 		return ResponseEntity.notFound().build();
 	}

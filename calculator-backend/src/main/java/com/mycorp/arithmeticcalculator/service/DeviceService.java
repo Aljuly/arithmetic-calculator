@@ -27,144 +27,133 @@ import static java.util.Objects.nonNull;
 
 @Component
 public class DeviceService {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final String UNKNOWN = "UNKNOWN";
+	private static final String UNKNOWN = "UNKNOWN";
 
-    @Value("${support.email}")
-    private String from;
+	@Value("${support.email}")
+	private String from;
 
-    private DeviceMetadataRepository deviceMetadataRepository;
-    private DatabaseReader databaseReader;
-    private Parser parser;
-    private JavaMailSender mailSender;
-    private MessageSource messages;
+	private DeviceMetadataRepository deviceMetadataRepository;
+	private DatabaseReader databaseReader;
+	private Parser parser;
+	private JavaMailSender mailSender;
+	private MessageSource messages;
 
-    public DeviceService(DeviceMetadataRepository deviceMetadataRepository,
-                         DatabaseReader databaseReader,
-                         Parser parser,
-                         JavaMailSender mailSender,
-                         MessageSource messages) {
-        this.deviceMetadataRepository = deviceMetadataRepository;
-        this.databaseReader = databaseReader;
-        this.parser = parser;
-        this.mailSender = mailSender;
-        this.messages = messages;
-    }
+	public DeviceService(DeviceMetadataRepository deviceMetadataRepository, DatabaseReader databaseReader,
+			Parser parser, JavaMailSender mailSender, MessageSource messages) {
+		this.deviceMetadataRepository = deviceMetadataRepository;
+		this.databaseReader = databaseReader;
+		this.parser = parser;
+		this.mailSender = mailSender;
+		this.messages = messages;
+	}
 
-    public void verifyDevice(User user, HttpServletRequest request) throws IOException, GeoIp2Exception {
+	public void verifyDevice(User user, HttpServletRequest request) throws IOException, GeoIp2Exception {
 
-        String ip = extractIp(request);
-        
-        String location;
-        
-        if (ip.equals("127.0.0.1")) {
-        	location = "Local Machine";
-        } else {
-        	location = getIpLocation(ip);
-        }
-        
-        String deviceDetails = getDeviceDetails(request.getHeader("user-agent"));
+		String ip = extractIp(request);
 
-        DeviceMetadata existingDevice = findExistingDevice(user.getId(), deviceDetails, location);
+		String location;
 
-        if (Objects.isNull(existingDevice)) {
-            unknownDeviceNotification(deviceDetails, location, ip, user.getEmail(), request.getLocale());
+		if (ip.equals("127.0.0.1")) {
+			location = "Local Machine";
+		} else {
+			location = getIpLocation(ip);
+		}
 
-            DeviceMetadata deviceMetadata = new DeviceMetadata();
-            deviceMetadata.setUserId(user.getId());
-            deviceMetadata.setLocation(location);
-            deviceMetadata.setDeviceDetails(deviceDetails);
-            deviceMetadata.setLastLoggedIn(new Date());
-            deviceMetadataRepository.save(deviceMetadata);
-        } else {
-            existingDevice.setLastLoggedIn(new Date());
-            deviceMetadataRepository.save(existingDevice);
-        }
+		String deviceDetails = getDeviceDetails(request.getHeader("user-agent"));
 
-    }
+		DeviceMetadata existingDevice = findExistingDevice(user.getId(), deviceDetails, location);
 
-    private String extractIp(HttpServletRequest request) {
-        String clientIp;
-        String clientXForwardedForIp = request.getHeader("x-forwarded-for");
-        if (nonNull(clientXForwardedForIp)) {
-            clientIp = parseXForwardedHeader(clientXForwardedForIp);
-        } else {
-            clientIp = request.getRemoteAddr();
-        }
+		if (Objects.isNull(existingDevice)) {
+			unknownDeviceNotification(deviceDetails, location, ip, user.getEmail(), request.getLocale());
 
-        return clientIp;
-    }
+			DeviceMetadata deviceMetadata = new DeviceMetadata();
+			deviceMetadata.setUserId(user.getId());
+			deviceMetadata.setLocation(location);
+			deviceMetadata.setDeviceDetails(deviceDetails);
+			deviceMetadata.setLastLoggedIn(new Date());
+			deviceMetadataRepository.save(deviceMetadata);
+		} else {
+			existingDevice.setLastLoggedIn(new Date());
+			deviceMetadataRepository.save(existingDevice);
+		}
 
-    private String parseXForwardedHeader(String header) {
-        return header.split(" *, *")[0];
-    }
+	}
 
-    private String getDeviceDetails(String userAgent) {
-        String deviceDetails = UNKNOWN;
+	private String extractIp(HttpServletRequest request) {
+		String clientIp;
+		String clientXForwardedForIp = request.getHeader("x-forwarded-for");
+		if (nonNull(clientXForwardedForIp)) {
+			clientIp = parseXForwardedHeader(clientXForwardedForIp);
+		} else {
+			clientIp = request.getRemoteAddr();
+		}
 
-        Client client = parser.parse(userAgent);
-        if (Objects.nonNull(client)) {
-            deviceDetails = client.userAgent.family + " " + client.userAgent.major + "." + client.userAgent.minor +
-                    " - " + client.os.family + " " + client.os.major + "." + client.os.minor;
-        }
+		return clientIp;
+	}
 
-        return deviceDetails;
-    }
+	private String parseXForwardedHeader(String header) {
+		return header.split(" *, *")[0];
+	}
 
-    private String getIpLocation(String ip) throws IOException, GeoIp2Exception {
+	private String getDeviceDetails(String userAgent) {
+		String deviceDetails = UNKNOWN;
 
-        String location = UNKNOWN;
+		Client client = parser.parse(userAgent);
+		if (Objects.nonNull(client)) {
+			deviceDetails = client.userAgent.family + " " + client.userAgent.major + "." + client.userAgent.minor
+					+ " - " + client.os.family + " " + client.os.major + "." + client.os.minor;
+		}
 
-        InetAddress ipAddress = InetAddress.getByName(ip);
+		return deviceDetails;
+	}
 
-        CityResponse cityResponse = databaseReader.city(ipAddress);
-        if (Objects.nonNull(cityResponse) &&
-                Objects.nonNull(cityResponse.getCity()) &&
-                !Strings.isNullOrEmpty(cityResponse.getCity().getName())) {
+	private String getIpLocation(String ip) throws IOException, GeoIp2Exception {
 
-            location = cityResponse.getCity().getName();
-        }
+		String location = UNKNOWN;
 
-        return location;
-    }
+		InetAddress ipAddress = InetAddress.getByName(ip);
 
-    private DeviceMetadata findExistingDevice(Long userId, String deviceDetails, String location) {
+		CityResponse cityResponse = databaseReader.city(ipAddress);
+		if (Objects.nonNull(cityResponse) && Objects.nonNull(cityResponse.getCity())
+				&& !Strings.isNullOrEmpty(cityResponse.getCity().getName())) {
 
-        List<DeviceMetadata> knownDevices = deviceMetadataRepository.findByUserId(userId);
+			location = cityResponse.getCity().getName();
+		}
 
-        for (DeviceMetadata existingDevice : knownDevices) {
-            if (existingDevice.getDeviceDetails().equals(deviceDetails) &&
-                    existingDevice.getLocation().equals(location)) {
-                return existingDevice;
-            }
-        }
+		return location;
+	}
 
-        return null;
-    }
+	private DeviceMetadata findExistingDevice(Long userId, String deviceDetails, String location) {
 
-    private void unknownDeviceNotification(String deviceDetails, String location, String ip, String email, Locale locale) {
-        final String subject = "New Login Notification";
-        final SimpleMailMessage notification = new SimpleMailMessage();
-        notification.setTo(email);
-        notification.setSubject(subject);
+		List<DeviceMetadata> knownDevices = deviceMetadataRepository.findByUserId(userId);
 
-        String text = messages
-                .getMessage("message.login.notification.deviceDetails", null, locale) +
-                " " + deviceDetails +
-                "\n" +
-                messages
-                        .getMessage("message.login.notification.location", null, locale) +
-                " " + location +
-                "\n" +
-                messages
-                        .getMessage("message.login.notification.ip", null, locale) +
-                " " + ip;
+		for (DeviceMetadata existingDevice : knownDevices) {
+			if (existingDevice.getDeviceDetails().equals(deviceDetails)
+					&& existingDevice.getLocation().equals(location)) {
+				return existingDevice;
+			}
+		}
 
-        notification.setText(text);
-        notification.setFrom(from);
+		return null;
+	}
 
-        mailSender.send(notification);
-    }
+	private void unknownDeviceNotification(String deviceDetails, String location, String ip, String email,
+			Locale locale) {
+		final String subject = "New Login Notification";
+		final SimpleMailMessage notification = new SimpleMailMessage();
+		notification.setTo(email);
+		notification.setSubject(subject);
+
+		String text = messages.getMessage("message.login.notification.deviceDetails", null, locale) + " "
+				+ deviceDetails + "\n" + messages.getMessage("message.login.notification.location", null, locale) + " "
+				+ location + "\n" + messages.getMessage("message.login.notification.ip", null, locale) + " " + ip;
+
+		notification.setText(text);
+		notification.setFrom(from);
+
+		mailSender.send(notification);
+	}
 
 }

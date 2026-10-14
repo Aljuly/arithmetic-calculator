@@ -30,71 +30,62 @@ import com.mycorp.arithmeticcalculator.domain.FileEntity;
 import com.mycorp.springangularstarter.config.TestDbConfig;
 import com.mycorp.springangularstarter.config.TestIntegrationConfig;
 
-@SpringBootTest(classes = { TestDbConfig.class, TestIntegrationConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = {TestDbConfig.class,
+		TestIntegrationConfig.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Transactional
 public class FileEndpointTest {
-	
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-	
-    @PersistenceContext
-    private EntityManager entityManager;
-	
-	private MockMvc mockMvc;	
-	
+
+	@Autowired
+	private WebApplicationContext webApplicationContext;
+
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	private MockMvc mockMvc;
+
 	private Resource defaultImage;
-	
+
 	@BeforeEach
 	public void setUp() {
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 		this.defaultImage = new ClassPathResource("img/unknown-person.png");
 	}
-	
+
 	@Test
 	public void shouldReturnLogoWhenIdGiven() throws Exception {
-        FileEntity fileLogoEntity = new FileEntity();
-        fileLogoEntity.setName("test.png");
-        fileLogoEntity.setData(StreamUtils.copyToByteArray(defaultImage.getInputStream()));
-        fileLogoEntity.setContentType(MediaType.IMAGE_PNG_VALUE);
-        entityManager.persist(fileLogoEntity);
-        entityManager.flush();
-        entityManager.clear();
+		FileEntity fileLogoEntity = new FileEntity();
+		fileLogoEntity.setName("test.png");
+		fileLogoEntity.setData(StreamUtils.copyToByteArray(defaultImage.getInputStream()));
+		fileLogoEntity.setContentType(MediaType.IMAGE_PNG_VALUE);
+		entityManager.persist(fileLogoEntity);
+		entityManager.flush();
+		entityManager.clear();
 
-        String imageId = fileLogoEntity.getId().toString();
+		String imageId = fileLogoEntity.getId().toString();
 
-        // Test existing image
-        mockMvc.perform(get("/v1.0/images/{imageId}", imageId))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.IMAGE_PNG_VALUE))
-            .andExpect(content().bytes(StreamUtils.copyToByteArray(defaultImage.getInputStream())));
+		// Test existing image
+		mockMvc.perform(get("/v1.0/images/{imageId}", imageId)).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.IMAGE_PNG_VALUE))
+				.andExpect(content().bytes(StreamUtils.copyToByteArray(defaultImage.getInputStream())));
 
-        // Test non-existing image should return 404
-        mockMvc.perform(get("/v1.0/images/{imageId}", "123456"))
-            .andExpect(status().isOk());
+		// Test non-existing image should return 404
+		mockMvc.perform(get("/v1.0/images/{imageId}", "123456")).andExpect(status().isOk());
 	}
 
 	@Test
 	public void shouldReturnDefaultImage() throws Exception {
 		final byte[] logoBytes = StreamUtils.copyToByteArray(defaultImage.getInputStream());
-		mockMvc.perform(get("/v1.0/images/default"))
-			.andExpect(status().isOk())
-			.andExpect(content().contentType(MediaType.IMAGE_PNG))
-			.andExpect(content().bytes(logoBytes));
+		mockMvc.perform(get("/v1.0/images/default")).andExpect(status().isOk())
+				.andExpect(content().contentType(MediaType.IMAGE_PNG)).andExpect(content().bytes(logoBytes));
 	}
 
 	@Test
 	public void shouldSaveLogoImageAndReturnLocation() throws Exception {
-		final MockMultipartFile logo = new MockMultipartFile(
-				"file",
-				"logo.png",
-				MediaType.IMAGE_PNG_VALUE,
+		final MockMultipartFile logo = new MockMultipartFile("file", "logo.png", MediaType.IMAGE_PNG_VALUE,
 				StreamUtils.copyToByteArray(defaultImage.getInputStream()));
 		final MockHttpServletRequestBuilder request = MockMvcRequestBuilders.multipart("/v1.0/images").file(logo);
-		final String location = mockMvc.perform(request)
-				.andExpect(status().isOk())
-				.andReturn()
-				.getResponse()
+		final String location = mockMvc.perform(request).andExpect(status().isOk()).andReturn().getResponse()
 				.getContentAsString();
 		Assertions.assertNotNull(location);
 	}

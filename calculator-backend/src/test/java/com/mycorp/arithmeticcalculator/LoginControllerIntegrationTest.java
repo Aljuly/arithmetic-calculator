@@ -29,49 +29,42 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.stream.Stream;
 
-@SpringBootTest(classes = { TestDbConfig.class, TestIntegrationConfig.class }, webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = {TestDbConfig.class,
+		TestIntegrationConfig.class}, webEnvironment = WebEnvironment.RANDOM_PORT)
 @Transactional
 @Slf4j
 public class LoginControllerIntegrationTest {
-	
+
 	@Autowired
 	private WebApplicationContext webApplicationContext;
 
 	private MockMvc mockMvc;
-	
-    @BeforeEach
-    public void setUp() {
+
+	@BeforeEach
+	public void setUp() {
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
+	}
 
 	@ParameterizedTest
 	@MethodSource("provideTestData")
 	@WithAnonymousUser
-    public void shouldReturnToken_WhenUserLogin(String body, int status,
-												String titleOne, String valOne,
-												String titleTwo, String valTwo) throws Exception {
-		mockMvc.perform(post("/v1.0/login")
-				.characterEncoding("utf-8")
-				.content(body)
-				.header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON))
-				.andDo(print())
-				.andExpect(status().is(status))
+	public void shouldReturnToken_WhenUserLogin(String body, int status, String titleOne, String valOne,
+			String titleTwo, String valTwo) throws Exception {
+		mockMvc.perform(post("/v1.0/login").characterEncoding("utf-8").content(body).header(HttpHeaders.CONTENT_TYPE,
+				MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().is(status))
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath(titleOne, containsString(valOne)))
 				.andExpect(jsonPath(titleTwo, containsString(valTwo)));
 	}
 
 	private static Stream<Arguments> provideTestData() {
-    	return Stream.of(
-    			Arguments.of("{\"email\": \"test@test.com\", \"password\": \"Passw0rd!\"}", 200,
-						"$.login", "test@test.com",
-						"$.token", "."),
-				Arguments.of("{\"email\": \"test@test.com\", \"password\": \"123456\"}", 503,
-						"$.message", "Unauthorized Access",
-						"$.error", "AuthError"),
-				Arguments.of("{\"email\": \"noname@test.com\", \"password\": \"123\"}", 404,
-						"$.message", "User Not Found",
-						"$.error", "UserNotFound")
+		return Stream.of(
+				Arguments.of("{\"email\": \"test@test.com\", \"password\": \"Passw0rd!\"}", 200, "$.login",
+						"test@test.com", "$.token", "."),
+				Arguments.of("{\"email\": \"test@test.com\", \"password\": \"123456\"}", 503, "$.message",
+						"Unauthorized Access", "$.error", "AuthError"),
+				Arguments.of("{\"email\": \"noname@test.com\", \"password\": \"123\"}", 404, "$.message",
+						"User Not Found", "$.error", "UserNotFound")
 
 		);
 	}

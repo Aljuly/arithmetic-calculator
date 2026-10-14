@@ -23,25 +23,22 @@ import com.mycorp.arithmeticcalculator.service.FileService;
 public class FileServiceTest {
 
 	private FileService fileService;
-	
+
 	@Mock
 	MultipartFile multipartFile;
-	
+
 	@Mock
 	FileEntityRepository entityRepository;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.openMocks(this);
 		fileService = spy(new FileService(entityRepository));
 	}
-	
+
 	@Test
 	public void testSaveLogo() throws Exception {
-		MockMultipartFile logo = new MockMultipartFile(
-				"file", 
-				"logo.png", 
-				MediaType.IMAGE_PNG_VALUE, 
+		MockMultipartFile logo = new MockMultipartFile("file", "logo.png", MediaType.IMAGE_PNG_VALUE,
 				"some-entry".getBytes());
 		FileEntity logoEntity = new FileEntity();
 		Long logoId = 10000L;
@@ -50,7 +47,7 @@ public class FileServiceTest {
 		String imageId = fileService.persistFile(logo);
 		assertEquals(imageId, logoId.toString());
 	}
-	
+
 	@Test
 	public void shouldReturnEmptyStringWhenExceptionThrowing() throws IOException {
 		doThrow(IOException.class).when(multipartFile).getBytes();

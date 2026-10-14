@@ -10,22 +10,22 @@ import org.springframework.data.jpa.repository.Query;
 import com.mycorp.arithmeticcalculator.domain.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-	
+
 	@Override
 	Page<User> findAll(Pageable pageable);
-	
-	User findByLogin(String username);
-	
-	@Override
-    void delete(User user);
-		
-    User findByEmail(String email);
 
-    User findUserByEmail(String email);
-    
-    @Query(value = "SELECT * from _user WHERE id = ?1", nativeQuery = true)
+	User findByLogin(String username);
+
+	@Override
+	void delete(User user);
+
+	User findByEmail(String email);
+
+	User findUserByEmail(String email);
+
+	@Query(value = "SELECT * from _user WHERE id = ?1", nativeQuery = true)
 	User findUserById(Long id);
-	
+
 	List<User> findAll();
 
 }

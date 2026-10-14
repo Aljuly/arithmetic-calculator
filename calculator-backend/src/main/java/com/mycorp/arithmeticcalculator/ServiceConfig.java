@@ -16,38 +16,38 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 @Configuration
-@ComponentScan({ "com.mycorp.arithmeticcalculator" })
+@ComponentScan({"com.mycorp.arithmeticcalculator"})
 public class ServiceConfig {
-    @Bean
-    LocaleResolver localeResolver() {
-        SessionLocaleResolver slr = new SessionLocaleResolver();
-        slr.setDefaultLocale(Locale.US);
-        return slr;
-    }
+	@Bean
+	LocaleResolver localeResolver() {
+		SessionLocaleResolver slr = new SessionLocaleResolver();
+		slr.setDefaultLocale(Locale.US);
+		return slr;
+	}
 
-    @Bean
-    LocaleChangeInterceptor localeChangeInterceptor() {
-        LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
-        lci.setParamName("lang");
-        return lci;
-    }
-    
-    @Bean
-    MessageSource messageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:messages_en");
-        messageSource.setDefaultEncoding("UTF-8");
-        return messageSource;
-    }
-    
-    @Bean
-    PasswordEncoder encoder() {
-        return new BCryptPasswordEncoder(11);
-    }
-    
-    @Bean
-    SessionRegistry sessionRegistry() {
-        return new SessionRegistryImpl();
-    }
+	@Bean
+	LocaleChangeInterceptor localeChangeInterceptor() {
+		LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+		lci.setParamName("lang");
+		return lci;
+	}
+
+	@Bean
+	MessageSource messageSource() {
+		ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+		messageSource.setBasename("classpath:messages_en");
+		messageSource.setDefaultEncoding("UTF-8");
+		return messageSource;
+	}
+
+	@Bean
+	PasswordEncoder encoder() {
+		return new BCryptPasswordEncoder(11);
+	}
+
+	@Bean
+	SessionRegistry sessionRegistry() {
+		return new SessionRegistryImpl();
+	}
 
 }

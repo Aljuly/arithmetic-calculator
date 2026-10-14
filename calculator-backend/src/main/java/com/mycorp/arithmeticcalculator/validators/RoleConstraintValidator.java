@@ -12,11 +12,10 @@ public class RoleConstraintValidator implements ConstraintValidator<ValidRoleNam
 	private Matcher matcher;
 	private static final String ROLE_NAME_PATTERN = "^[A-Z]+(?:_[A-Z]+)*$";
 
-	
-    @Override
-    public void initialize(ValidRoleName arg0) {
-    }
-	
+	@Override
+	public void initialize(ValidRoleName arg0) {
+	}
+
 	@Override
 	public boolean isValid(final String value, ConstraintValidatorContext context) {
 		pattern = Pattern.compile(ROLE_NAME_PATTERN);

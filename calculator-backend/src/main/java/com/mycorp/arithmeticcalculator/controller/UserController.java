@@ -28,42 +28,38 @@ import io.swagger.annotations.ApiResponses;
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private ActiveUserStore activeUserStore;
-
-    @Autowired
-    private IUserAuthService userService;
+	@Autowired
+	private ActiveUserStore activeUserStore;
 
 	@Autowired
-	private MessageSource messages; 
-    
+	private IUserAuthService userService;
+
+	@Autowired
+	private MessageSource messages;
+
 	@ApiOperation(value = "Retrieves all LoggedIn users")
-	@ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Retrieves all LoggedIn users")
-    })
-    @GetMapping("/loggedUsers")
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "Retrieves all LoggedIn users")})
+	@GetMapping("/loggedUsers")
 	public ResponseEntity<Iterable<String>> getLoggedUsers() {
 		return new ResponseEntity<>(activeUserStore.getUsers(), HttpStatus.OK);
 	}
 
-    @ApiOperation(value = "View a list of users")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Retrieves all available users")
-    })
-    @GetMapping("/loggedUsersFromSessionRegistry")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return new ResponseEntity<>(userService.getUsersFromSessionRegistry(), HttpStatus.OK);        
-    }
-    
-    @ApiOperation(value = "Retrieves an existing User")
-    @ApiResponses(value = { 
-            @ApiResponse(code = 200, message = "Body: User data"),
-            @ApiResponse(code = 404, message = "The resource you were trying to reach is not found")
-    })
-    @GetMapping("{userId}")
-    public ResponseEntity<?> getUserById(final Locale locale,
-            @ApiParam(value = "User id from which user object will retrieve", required = true) @PathVariable Long userId) {
-    	return new ResponseEntity<>(userService.getUserByID(userId)
-    			.orElseThrow(() -> new ResourceNotFoundException(messages.getMessage("message.userNotFound", null, locale))), HttpStatus.OK);
-    }
+	@ApiOperation(value = "View a list of users")
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "Retrieves all available users")})
+	@GetMapping("/loggedUsersFromSessionRegistry")
+	public ResponseEntity<List<User>> getAllUsers() {
+		return new ResponseEntity<>(userService.getUsersFromSessionRegistry(), HttpStatus.OK);
+	}
+
+	@ApiOperation(value = "Retrieves an existing User")
+	@ApiResponses(value = {@ApiResponse(code = 200, message = "Body: User data"),
+			@ApiResponse(code = 404, message = "The resource you were trying to reach is not found")})
+	@GetMapping("{userId}")
+	public ResponseEntity<?> getUserById(final Locale locale,
+			@ApiParam(value = "User id from which user object will retrieve", required = true) @PathVariable Long userId) {
+		return new ResponseEntity<>(
+				userService.getUserByID(userId).orElseThrow(
+						() -> new ResourceNotFoundException(messages.getMessage("message.userNotFound", null, locale))),
+				HttpStatus.OK);
+	}
 }
