@@ -168,32 +168,78 @@ sequenceDiagram
 
 ## 📡 API reference
 
-All account endpoints live under **`/v1.0/user`**. Interactive docs: **`/swagger-ui.html`** (SpringFox).
+Interactive docs: **`/swagger-ui.html`** (SpringFox). The API is stateless: get a token from `/v1.0/login`, then send it on every request as `Authorization: Bearer <token>`.
 
-| Method | Endpoint | Access | Purpose |
-|---|---|---|---|
-| `POST` | `/register` | public | Create an account (JSON `UserDto`) and send the verification email |
-| `GET` | `/registrationConfirm?token=` | ⚠️ see [known gaps](#%EF%B8%8F-known-gaps) | Verify the email address |
-| `GET` | `/resendRegistrationToken?token=` | public | Replace an old verification token and email the new one |
-| `POST` | `/resetPassword?email=` | public | Email a password-reset link |
-| `GET` | `/changePassword?id=&token=` | public | Validate a reset token and redirect |
-| `POST` | `/savePassword` | `READ_PRIVILEGE` | Set a new password after a reset |
-| `POST` | `/updatePassword` | `READ_PRIVILEGE` | Change password (requires the old one) |
-| `POST` | `/update/2fa?use2FA=` | signed-in user | Toggle 2FA; returns a QR-code URL when enabling |
+**Access:** 🌐 public · 🔑 any signed-in user · 👤 `ROLE_USER` or `ROLE_ADMIN` · 🛡️ `ROLE_ADMIN` only. Access rules come from `SecSecurityConfig` and `@PreAuthorize`. All successful responses are `200 OK`. ⚠️ marks an endpoint that doesn't currently work as intended; see [known gaps](#%EF%B8%8F-known-gaps).
 
-Other API groups: `POST /v1.0/login` (JWT), `/v1.0/users/**` and `/v1.0/roles/**` (admin), `/v1.0/images/**` (avatars).
+### Authentication
 
-Responses use a simple envelope:
+| Method | Endpoint | Access | Input | Response |
+|---|---|---|---|---|
+| `POST` | `/v1.0/login` | 🌐 | JSON `LoginRequest` `{ email, password }` | `LoginResponse` `{ login, token }`. Bad credentials → `503` |
 
-```json
-{ "message": "success" }
-```
+### Registration & passwords: `/v1.0/user`
 
-| Exception | Meaning |
+| Method | Endpoint | Access | Input | Response |
+|---|---|---|---|---|
+| `POST` | `/register` | 🌐 | JSON `UserDto` `{ firstName, lastName, email, password, matchingPassword, isUsing2FA, role }` | `{ message: "success" }`, and sends the verification email |
+| `GET` | `/registrationConfirm` | 🔑 ⚠️ | `?token=` | `{ message: "success" \| "expired" \| "invalid" }` |
+| `GET` | `/resendRegistrationToken` | 🌐 | `?token=` (the old token) | Confirmation message, and emails a new token |
+| `POST` | `/resetPassword` | 🌐 | `?email=` | Confirmation message, and emails a reset link. Unknown email → `404` |
+| `GET` | `/changePassword` | 🌐 ⚠️ | `?id=&token=` | Should redirect to the update form, or to login on an invalid token |
+| `POST` | `/savePassword` | ⚠️ | form params `newPassword` | Success message |
+| `POST` | `/updatePassword` | ⚠️ | form params `oldPassword`, `newPassword` | Success message. Wrong old password → `400` |
+| `POST` | `/update/2fa` | 🔑 | `?use2FA=true\|false` | QR-code URL when enabling, `"Success"` when disabling |
+
+### User administration: `/v1.0/users`
+
+| Method | Endpoint | Access | Input | Response |
+|---|---|---|---|---|
+| `GET` | `/v1.0/users` | 🛡️ | `?page=0&size=10&sortBy=id&sortOrder=ASC` | Page of `UserResponce`. The `login` parameter is accepted but ignored |
+| `GET` | `/v1.0/users/by-name/{name}` | 👤 | path `name` | `UserResponce` |
+| `POST` | `/v1.0/users` | 🛡️ | JSON `UserResponce` | Created `UserResponce` |
+| `PUT` | `/v1.0/users` | 🛡️ | JSON `UserResponce` | Empty `200` |
+| `DELETE` | `/v1.0/users/{userId}` | 🛡️ | path `userId` | Empty `200` |
+| `GET` | `/v1.0/users/email-check` | 🛡️ | `?email=` | Uniqueness result (string) |
+| `GET` | `/v1.0/users/login-check` | 🛡️ | `?username=` | Uniqueness result (string) |
+
+### Roles: `/v1.0/roles`
+
+| Method | Endpoint | Access | Input | Response |
+|---|---|---|---|---|
+| `GET` | `/v1.0/roles` | 🛡️ | none | List of `RoleDto` `{ id, role, description, privileges }` |
+| `POST` | `/v1.0/roles` | 🛡️ | JSON `RoleDto` | Created `RoleDto` |
+| `PUT` | `/v1.0/roles/v1.0/roles` | 🛡️ ⚠️ | JSON `RoleDto` | Always `404` (not implemented) |
+| `DELETE` | `/v1.0/roles/{roleId}` | 🛡️ | path `roleId` | Empty `200`. Unknown role → `404` |
+
+### Images: `/v1.0/images`
+
+| Method | Endpoint | Access | Input | Response |
+|---|---|---|---|---|
+| `GET` | `/v1.0/images/{imageId}` | 👤 | path `imageId` | Image bytes. Falls back to the default image |
+| `GET` | `/v1.0/images/default` | 👤 | none | Default background image, or `404` |
+| `POST` | `/v1.0/images` | 🛡️ | multipart `file` | New image ID (string) |
+
+### Sessions: `/api/users`
+
+| Method | Endpoint | Access | Input | Response |
+|---|---|---|---|---|
+| `GET` | `/api/users/loggedUsers` | 🔑 | none | Usernames from the active-user store |
+| `GET` | `/api/users/loggedUsersFromSessionRegistry` | 🔑 | none | Users from the session registry |
+| `GET` | `/api/users/{userId}` | 🔑 | path `userId` | User data |
+
+### Errors
+
+Message endpoints return a `GenericResponse` envelope, `{ "message": "…", "error": "…" }`. `RestResponseEntityExceptionHandler` maps exceptions to status codes:
+
+| Exception | Status |
 |---|---|
-| `UserAlreadyExistsException` | Email is already registered |
-| `UserNotFoundException` | No account for the email given to `/resetPassword` |
-| `InvalidOldPasswordException` | The current password didn't match on `/updatePassword` |
+| Validation errors (`ConstraintViolationException`, invalid `@Valid` bodies) | `400` |
+| `InvalidOldPasswordException` | `400` |
+| `UserNotFoundException`, `RoleNotFoundException` | `404` |
+| `UserAlreadyExistException` | `409` |
+| `BadCredentialsException` | `503` |
+| Anything else | `500` |
 
 ---
 
@@ -289,4 +335,9 @@ The code currently differs from the intended behavior in these places:
 | Email links | point at the API endpoints | the verification link targets `/registrationConfirm.html` and the reset link targets `/user/changePassword` (no `/v1.0` prefix) |
 | Async email | `@Async` sending | sending is synchronous. There is no `@Async` or `@EnableAsync` |
 | Unverified users | denied access | `verified` is stored but not enforced |
+| `savePassword` / `updatePassword` | available to signed-in users | `@PreAuthorize("hasRole('READ_PRIVILEGE')")` requires the authority `ROLE_READ_PRIVILEGE`, but users only get their role names (`ROLE_USER`, `ROLE_ADMIN`). Both endpoints always return `403` |
+| `savePassword` principal | current user | casts the security principal to the domain `User`, but the JWT filter sets a Spring Security `User`, so it would fail with a `ClassCastException` |
+| `changePassword` redirect | HTTP redirect | the controller is a `@RestController`, so `"redirect:/…"` is sent back as plain text instead of a redirect |
+| Role update | `PUT /v1.0/roles` | the method mapping repeats the class prefix (`/v1.0/roles/v1.0/roles`), and the method is a stub that always returns `404` |
+| `/loggedUsers` admin rule | admin-only | `SecSecurityConfig` protects `/loggedUsers`, but the endpoint is `/api/users/loggedUsers`, so any signed-in user can call it |
 | JWT key | n/a | regenerated on every startup, so tokens don't survive a restart |

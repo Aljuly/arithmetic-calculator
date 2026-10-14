@@ -38,3 +38,6 @@ build/
 
 ### jqwik ###
 .jqwik-database
+
+### Office lock files ###
+~$*
